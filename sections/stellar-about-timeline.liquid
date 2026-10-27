@@ -1,0 +1,82 @@
+{% comment %}
+  Stellar About Timeline
+  Brand story timeline with year markers.
+  @concept-theme: section-type="custom-liquid"
+{% endcomment %}
+
+<section
+  class="{% if section.settings.color_scheme == 'dark' %}stellar-bg-dark{% elsif section.settings.color_scheme == 'deepspace' %}stellar-bg-deepspace{% elsif section.settings.color_scheme == 'light' %}stellar-bg-light{% elsif section.settings.color_scheme == 'sand' %}stellar-bg-sand{% elsif section.settings.color_scheme == 'skyblue' %}stellar-bg-skyblue{% endif %}{% if section.settings.bg_texture == 'stars' %} stellar-stars-bg{% elsif section.settings.bg_texture == 'constellation' %} stellar-constellation-bg{% elsif section.settings.bg_texture == 'nebula' %} stellar-nebula-gradient{% endif %}{% if section.settings.reveal_animation == 'fade_up' %} stellar-reveal{% elsif section.settings.reveal_animation == 'stagger' %} stellar-reveal-stagger{% endif %}"
+  style="{% if section.settings.section_height == 'full' %}min-height:100vh;{% endif %}padding-top:{{ section.settings.padding_top }}px;padding-bottom:{{ section.settings.padding_bottom }}px;{% if section.settings.color_scheme == 'custom' %}background-color:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+>
+  <div class="stellar-container" style="max-width:42rem;margin:0 auto;">
+    <h2 class="stellar-font-display" style="font-size:clamp(1.75rem,3vw,2.25rem);text-align:center;margin-bottom:3rem;">
+      {{ section.settings.heading }}
+    </h2>
+    <div style="display:flex;flex-direction:column;gap:2rem;">
+      {% for block in section.blocks %}
+        {% if block.type == 'milestone' %}
+          <div style="display:flex;gap:1.5rem;" {{ block.shopify_attributes }}>
+            <div class="stellar-font-display" style="color:var(--stellar-purple);font-size:1.25rem;width:4rem;flex-shrink:0;">
+              {{ block.settings.year }}
+            </div>
+            <div class="stellar-font-body" style="opacity:0.6;border-left:2px solid hsla(246,40%,57%,0.2);padding-left:1.5rem;padding-bottom:1rem;">
+              {{ block.settings.text }}
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <div style="max-width:42rem;margin:2rem auto 0;">
+      {% for block in section.blocks %}
+        {% if block.type == 'heading' or block.type == 'text' or block.type == 'button' or block.type == 'image' or block.type == 'badge' or block.type == 'divider' %}
+          {% render 'stellar-standard-block', block: block %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Stellar About Timeline",
+  "tag": "section",
+  "class": "stellar-about-timeline",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Our Story" },
+    { "type": "header", "content": "Layout & Style" },
+    { "type": "select", "id": "section_height", "label": "Section height", "options": [{ "value": "auto", "label": "Auto (content)" },{ "value": "full", "label": "Full viewport" }], "default": "auto" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 120, "step": 4, "default": 80, "unit": "px" },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 120, "step": 4, "default": 80, "unit": "px" },
+    { "type": "select", "id": "color_scheme", "label": "Color scheme", "options": [{ "value": "dark", "label": "Dark" },{ "value": "deepspace", "label": "Deep Space" },{ "value": "light", "label": "Light" },{ "value": "sand", "label": "Sand" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "custom", "label": "Custom" }], "default": "light" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_bg_color", "label": "Custom background", "default": "#F6F7F8" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_text_color", "label": "Custom text color", "default": "#222222" },
+    { "type": "select", "id": "bg_texture", "label": "Background texture", "options": [{ "value": "none", "label": "None" },{ "value": "stars", "label": "Stars" },{ "value": "constellation", "label": "Constellation" },{ "value": "nebula", "label": "Nebula" }], "default": "none" },
+    { "type": "select", "id": "reveal_animation", "label": "Scroll animation", "options": [{ "value": "none", "label": "None" },{ "value": "fade_up", "label": "Fade up" },{ "value": "stagger", "label": "Stagger children" }], "default": "none" }
+  ],
+  "blocks": [
+    { "type": "milestone", "name": "Milestone", "settings": [{ "type": "text", "id": "year", "label": "Year", "default": "2024" },{ "type": "textarea", "id": "text", "label": "Description", "default": "A major milestone for the brand." }] },
+    { "type": "heading", "name": "Heading", "settings": [{ "type": "text", "id": "text", "label": "Heading text", "default": "Heading" },{ "type": "select", "id": "size", "label": "Size", "options": [{ "value": "h2", "label": "Large" },{ "value": "h3", "label": "Medium" },{ "value": "h4", "label": "Small" }], "default": "h3" }] },
+    { "type": "text", "name": "Text", "settings": [{ "type": "richtext", "id": "content", "label": "Text" }] },
+    { "type": "button", "name": "Button", "settings": [{ "type": "text", "id": "text", "label": "Button text", "default": "Learn More" },{ "type": "url", "id": "url", "label": "Link" },{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "primary", "label": "Primary" },{ "value": "outline", "label": "Outline" }], "default": "primary" }] },
+    { "type": "image", "name": "Image", "settings": [{ "type": "image_picker", "id": "image", "label": "Image" },{ "type": "text", "id": "alt", "label": "Alt text" }] },
+    { "type": "badge", "name": "Badge", "settings": [{ "type": "text", "id": "label", "label": "Label", "default": "New" },{ "type": "select", "id": "color", "label": "Color", "options": [{ "value": "green", "label": "Green" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "purple", "label": "Purple" },{ "value": "gold", "label": "Gold" }], "default": "skyblue" }] },
+    { "type": "divider", "name": "Divider", "settings": [{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "line", "label": "Line" },{ "value": "space", "label": "Space" },{ "value": "dotted", "label": "Dotted" }], "default": "line" },{ "type": "range", "id": "spacing", "label": "Spacing", "min": 1, "max": 6, "step": 1, "default": 2, "unit": "rem" }] }
+  ],
+  "enabled_on": {
+    "templates": ["page"]
+  },
+  "presets": [
+    {
+      "name": "Stellar About Timeline",
+      "blocks": [
+        { "type": "milestone", "settings": { "year": "2022", "text": "Founder forgets Lactaid at the ice cream shop — the lightbulb moment." } },
+        { "type": "milestone", "settings": { "year": "2023", "text": "Partners with Dr. Michael Seidman to develop breakthrough lactase formula." } },
+        { "type": "milestone", "settings": { "year": "2024", "text": "Milky launches and earns NSF certification within 6 months." } },
+        { "type": "milestone", "settings": { "year": "2025", "text": "45,000+ customers, NYT feature, TikTok virality with 334K+ likes." } },
+        { "type": "milestone", "settings": { "year": "2026", "text": "Stellar brand launches with Nova product line expansion." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

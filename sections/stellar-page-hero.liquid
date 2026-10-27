@@ -1,0 +1,140 @@
+{% comment %}
+  Stellar Page Hero
+  Reusable dark cosmic hero with heading, subheading, and optional search bar.
+  @concept-theme: section-type="image-banner" | block-type="heading,text"
+{% endcomment %}
+
+<section
+  class="{% if section.settings.color_scheme == 'dark' %}stellar-bg-dark{% elsif section.settings.color_scheme == 'deepspace' %}stellar-bg-deepspace{% elsif section.settings.color_scheme == 'light' %}stellar-bg-light{% elsif section.settings.color_scheme == 'sand' %}stellar-bg-sand{% elsif section.settings.color_scheme == 'skyblue' %}stellar-bg-skyblue{% endif %}{% if section.settings.bg_texture == 'stars' %} stellar-stars-bg{% elsif section.settings.bg_texture == 'constellation' %} stellar-constellation-bg{% elsif section.settings.bg_texture == 'nebula' %} stellar-nebula-gradient{% endif %}{% if section.settings.reveal_animation == 'fade_up' %} stellar-reveal{% elsif section.settings.reveal_animation == 'stagger' %} stellar-reveal-stagger{% endif %}"
+  style="position:relative;padding:{{ section.settings.padding_top }}rem 0 {{ section.settings.padding_bottom }}rem;{% if section.settings.color_scheme == 'custom' %}background:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+>
+  <!-- Background image (z-index:1) -->
+  {% if section.settings.hero_image != blank %}
+    <img src="{{ section.settings.hero_image | image_url: width: 1920 }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;" loading="eager" aria-hidden="true">
+  {% endif %}
+
+  <!-- Overlay (z-index:2, always above image) -->
+  <div style="position:absolute;inset:0;z-index:2;background:{{ section.settings.overlay_color }};opacity:{{ section.settings.overlay_opacity | divided_by: 100.0 }};"></div>
+
+  <div class="stellar-container" style="position:relative;z-index:3;text-align:center;max-width:42rem;margin:0 auto;">
+    {% if section.settings.eyebrow != blank %}
+      <p class="stellar-eyebrow" style="{% if section.settings.eyebrow_color != blank and section.settings.eyebrow_color != 'rgba(0,0,0,0)' %}color:{{ section.settings.eyebrow_color }};{% else %}color:var(--stellar-skyblue);{% endif %}margin-bottom:0.75rem;">{{ section.settings.eyebrow }}</p>
+    {% endif %}
+
+    {% if section.settings.heading != blank %}
+      {%- liquid
+        assign processed_heading = section.settings.heading
+
+        if section.settings.line_break_after != blank
+          assign break_marker = section.settings.line_break_after
+          assign heading_parts = processed_heading | split: break_marker
+          if heading_parts.size > 1
+            assign line_1 = heading_parts | first | append: break_marker
+            assign line_2_parts = heading_parts | slice: 1, heading_parts.size
+            assign line_2 = line_2_parts | join: break_marker
+            assign processed_heading = line_1 | append: '<span class="stellar-heading-line-2">' | append: line_2 | append: '</span>'
+          endif
+        endif
+
+        if section.settings.highlight_text != blank
+          assign hl_text = section.settings.highlight_text
+          assign hl_weight = section.settings.highlight_weight | default: 'inherit'
+          assign hl_color = section.settings.highlight_color | default: 'inherit'
+          assign hl_open = '<span class="stellar-heading-highlight" style="--stellar-highlight-weight:' | append: hl_weight | append: ';--stellar-highlight-color:' | append: hl_color | append: ';">'
+          assign hl_close = '</span>'
+          assign hl_replacement = hl_open | append: hl_text | append: hl_close
+          assign processed_heading = processed_heading | replace: hl_text, hl_replacement
+        endif
+      -%}
+      <h1 class="stellar-font-display" style="font-size:clamp(2rem,5vw,3.5rem);margin-bottom:1rem;{% if section.settings.heading_color != blank and section.settings.heading_color != 'rgba(0,0,0,0)' %}color:{{ section.settings.heading_color }};{% endif %}">
+        {{ processed_heading }}
+      </h1>
+    {% endif %}
+
+    {% if section.settings.subheading != blank %}
+      <p class="stellar-font-body" style="opacity:0.6;max-width:32rem;margin:0 auto 1rem;{% if section.settings.subheading_color != blank and section.settings.subheading_color != 'rgba(0,0,0,0)' %}color:{{ section.settings.subheading_color }};opacity:1;{% endif %}">
+        {{ section.settings.subheading }}
+      </p>
+    {% endif %}
+    {% if section.settings.stat_text != blank %}
+      <p class="stellar-font-body" style="font-size:0.875rem;{% if section.settings.eyebrow_color != blank and section.settings.eyebrow_color != 'rgba(0,0,0,0)' %}color:{{ section.settings.eyebrow_color }};{% else %}color:var(--stellar-skyblue);{% endif %}">{{ section.settings.stat_text }}</p>
+    {% endif %}
+
+    {% if section.settings.show_search %}
+      <div style="position:relative;max-width:28rem;margin:2rem auto 0;">
+        <svg style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);opacity:0.3;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="{{ section.settings.search_placeholder }}"
+          style="width:100%;border-radius:0.75rem;background:hsla(0,0%,100%,0.05);border:1px solid hsla(0,0%,100%,0.1);padding:0.75rem 1rem 0.75rem 2.75rem;color:inherit;font-size:0.875rem;"
+          class="stellar-font-body" />
+      </div>
+    {% endif %}
+
+    {% for block in section.blocks %}
+      {% if block.type == 'button' %}
+        <div style="margin-top:2rem;" {{ block.shopify_attributes }}>
+          <a href="{{ block.settings.url }}" class="stellar-font-body stellar-hover-lift" style="display:inline-block;padding:0.75rem 2rem;border-radius:0.5rem;{% if block.settings.style == 'primary' %}background:rgb(var(--color-base-button));color:rgb(var(--color-base-button-text));{% else %}border:1px solid currentColor;color:inherit;background:transparent;{% endif %}font-weight:500;text-decoration:none;">
+            {{ block.settings.text }}
+          </a>
+        </div>
+      {% elsif block.type == 'heading' or block.type == 'text' or block.type == 'image' or block.type == 'badge' or block.type == 'divider' %}
+        {% render 'stellar-standard-block', block: block %}
+      {% endif %}
+    {% endfor %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Stellar Page Hero",
+  "tag": "section",
+  "class": "stellar-page-hero",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow text" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Page Title" },
+    { "type": "text", "id": "subheading", "label": "Subheading" },
+    { "type": "text", "id": "stat_text", "label": "Stat/trust line" },
+    { "type": "header", "content": "Heading split and highlight" },
+    { "type": "text", "id": "line_break_after", "label": "Line break after", "info": "Enter the last word(s) before the line break. Everything after wraps to a second line." },
+    { "type": "text", "id": "highlight_text", "label": "Highlight text", "info": "Enter the exact text to highlight. Styled with the weight and color below." },
+    { "type": "select", "id": "highlight_weight", "options": [{ "value": "inherit", "label": "Inherit" },{ "value": "300", "label": "Light" },{ "value": "400", "label": "Regular" },{ "value": "700", "label": "Bold" }], "default": "inherit", "label": "Highlight font weight" },
+    { "type": "color", "id": "highlight_color", "label": "Highlight color", "default": "#655DC6" },
+    { "type": "header", "content": "Text colors" },
+    { "type": "paragraph", "content": "Leave blank to inherit from the color scheme. Set explicitly to override." },
+    { "type": "color", "id": "heading_color", "label": "Heading color" },
+    { "type": "color", "id": "subheading_color", "label": "Subheading color" },
+    { "type": "color", "id": "eyebrow_color", "label": "Eyebrow and stat color" },
+    { "type": "header", "content": "Background" },
+    { "type": "image_picker", "id": "hero_image", "label": "Background image" },
+    { "type": "color", "id": "overlay_color", "label": "Overlay color", "default": "#22162B" },
+    { "type": "range", "id": "overlay_opacity", "label": "Overlay opacity", "min": 0, "max": 100, "step": 5, "default": 80, "unit": "%" },
+    { "type": "header", "content": "Search" },
+    { "type": "checkbox", "id": "show_search", "label": "Show search bar", "default": false },
+    { "type": "text", "id": "search_placeholder", "label": "Search placeholder", "default": "Search questions..." },
+    { "type": "header", "content": "Layout & Style" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 12, "step": 1, "default": 7, "unit": "rem" },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 12, "step": 1, "default": 7, "unit": "rem" },
+    { "type": "select", "id": "color_scheme", "label": "Color scheme", "options": [{ "value": "dark", "label": "Dark" },{ "value": "deepspace", "label": "Deep Space" },{ "value": "light", "label": "Light" },{ "value": "sand", "label": "Sand" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "custom", "label": "Custom" }], "default": "dark" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_bg_color", "label": "Custom background", "default": "#222222" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_text_color", "label": "Custom text", "default": "#F6F7F8" },
+    { "type": "select", "id": "bg_texture", "label": "Background texture", "options": [{ "value": "none", "label": "None" },{ "value": "stars", "label": "Stars" },{ "value": "constellation", "label": "Constellation" },{ "value": "nebula", "label": "Nebula" }], "default": "stars" },
+    { "type": "select", "id": "reveal_animation", "label": "Scroll animation", "options": [{ "value": "none", "label": "None" },{ "value": "fade_up", "label": "Fade up" },{ "value": "stagger", "label": "Stagger children" }], "default": "none" }
+  ],
+  "blocks": [
+    { "type": "button", "name": "Button", "settings": [{ "type": "text", "id": "text", "label": "Button text", "default": "Learn More" },{ "type": "url", "id": "url", "label": "Button link" },{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "primary", "label": "Primary (filled)" },{ "value": "outline", "label": "Outline" }], "default": "primary" }] },
+    { "type": "heading", "name": "Heading", "settings": [{ "type": "text", "id": "text", "label": "Text", "default": "Heading" },{ "type": "select", "id": "size", "label": "Size", "options": [{ "value": "h2", "label": "Large" },{ "value": "h3", "label": "Medium" },{ "value": "h4", "label": "Small" }], "default": "h3" }] },
+    { "type": "text", "name": "Text", "settings": [{ "type": "richtext", "id": "content", "label": "Content", "default": "<p>Body text</p>" }] },
+    { "type": "image", "name": "Image", "settings": [{ "type": "image_picker", "id": "image", "label": "Image" },{ "type": "text", "id": "alt", "label": "Alt text", "default": "Image" }] },
+    { "type": "badge", "name": "Badge", "settings": [{ "type": "text", "id": "label", "label": "Label", "default": "New" },{ "type": "select", "id": "color", "label": "Color", "options": [{ "value": "green", "label": "Green" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "purple", "label": "Purple" },{ "value": "gold", "label": "Gold" }], "default": "skyblue" }] },
+    { "type": "divider", "name": "Divider", "settings": [{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "line", "label": "Line" },{ "value": "space", "label": "Space" },{ "value": "dotted", "label": "Dotted" }], "default": "line" },{ "type": "range", "id": "spacing", "label": "Spacing", "min": 1, "max": 6, "step": 1, "default": 2, "unit": "rem" }] }
+  ],
+  "enabled_on": {
+    "templates": ["page"]
+  },
+  "presets": [
+    {
+      "name": "Stellar Page Hero",
+      "settings": { "heading": "Page Title", "subheading": "Page description goes here." }
+    }
+  ]
+}
+{% endschema %}

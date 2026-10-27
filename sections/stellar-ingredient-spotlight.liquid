@@ -1,0 +1,236 @@
+{% comment %}
+  Stellar Ingredient Spotlight
+  Feature-style ingredient cards with icon or image mode.
+  @concept-theme: section-type="multicolumn" | block-type="image,heading,text"
+{% endcomment %}
+
+<section
+  class="{% if section.settings.color_scheme == 'dark' %}stellar-bg-dark{% elsif section.settings.color_scheme == 'deepspace' %}stellar-bg-deepspace{% elsif section.settings.color_scheme == 'light' %}stellar-bg-light{% elsif section.settings.color_scheme == 'sand' %}stellar-bg-sand{% elsif section.settings.color_scheme == 'skyblue' %}stellar-bg-skyblue{% endif %}{% if section.settings.bg_texture == 'stars' %} stellar-stars-bg{% elsif section.settings.bg_texture == 'constellation' %} stellar-constellation-bg{% elsif section.settings.bg_texture == 'nebula' %} stellar-nebula-gradient{% endif %}{% if section.settings.reveal_animation == 'fade_up' %} stellar-reveal{% elsif section.settings.reveal_animation == 'stagger' %} stellar-reveal-stagger{% endif %}"
+  style="padding:{{ section.settings.padding_top }}rem 0 {{ section.settings.padding_bottom }}rem;{% if section.settings.color_scheme == 'custom' %}background:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+>
+  <div class="stellar-container" style="text-align:center;">
+    {% if section.settings.eyebrow != blank %}
+      <p class="stellar-eyebrow" style="color:var(--stellar-purple);margin-bottom:0.75rem;">{{ section.settings.eyebrow }}</p>
+    {% endif %}
+    {% if section.settings.heading != blank %}
+      {%- liquid
+        assign processed_heading = section.settings.heading
+
+        if section.settings.line_break_after != blank
+          assign break_marker = section.settings.line_break_after
+          assign heading_parts = processed_heading | split: break_marker
+          if heading_parts.size > 1
+            assign line_1 = heading_parts | first | append: break_marker
+            assign line_2_parts = heading_parts | slice: 1, heading_parts.size
+            assign line_2 = line_2_parts | join: break_marker
+            assign processed_heading = line_1 | append: '<span class="stellar-heading-line-2">' | append: line_2 | append: '</span>'
+          endif
+        endif
+
+        if section.settings.highlight_text != blank
+          assign hl_text = section.settings.highlight_text
+          assign hl_weight = section.settings.highlight_weight | default: 'inherit'
+          assign hl_color = section.settings.highlight_color | default: 'inherit'
+          assign hl_open = '<span class="stellar-heading-highlight" style="--stellar-highlight-weight:' | append: hl_weight | append: ';--stellar-highlight-color:' | append: hl_color | append: ';">'
+          assign hl_close = '</span>'
+          assign hl_replacement = hl_open | append: hl_text | append: hl_close
+          assign processed_heading = processed_heading | replace: hl_text, hl_replacement
+        endif
+      -%}
+      <h2 class="stellar-font-display" style="font-size:clamp(1.75rem,3vw,2.5rem);margin-bottom:0.5rem;">
+        {{ processed_heading }}
+      </h2>
+    {% endif %}
+    {% if section.settings.subheading != blank %}
+      <p class="stellar-font-body" style="opacity:0.6;margin-bottom:3rem;">{{ section.settings.subheading }}</p>
+    {% elsif section.settings.heading != blank %}
+      <div style="margin-bottom:3rem;"></div>
+    {% endif %}
+  </div>
+
+<div class="stellar-container">
+  <div class="stellar-ingredients-grid{% if section.settings.mobile_scroll %} stellar-ingredients-scroll{% endif %}" style="display:grid;gap:1.5rem;">
+    {% for block in section.blocks %}
+      {% if block.type == 'ingredient' %}
+        <div {{ block.shopify_attributes }} class="stellar-hover-lift stellar-ingredient-card" style="border-radius:1rem;overflow:hidden;{% if section.settings.color_scheme == 'dark' or section.settings.color_scheme == 'deepspace' %}border:1px solid hsla(0,0%,100%,0.08);background:hsla(0,0%,100%,0.04);{% else %}border:1px solid hsla(0,0%,13%,0.05);background:var(--stellar-offwhite);box-shadow:0 1px 3px hsla(0,0%,0%,0.05);{% endif %}">
+
+          {%- if block.settings.media_type == 'image' and block.settings.image != blank -%}
+            {%- comment -%} Full-width image mode {%- endcomment -%}
+            <div class="stellar-img-zoom" style="aspect-ratio:4/3;overflow:hidden;">
+              <img
+                src="{{ block.settings.image | image_url: width: 600 }}"
+                srcset="{{ block.settings.image | image_url: width: 300 }} 300w, {{ block.settings.image | image_url: width: 600 }} 600w"
+                sizes="(max-width: 768px) 100vw, 400px"
+                alt="{{ block.settings.image.alt | default: block.settings.name | escape }}"
+                style="width:100%;height:100%;object-fit:cover;"
+                loading="lazy"
+              >
+            </div>
+          {%- else -%}
+            {%- comment -%} Icon mode {%- endcomment -%}
+            <div style="padding:2rem 1.5rem 0;display:flex;justify-content:center;">
+              <div style="width:4rem;height:4rem;border-radius:50%;{% if section.settings.color_scheme == 'dark' or section.settings.color_scheme == 'deepspace' %}background:hsla(246,40%,57%,0.15);border:1px solid hsla(246,40%,57%,0.2);{% else %}background:linear-gradient(135deg, hsla(246,40%,57%,0.1), hsla(211,60%,79%,0.08));border:1px solid hsla(0,0%,13%,0.05);{% endif %}display:flex;align-items:center;justify-content:center;">
+                {%- case block.settings.icon -%}
+                  {%- when 'molecule' -%}
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--stellar-purple)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="5" r="2"/><circle cx="12" cy="21" r="2"/><line x1="14.5" y1="10" x2="17.5" y2="6.5"/><line x1="9.5" y1="10" x2="6.5" y2="6.5"/><line x1="12" y1="15" x2="12" y2="19"/></svg>
+                  {%- when 'shield' -%}
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--stellar-purple)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                  {%- when 'leaf' -%}
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--stellar-green)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75"/></svg>
+                  {%- when 'check' -%}
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--stellar-green)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  {%- when 'flask' -%}
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--stellar-skyblue)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v7l5 8.5a2 2 0 0 1-1.73 3H5.73A2 2 0 0 1 4 18.5L9 10V3z"/><line x1="9" y1="3" x2="15" y2="3"/></svg>
+                  {%- when 'droplet' -%}
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--stellar-skyblue)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                  {%- else -%}
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--stellar-purple)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                {%- endcase -%}
+              </div>
+            </div>
+          {%- endif -%}
+
+          {%- comment -%} Card content {%- endcomment -%}
+          <div style="padding:1.5rem;text-align:center;">
+            {% if block.settings.name != blank %}
+              <h3 class="stellar-font-display" style="font-size:1.125rem;margin-bottom:0.25rem;">{{ block.settings.name }}</h3>
+            {% endif %}
+            {% if block.settings.fact != blank %}
+              <p class="stellar-font-body" style="color:{% if section.settings.caption_color != blank and section.settings.caption_color != 'rgba(0,0,0,0)' %}{{ section.settings.caption_color }}{% else %}var(--stellar-skyblue){% endif %};font-size:0.75rem;font-weight:500;margin-bottom:1rem;">{{ block.settings.fact }}</p>
+            {% endif %}
+            {% if block.settings.description != blank %}
+              <div class="stellar-font-body" style="font-size:0.875rem;{% if section.settings.caption_color != blank and section.settings.caption_color != 'rgba(0,0,0,0)' %}color:{{ section.settings.caption_color }};{% else %}opacity:0.6;{% endif %}line-height:1.6;">
+                {{ block.settings.description }}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+      {% elsif block.type == 'nothing_else' %}
+        <div {{ block.shopify_attributes }} class="stellar-hover-lift stellar-ingredient-card" style="border-radius:1rem;overflow:hidden;border:1px solid hsla(142,70%,45%,0.2);background:hsla(142,70%,45%,0.05);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2.5rem 1.5rem;">
+          <div style="width:4rem;height:4rem;border-radius:50%;border:2px solid hsla(142,70%,45%,0.3);display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--stellar-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          {% if block.settings.heading != blank %}
+            <h3 class="stellar-font-display" style="font-size:1.125rem;margin-bottom:0.75rem;">{{ block.settings.heading }}</h3>
+          {% endif %}
+          {% if block.settings.body != blank %}
+            <p class="stellar-font-body" style="font-size:0.875rem;opacity:0.6;line-height:1.6;">{{ block.settings.body }}</p>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+  </div>
+
+  <div class="stellar-container" style="max-width:48rem;margin:2rem auto 0;text-align:center;">
+    {% for block in section.blocks %}
+      {% if block.type == 'heading' or block.type == 'text' or block.type == 'button' or block.type == 'image' or block.type == 'badge' or block.type == 'divider' %}
+        {% render 'stellar-standard-block', block: block %}
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <style>
+    .stellar-ingredients-grid {
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 600px) {
+      .stellar-ingredients-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (min-width: 960px) {
+      .stellar-ingredients-grid {
+        grid-template-columns: repeat({{ section.settings.columns }}, 1fr);
+      }
+    }
+    /* Mobile horizontal scroll when enabled */
+    @media (max-width: 599px) {
+      .stellar-ingredients-scroll {
+        display: flex !important;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+        gap: 1rem;
+        padding-bottom: 0.5rem;
+      }
+      .stellar-ingredients-scroll > * {
+        flex: 0 0 80%;
+        min-width: 260px;
+        max-width: 320px;
+        scroll-snap-align: start;
+      }
+      .stellar-ingredients-scroll::-webkit-scrollbar { display: none; }
+      .stellar-ingredients-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+    }
+  </style>
+</section>
+
+{% schema %}
+{
+  "name": "Stellar Ingredients",
+  "tag": "section",
+  "class": "stellar-ingredient-spotlight",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Radical Transparency" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "What's Inside" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "One active ingredient. Nothing to hide." },
+    { "type": "header", "content": "Heading split and highlight" },
+    { "type": "text", "id": "line_break_after", "label": "Line break after", "info": "Enter the last word(s) before the line break. Everything after wraps to a second line." },
+    { "type": "text", "id": "highlight_text", "label": "Highlight text", "info": "Enter the exact text to highlight. Styled with the weight and color below." },
+    { "type": "select", "id": "highlight_weight", "options": [{ "value": "inherit", "label": "Inherit" },{ "value": "300", "label": "Light" },{ "value": "400", "label": "Regular" },{ "value": "700", "label": "Bold" }], "default": "inherit", "label": "Highlight font weight" },
+    { "type": "color", "id": "highlight_color", "label": "Highlight color", "default": "#655DC6" },
+    { "type": "header", "content": "Layout" },
+    { "type": "select", "id": "columns", "label": "Columns (desktop)", "options": [{ "value": "2", "label": "2" }, { "value": "3", "label": "3" }, { "value": "4", "label": "4" }], "default": "3" },
+    { "type": "checkbox", "id": "mobile_scroll", "label": "Horizontal scroll on mobile", "default": false, "info": "Cards scroll horizontally on mobile instead of stacking vertically." },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 12, "step": 1, "default": 5, "unit": "rem" },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 12, "step": 1, "default": 5, "unit": "rem" },
+    { "type": "header", "content": "Style" },
+    { "type": "select", "id": "color_scheme", "label": "Color scheme", "options": [{ "value": "dark", "label": "Dark" },{ "value": "deepspace", "label": "Deep Space" },{ "value": "light", "label": "Light" },{ "value": "sand", "label": "Sand" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "custom", "label": "Custom" }], "default": "sand" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_bg_color", "label": "Custom background", "default": "#E5DDD3" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_text_color", "label": "Custom text", "default": "#222222" },
+    { "type": "color", "id": "caption_color", "label": "Caption text color", "info": "Applies to the key fact and description on ingredient cards. Leave blank to use defaults." },
+    { "type": "select", "id": "bg_texture", "label": "Background texture", "options": [{ "value": "none", "label": "None" },{ "value": "stars", "label": "Stars" },{ "value": "constellation", "label": "Constellation" },{ "value": "nebula", "label": "Nebula" }], "default": "none" },
+    { "type": "select", "id": "reveal_animation", "label": "Scroll animation", "options": [{ "value": "none", "label": "None" },{ "value": "fade_up", "label": "Fade up" },{ "value": "stagger", "label": "Stagger children" }], "default": "none" }
+  ],
+  "blocks": [
+    { "type": "ingredient", "name": "Ingredient", "settings": [
+      { "type": "select", "id": "media_type", "label": "Media type", "options": [{ "value": "icon", "label": "Icon" }, { "value": "image", "label": "Image" }], "default": "icon" },
+      { "type": "select", "id": "icon", "label": "Icon", "info": "Used when media type is Icon", "options": [
+        { "value": "molecule", "label": "Molecule" },
+        { "value": "shield", "label": "Shield" },
+        { "value": "leaf", "label": "Leaf" },
+        { "value": "check", "label": "Check" },
+        { "value": "flask", "label": "Flask" },
+        { "value": "droplet", "label": "Droplet" }
+      ], "default": "molecule" },
+      { "type": "image_picker", "id": "image", "label": "Image", "info": "Used when media type is Image" },
+      { "type": "text", "id": "name", "label": "Name", "default": "Pure Lactase Enzyme" },
+      { "type": "text", "id": "fact", "label": "Key fact", "default": "10,800–21,000 FCC units per tablet" },
+      { "type": "richtext", "id": "description", "label": "Description" }
+    ] },
+    { "type": "nothing_else", "name": "Nothing Else Card", "settings": [{ "type": "text", "id": "heading", "label": "Heading", "default": "Nothing Else" },{ "type": "textarea", "id": "body", "label": "Body text", "default": "No artificial sweeteners. No fillers. No heavy metals. Just the enzyme your body needs." }] },
+    { "type": "heading", "name": "Heading", "settings": [{ "type": "text", "id": "text", "label": "Text", "default": "Heading" },{ "type": "select", "id": "size", "label": "Size", "options": [{ "value": "h2", "label": "Large" },{ "value": "h3", "label": "Medium" },{ "value": "h4", "label": "Small" }], "default": "h3" }] },
+    { "type": "text", "name": "Text", "settings": [{ "type": "richtext", "id": "content", "label": "Content", "default": "<p>Body text</p>" }] },
+    { "type": "button", "name": "Button", "settings": [{ "type": "text", "id": "text", "label": "Label", "default": "Learn More" },{ "type": "url", "id": "url", "label": "Link" },{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "primary", "label": "Primary" },{ "value": "outline", "label": "Outline" }], "default": "primary" }] },
+    { "type": "image", "name": "Image", "settings": [{ "type": "image_picker", "id": "image", "label": "Image" },{ "type": "text", "id": "alt", "label": "Alt text", "default": "Image" }] },
+    { "type": "badge", "name": "Badge", "settings": [{ "type": "text", "id": "label", "label": "Label", "default": "New" },{ "type": "select", "id": "color", "label": "Color", "options": [{ "value": "green", "label": "Green" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "purple", "label": "Purple" },{ "value": "gold", "label": "Gold" }], "default": "skyblue" }] },
+    { "type": "divider", "name": "Divider", "settings": [{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "line", "label": "Line" },{ "value": "space", "label": "Space" },{ "value": "dotted", "label": "Dotted" }], "default": "line" },{ "type": "range", "id": "spacing", "label": "Spacing", "min": 1, "max": 6, "step": 1, "default": 2, "unit": "rem" }] }
+  ],
+  "enabled_on": {
+    "templates": ["index"]
+  },
+  "presets": [
+    {
+      "name": "Stellar Ingredients",
+      "blocks": [
+        { "type": "ingredient", "settings": { "media_type": "icon", "icon": "molecule", "name": "Pure Lactase Enzyme", "fact": "10,800–21,000 FCC units per tablet" } },
+        { "type": "ingredient", "settings": { "media_type": "icon", "icon": "flask", "name": "Calcium Carbonate", "fact": "Inactive ingredient" } },
+        { "type": "ingredient", "settings": { "media_type": "icon", "icon": "leaf", "name": "Microcrystalline Cellulose", "fact": "Tablet binder" } },
+        { "type": "nothing_else", "settings": { "heading": "Nothing Else", "body": "No artificial sweeteners. No fillers. No heavy metals. Just the enzyme your body needs." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

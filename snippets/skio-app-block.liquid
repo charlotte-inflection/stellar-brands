@@ -1,0 +1,49 @@
+{% comment %}
+  Renders the Skio subscription plan picker in a product detail section.
+  Usage:
+    {% when 'skio-plan-picker' %}
+      {% render 'skio-app-block', block: block, product: product %}
+{% endcomment %}
+
+{%- assign skioSellingPlanGroups = product.selling_plan_groups | where: 'app_id', 'SKIO' -%}
+{%- assign skioRender = false -%}
+{%- if product.available and skioSellingPlanGroups.size > 0 -%}
+  {%- assign skioRender = true -%}
+{%- endif -%}
+
+{% if skioRender %}
+  <style>
+    skio-plan-picker {
+      --skio-group-border-radius: {{ block.settings.group_border_radius }}px;
+      --skio-group-border-width: {{ block.settings.group_border_width }}px;
+      --skio-group-border-color: {{ block.settings.group_border_color }};
+      --skio-group-border-selected-color: {{ block.settings.group_border_selected_color }};
+      --skio-group-background-color: {{ block.settings.group_background_color }};
+      --skio-group-background-selected-color: {{ block.settings.selected_group_background_color }};
+      --skio-group-text-color: {{ block.settings.group_text_color }};
+      --skio-group-text-selected-color: {{ block.settings.group_selected_text_color }};
+      --skio-discount-color: {{ block.settings.discount_color }};
+      --skio-discount-text-color: {{ block.settings.discount_text_color }};
+      --skio-button-plan-selector-width: {{ block.settings.button_plan_selector_width }};
+    }
+  </style>
+
+  <{{ block.settings.element_name }}
+    key='{{ block.id }}'
+    options='{{ block.settings | json | escape }}'
+    layout='{{ block.settings.layout }}'
+
+    {% if settings.currency_code_enabled %}
+      moneyFormat='{{ shop.money_with_currency_format }}'
+    {% else %}
+      moneyFormat='{{ shop.money_format }}'
+    {% endif %}
+
+    product='{{ product | json | escape }}'
+    selectedVariant='{{ product.selected_or_first_available_variant | json | escape }}'
+  >
+    <input type='hidden' name='selling_plan' form='{{ block.settings.form_id }}'>
+  </{{ block.settings.element_name }}>
+
+  <script src='{{ 'skio-plan-picker-component.js' | asset_url }}' type='module'></script>
+{% endif %}

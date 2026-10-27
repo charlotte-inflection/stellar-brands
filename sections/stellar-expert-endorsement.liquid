@@ -1,0 +1,135 @@
+{% comment %}
+  Stellar Expert Endorsement
+  Doctor/expert quote with avatar on dark star-field background.
+  @concept-theme: section-type="image-with-text"
+{% endcomment %}
+
+<section
+  class="{% if section.settings.color_scheme == 'dark' %}stellar-bg-dark{% elsif section.settings.color_scheme == 'deepspace' %}stellar-bg-deepspace{% elsif section.settings.color_scheme == 'light' %}stellar-bg-light{% elsif section.settings.color_scheme == 'sand' %}stellar-bg-sand{% elsif section.settings.color_scheme == 'skyblue' %}stellar-bg-skyblue{% endif %}{% if section.settings.bg_texture == 'stars' %} stellar-stars-bg{% elsif section.settings.bg_texture == 'constellation' %} stellar-constellation-bg{% elsif section.settings.bg_texture == 'nebula' %} stellar-nebula-gradient{% endif %}{% if section.settings.reveal_animation == 'fade_up' %} stellar-reveal{% elsif section.settings.reveal_animation == 'stagger' %} stellar-reveal-stagger{% endif %}"
+  style="padding-top:{{ section.settings.padding_top }}px;padding-bottom:{{ section.settings.padding_bottom }}px;{% if section.settings.color_scheme == 'custom' %}background-color:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+>
+  <div class="stellar-container" style="max-width:56rem;">
+    {% if section.settings.heading != blank %}
+      {%- liquid
+        assign processed_heading = section.settings.heading
+
+        if section.settings.line_break_after != blank
+          assign break_marker = section.settings.line_break_after
+          assign heading_parts = processed_heading | split: break_marker
+          if heading_parts.size > 1
+            assign line_1 = heading_parts | first | append: break_marker
+            assign line_2_parts = heading_parts | slice: 1, heading_parts.size
+            assign line_2 = line_2_parts | join: break_marker
+            assign processed_heading = line_1 | append: '<span class="stellar-heading-line-2">' | append: line_2 | append: '</span>'
+          endif
+        endif
+
+        if section.settings.highlight_text != blank
+          assign hl_text = section.settings.highlight_text
+          assign hl_weight = section.settings.highlight_weight | default: 'inherit'
+          assign hl_color = section.settings.highlight_color | default: 'inherit'
+          assign hl_open = '<span class="stellar-heading-highlight" style="--stellar-highlight-weight:' | append: hl_weight | append: ';--stellar-highlight-color:' | append: hl_color | append: ';">'
+          assign hl_close = '</span>'
+          assign hl_replacement = hl_open | append: hl_text | append: hl_close
+          assign processed_heading = processed_heading | replace: hl_text, hl_replacement
+        endif
+      -%}
+      <h2 class="stellar-font-display" style="font-size:clamp(1.75rem,3vw,2.5rem);color:var(--stellar-offwhite);text-align:center;margin-bottom:4rem;">
+        {{ processed_heading }}
+      </h2>
+    {% endif %}
+
+    {% for block in section.blocks %}
+      {% if block.type == 'endorsement' %}
+        <div {{ block.shopify_attributes }} style="display:flex;flex-direction:column;align-items:center;gap:2rem;margin-bottom:3rem;text-align:center;" class="stellar-endorsement-row">
+          <div style="flex-shrink:0;">
+            {% if block.settings.avatar != blank %}
+              <img src="{{ block.settings.avatar | image_url: width: 128 }}" alt="{{ block.settings.name }}" style="width:8rem;height:8rem;border-radius:50%;border:1px solid hsla(0,0%,100%,0.1);object-fit:cover;" loading="lazy">
+            {% else %}
+              <div style="width:8rem;height:8rem;border-radius:50%;background:linear-gradient(135deg, hsla(0,0%,100%,0.1), hsla(0,0%,100%,0.05));border:1px solid hsla(0,0%,100%,0.1);"></div>
+            {% endif %}
+          </div>
+          <div>
+            <blockquote class="stellar-font-body" style="color:hsla(0,0%,96%,0.9);font-size:clamp(1rem,2vw,1.25rem);font-style:italic;line-height:1.75;margin-bottom:1.5rem;">
+              &ldquo;{{ block.settings.quote }}&rdquo;
+            </blockquote>
+            <p class="stellar-font-body" style="color:var(--stellar-offwhite);font-weight:500;font-size:0.875rem;">{{ block.settings.name }}</p>
+            <p class="stellar-font-body" style="color:hsla(0,0%,96%,0.4);font-size:0.75rem;margin-top:0.25rem;">{{ block.settings.title }}</p>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+
+    {% if section.settings.cta_text != blank %}
+      <div style="text-align:center;">
+        <a href="{{ section.settings.cta_url }}" class="stellar-font-body" style="display:inline-block;padding:0.625rem 1.5rem;border-radius:0.5rem;border:1px solid hsla(0,0%,100%,0.2);color:var(--stellar-offwhite);text-decoration:none;font-family:var(--font-button-family);font-size:var(--font-button-size);font-weight:var(--font-button-weight);text-transform:var(--font-button-text-transform);">
+          {{ section.settings.cta_text }}
+        </a>
+      </div>
+    {% endif %}
+
+    <div style="max-width:48rem;margin:2rem auto 0;">
+      {% for block in section.blocks %}
+        {% if block.type == 'heading' or block.type == 'text' or block.type == 'button' or block.type == 'image' or block.type == 'badge' or block.type == 'divider' %}
+          {% render 'stellar-standard-block', block: block %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  <style>
+    @media (min-width: 768px) {
+      .stellar-endorsement-row { flex-direction: row !important; text-align: left !important; gap: 3rem !important; }
+    }
+  </style>
+</section>
+
+{% schema %}
+{
+  "name": "Stellar Expert Endorse",
+  "tag": "section",
+  "class": "stellar-expert-endorsement",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Backed by Experts" },
+    { "type": "header", "content": "Heading split and highlight" },
+    { "type": "text", "id": "line_break_after", "label": "Line break after", "info": "Enter the last word(s) before the line break. Everything after wraps to a second line." },
+    { "type": "text", "id": "highlight_text", "label": "Highlight text", "info": "Enter the exact text to highlight. Styled with the weight and color below." },
+    { "type": "select", "id": "highlight_weight", "options": [{ "value": "inherit", "label": "Inherit" },{ "value": "300", "label": "Light" },{ "value": "400", "label": "Regular" },{ "value": "700", "label": "Bold" }], "default": "inherit", "label": "Highlight font weight" },
+    { "type": "color", "id": "highlight_color", "label": "Highlight color", "default": "#655DC6" },
+    { "type": "header", "content": "CTA" },
+    { "type": "text", "id": "cta_text", "label": "CTA text", "default": "Learn About Our Science" },
+    { "type": "url", "id": "cta_url", "label": "CTA link" },
+    { "type": "header", "content": "Layout & Style" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 120, "step": 4, "default": 80, "unit": "px" },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 120, "step": 4, "default": 80, "unit": "px" },
+    { "type": "select", "id": "color_scheme", "label": "Color scheme", "options": [{ "value": "dark", "label": "Dark" }, { "value": "deepspace", "label": "Deep Space" }, { "value": "light", "label": "Light" }, { "value": "sand", "label": "Sand" }, { "value": "skyblue", "label": "Sky Blue" }, { "value": "custom", "label": "Custom" }], "default": "deepspace" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_bg_color", "label": "Custom background", "default": "#1a1625" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_text_color", "label": "Custom text color", "default": "#F6F7F8" },
+    { "type": "select", "id": "bg_texture", "label": "Background texture", "options": [{ "value": "none", "label": "None" },{ "value": "stars", "label": "Stars" },{ "value": "constellation", "label": "Constellation" },{ "value": "nebula", "label": "Nebula" }], "default": "stars" },
+    { "type": "select", "id": "reveal_animation", "label": "Scroll animation", "options": [{ "value": "none", "label": "None" },{ "value": "fade_up", "label": "Fade up" },{ "value": "stagger", "label": "Stagger children" }], "default": "none" }
+  ],
+  "blocks": [
+    { "type": "endorsement", "name": "Expert", "settings": [
+      { "type": "image_picker", "id": "avatar", "label": "Photo" },
+      { "type": "textarea", "id": "quote", "label": "Quote", "default": "Milky's lactase enzyme supplements are crafted for those who love dairy but struggle with lactose intolerance." },
+      { "type": "text", "id": "name", "label": "Name", "default": "Dr. Michael Seidman, MD, FACS" },
+      { "type": "text", "id": "title", "label": "Title", "default": "Director of Otologic/Neurotologic Surgery · Board-Certified" }
+    ] },
+    { "type": "heading", "name": "Heading", "settings": [{ "type": "text", "id": "text", "label": "Heading text", "default": "Heading" }, { "type": "select", "id": "size", "label": "Size", "options": [{ "value": "h1", "label": "Extra Large" }, { "value": "h2", "label": "Large" }, { "value": "h3", "label": "Medium" }], "default": "h2" }] },
+    { "type": "text", "name": "Text", "settings": [{ "type": "richtext", "id": "content", "label": "Text" }, { "type": "color", "id": "color", "label": "Text color" }] },
+    { "type": "button", "name": "Button", "settings": [{ "type": "text", "id": "text", "label": "Button text", "default": "Learn More" }, { "type": "url", "id": "url", "label": "Link" }, { "type": "select", "id": "style", "label": "Style", "options": [{ "value": "primary", "label": "Primary" }, { "value": "outline", "label": "Outline" }], "default": "primary" }] },
+    { "type": "image", "name": "Image", "settings": [{ "type": "image_picker", "id": "image", "label": "Image" }, { "type": "text", "id": "alt", "label": "Alt text" }] },
+    { "type": "badge", "name": "Badge", "settings": [{ "type": "text", "id": "label", "label": "Label", "default": "New" },{ "type": "select", "id": "color", "label": "Color", "options": [{ "value": "green", "label": "Green" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "purple", "label": "Purple" },{ "value": "gold", "label": "Gold" }], "default": "skyblue" }] },
+    { "type": "divider", "name": "Divider", "settings": [{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "line", "label": "Line" },{ "value": "space", "label": "Space" },{ "value": "dotted", "label": "Dotted" }], "default": "line" },{ "type": "range", "id": "spacing", "label": "Spacing", "min": 1, "max": 6, "step": 1, "default": 2, "unit": "rem" }] }
+  ],
+  "enabled_on": {
+    "templates": ["index", "page"]
+  },
+  "presets": [
+    {
+      "name": "Stellar Expert Endorse",
+      "blocks": [{ "type": "endorsement" }]
+    }
+  ]
+}
+{% endschema %}
+

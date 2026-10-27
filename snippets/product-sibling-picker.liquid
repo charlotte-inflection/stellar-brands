@@ -1,0 +1,131 @@
+{%- doc -%}
+  Renders a sibling product picker as text-label buttons, visually matching
+  the variant picker button style. Links to sibling product URLs.
+
+  Products are defined via a product_list block setting. The display value
+  for each product can be pulled from a metafield (if value_metafield is set)
+  or falls back to the product title.
+
+  The current product is shown as the selected (checked) button.
+  Sibling products render as <a> links to their URLs.
+
+  @param {object} product - Current product object
+  @param {object} block - Block settings and shopify_attributes
+  @param {string} section_id - Section identifier for unique IDs
+  @param {string} product_id - Product identifier
+
+  @example
+  {% render 'product-sibling-picker',
+    product: product,
+    block: block,
+    section_id: section.id,
+    product_id: product.id
+  %}
+{%- enddoc -%}
+
+{%- liquid
+  assign contains_product = false
+  for sibling in block.settings.products
+    if sibling.id == product.id
+      assign contains_product = true
+      break
+    endif
+  endfor
+-%}
+
+{%- if contains_product -%}
+  {%- liquid
+    comment
+      Determine the display value for the current product.
+      If a metafield key is provided, use it; otherwise fall back to product title.
+    endcomment
+    assign current_value = product.title
+
+    if block.settings.value_metafield != blank
+      assign mf_parts = block.settings.value_metafield | split: '.'
+      assign mf_namespace = mf_parts | first
+      assign mf_key = mf_parts | last
+      assign mf_value = product.metafields[mf_namespace][mf_key].value
+      if mf_value != blank
+        assign current_value = mf_value
+      endif
+    endif
+
+    assign label_display = block.settings.label_display | default: 'label_value'
+  -%}
+
+  <div class="variant-picker grid gap-5" {{ block.shopify_attributes }}>
+    <fieldset class="product-form__input variant-input-wrapper relative">
+      <legend class="sr-only">{{ block.settings.label | default: 'Product' | escape }}</legend>
+      <div class="form__label flex items-center justify-between gap-2 w-full">
+        {%- if label_display != 'hidden' -%}
+          <div class="flex gap-2">
+            {%- if label_display == 'label_value' -%}
+              <span class="variant-label-name">{{- block.settings.label | default: 'Product' | escape -}}:</span>
+              <span class="variant-label-value">{{ current_value | escape }}</span>
+            {%- elsif label_display == 'label_only' -%}
+              <span class="variant-label-name">{{- block.settings.label | default: 'Product' | escape -}}</span>
+            {%- elsif label_display == 'value_only' -%}
+              <span class="variant-label-value">{{ current_value | escape }}</span>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+      <ul class="swatches swatches--{{ settings.rounded_swatch }} flex items-start flex-wrap gap-4">
+        {%- for sibling in block.settings.products -%}
+          {%- liquid
+            comment
+              Determine the display value for this sibling product.
+            endcomment
+            assign sibling_value = sibling.title
+
+            if block.settings.value_metafield != blank
+              assign sibling_mf_value = sibling.metafields[mf_namespace][mf_key].value
+              if sibling_mf_value != blank
+                assign sibling_value = sibling_mf_value
+              endif
+            endif
+          -%}
+          <li>
+            <magnet-element class="block">
+              {%- if sibling.id == product.id -%}
+                {%- comment -%} Current product: render as checked radio + label (selected state) {%- endcomment -%}
+                <input
+                  type="radio"
+                  class="sr-only"
+                  id="{{ section_id }}-{{ product_id }}-sibling-{{ forloop.index0 }}"
+                  name="sibling-{{ section_id }}-{{ product_id }}"
+                  checked
+                  tabindex="-1"
+                />
+                <label
+                  for="{{ section_id }}-{{ product_id }}-sibling-{{ forloop.index0 }}"
+                  class="label-swatch text-sm font-medium leading-none cursor-pointer block relative"
+                  title="{{ sibling_value | escape }}"
+                >
+                  {{- sibling_value | escape -}}
+                </label>
+              {%- else -%}
+                {%- comment -%} Sibling product: render as unchecked radio + link {%- endcomment -%}
+                <input
+                  type="radio"
+                  class="sr-only{% unless sibling.available %} disabled{% endunless %}"
+                  id="{{ section_id }}-{{ product_id }}-sibling-{{ forloop.index0 }}"
+                  name="sibling-{{ section_id }}-{{ product_id }}"
+                  tabindex="-1"
+                />
+                <a
+                  href="{{ sibling.url }}"
+                  class="label-swatch text-sm font-medium leading-none cursor-pointer block relative"
+                  title="{{ sibling_value | escape }}"
+                >
+                  {{- sibling_value | escape -}}
+                </a>
+              {%- endif -%}
+            </magnet-element>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </fieldset>
+  </div>
+{%- endif -%}

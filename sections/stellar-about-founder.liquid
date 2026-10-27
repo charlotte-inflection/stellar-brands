@@ -1,0 +1,159 @@
+{% comment %}
+  Stellar About Founder
+  Image-with-text founder quote section.
+  @concept-theme: section-type="image-with-text"
+{% endcomment %}
+
+<section
+  class="{% case section.settings.color_scheme %}{% when 'dark' %}stellar-bg-dark{% when 'deepspace' %}stellar-bg-deepspace{% when 'light' %}stellar-bg-light{% when 'sand' %}stellar-bg-sand{% when 'skyblue' %}stellar-bg-skyblue{% endcase %}{% if section.settings.bg_texture == 'stars' %} stellar-stars-bg{% elsif section.settings.bg_texture == 'constellation' %} stellar-constellation-bg{% elsif section.settings.bg_texture == 'nebula' %} stellar-nebula-gradient{% endif %}{% if section.settings.reveal_animation == 'fade_up' %} stellar-reveal{% elsif section.settings.reveal_animation == 'stagger' %} stellar-reveal-stagger{% endif %}"
+  style="{% if section.settings.section_height == 'full' %}min-height:100vh;{% endif %}padding-top:{{ section.settings.padding_top }}px;padding-bottom:{{ section.settings.padding_bottom }}px;{% if section.settings.color_scheme == 'custom' %}background-color:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+>
+  <div class="stellar-container" style="max-width:64rem;margin:0 auto;">
+    <div style="display:grid;grid-template-columns:1fr;gap:3rem;align-items:center;" class="stellar-grid-md-2">
+      {% if section.settings.image != blank %}
+        <div style="aspect-ratio:4/5;border-radius:1rem;overflow:hidden;">
+          <img src="{{ section.settings.image | image_url: width: 800 }}" alt="{{ section.settings.name }}" style="width:100%;height:100%;object-fit:cover;" loading="lazy" />
+        </div>
+      {% else %}
+        <div style="aspect-ratio:4/5;border-radius:1rem;background:linear-gradient(135deg, hsla(246,40%,57%,0.1), hsla(25,90%,55%,0.1));border:1px solid hsla(0,0%,13%,0.05);display:flex;align-items:center;justify-content:center;">
+          <p class="stellar-font-body" style="opacity:0.2;font-size:0.75rem;font-style:italic;text-align:center;padding:2rem;">Founder portrait placeholder</p>
+        </div>
+      {% endif %}
+      <div>
+        <p class="stellar-eyebrow" style="color:var(--stellar-skyblue);margin-bottom:1rem;">{{ section.settings.eyebrow }}</p>
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="hsla(246,40%,57%,0.2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:1rem;"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
+        <p class="stellar-font-body" style="opacity:0.7;font-size:1.125rem;font-style:italic;line-height:1.6;margin-bottom:1.5rem;">
+          {{ section.settings.quote }}
+        </p>
+        <div>
+          <p class="stellar-font-display">{{ section.settings.name }}</p>
+          <p class="stellar-font-body" style="font-size:0.875rem;opacity:0.5;">{{ section.settings.title }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="stellar-container" style="max-width:48rem;margin:2rem auto 0;">
+      {% for block in section.blocks %}
+        {% if block.type == 'heading' or block.type == 'text' or block.type == 'button' or block.type == 'image' or block.type == 'badge' or block.type == 'divider' %}
+          {% render 'stellar-standard-block', block: block %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  <style>
+    @media (min-width: 768px) {
+      .stellar-grid-md-2 { grid-template-columns: 1fr 1fr !important; }
+    }
+  </style>
+</section>
+
+{% schema %}
+{
+  "name": "Stellar About Founder",
+  "tag": "section",
+  "class": "stellar-about-founder",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "OUR FOUNDER" },
+    { "type": "image_picker", "id": "image", "label": "Founder photo" },
+    { "type": "textarea", "id": "quote", "label": "Quote", "default": "I was standing in line at an ice cream shop when I realized I'd forgotten my Lactaid at home — again. That night, I sketched the first version of Milky on a napkin." },
+    { "type": "text", "id": "name", "label": "Name", "default": "Khai Pham" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Founder & CEO, Stellar" },
+    {
+      "type": "header",
+      "content": "Layout & Style"
+    },
+    { "type": "select", "id": "section_height", "label": "Section height", "options": [
+      { "value": "auto", "label": "Auto (content)" },
+      { "value": "full", "label": "Full viewport" }
+    ], "default": "auto" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 120, "step": 4, "default": 0, "unit": "px" },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 120, "step": 4, "default": 80, "unit": "px" },
+    { "type": "select", "id": "color_scheme", "label": "Color scheme", "options": [
+      { "value": "dark", "label": "Dark" },
+      { "value": "deepspace", "label": "Deep Space" },
+      { "value": "light", "label": "Light" },
+      { "value": "sand", "label": "Sand" },
+      { "value": "skyblue", "label": "Sky Blue" },
+      { "value": "custom", "label": "Custom" }
+    ], "default": "light" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_bg_color", "label": "Custom background", "default": "#F6F7F8" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_text_color", "label": "Custom text color", "default": "#222222" },
+    { "type": "select", "id": "bg_texture", "label": "Background texture", "options": [
+      { "value": "none", "label": "None" },
+      { "value": "stars", "label": "Stars" },
+      { "value": "constellation", "label": "Constellation" },
+      { "value": "nebula", "label": "Nebula" }
+    ], "default": "none" },
+    { "type": "select", "id": "reveal_animation", "label": "Scroll animation", "options": [{ "value": "none", "label": "None" },{ "value": "fade_up", "label": "Fade up" },{ "value": "stagger", "label": "Stagger children" }], "default": "fade_up" }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "Heading",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Heading text", "default": "Heading" },
+        { "type": "select", "id": "size", "label": "Size", "options": [
+          { "value": "h2", "label": "Large" },
+          { "value": "h3", "label": "Medium" },
+          { "value": "h4", "label": "Small" }
+        ], "default": "h3" }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        { "type": "richtext", "id": "content", "label": "Text" }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Button",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Button text", "default": "Learn More" },
+        { "type": "url", "id": "url", "label": "Link" },
+        { "type": "select", "id": "style", "label": "Style", "options": [
+          { "value": "primary", "label": "Primary" },
+          { "value": "outline", "label": "Outline" }
+        ], "default": "primary" }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "alt", "label": "Alt text" }
+      ]
+    },
+    {
+      "type": "badge",
+      "name": "Badge",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Badge text", "default": "New" },
+        { "type": "select", "id": "color", "label": "Color", "options": [
+          { "value": "purple", "label": "Purple" },
+          { "value": "orange", "label": "Orange" },
+          { "value": "skyblue", "label": "Sky Blue" },
+          { "value": "green", "label": "Green" }
+        ], "default": "purple" }
+      ]
+    },
+    {
+      "type": "divider",
+      "name": "Divider",
+      "settings": [
+        { "type": "range", "id": "height", "label": "Height", "min": 1, "max": 4, "step": 1, "default": 1, "unit": "px" },
+        { "type": "range", "id": "opacity", "label": "Opacity", "min": 5, "max": 50, "step": 5, "default": 10, "unit": "%" }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "templates": ["page"]
+  },
+  "presets": [
+    {
+      "name": "Stellar About Founder"
+    }
+  ]
+}
+{% endschema %}

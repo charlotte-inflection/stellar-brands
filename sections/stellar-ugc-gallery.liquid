@@ -1,0 +1,190 @@
+{% comment %}
+  Stellar UGC Gallery
+  Horizontal-scroll social media posts with image zoom.
+  Videos play on hover (desktop) or tap (mobile), pause on exit.
+  @concept-theme: section-type="multicolumn" (horizontal scroll)
+{% endcomment %}
+
+<style>
+  #stellar-ugc-{{ section.id }} .stellar-ugc-video-card video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (min-width: 768px) {
+    #stellar-ugc-{{ section.id }} .stellar-ugc-scroll {
+      overflow-x: visible !important;
+      scroll-snap-type: none !important;
+      flex-wrap: nowrap;
+      justify-content: center;
+      max-width: 90rem;
+      margin: 0 auto;
+      padding: 0 2rem !important;
+    }
+    #stellar-ugc-{{ section.id }} .stellar-ugc-card {
+      flex-shrink: 1 !important;
+      flex-grow: 1;
+      width: 0 !important;
+      max-width: 18rem;
+    }
+  }
+</style>
+
+<section
+  class="{% if section.settings.color_scheme == 'dark' %}stellar-bg-dark{% elsif section.settings.color_scheme == 'deepspace' %}stellar-bg-deepspace{% elsif section.settings.color_scheme == 'light' %}stellar-bg-light{% elsif section.settings.color_scheme == 'sand' %}stellar-bg-sand{% elsif section.settings.color_scheme == 'skyblue' %}stellar-bg-skyblue{% endif %}{% if section.settings.bg_texture == 'stars' %} stellar-stars-bg{% elsif section.settings.bg_texture == 'constellation' %} stellar-constellation-bg{% elsif section.settings.bg_texture == 'nebula' %} stellar-nebula-gradient{% endif %}{% if section.settings.reveal_animation == 'fade_up' %} stellar-reveal{% elsif section.settings.reveal_animation == 'stagger' %} stellar-reveal-stagger{% endif %}"
+  style="padding:{{ section.settings.padding_top }}rem 0 {{ section.settings.padding_bottom }}rem;{% if section.settings.color_scheme == 'custom' %}background:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+  id="stellar-ugc-{{ section.id }}"
+>
+  <div class="stellar-container" style="text-align:center;">
+    <h2 class="stellar-font-display" style="font-size:clamp(1.75rem,3vw,2.5rem);margin-bottom:0.5rem;">
+      {{ section.settings.heading }}
+    </h2>
+    <p class="stellar-font-body" style="opacity:0.5;margin-bottom:3rem;">{{ section.settings.subheading }}</p>
+  </div>
+
+  <div class="stellar-scrollbar-hide stellar-ugc-scroll" style="display:flex;gap:1rem;overflow-x:auto;padding:0 1rem 1rem;scroll-snap-type:x mandatory;">
+    {% for block in section.blocks %}
+      {% if block.type == 'post' %}
+        <div {{ block.shopify_attributes }} class="stellar-ugc-card stellar-hover-lift{% if block.settings.video != blank %} stellar-ugc-hover-video{% endif %}" style="scroll-snap-align:center;flex-shrink:0;width:14rem;border-radius:1rem;overflow:hidden;border:1px solid hsla(0,0%,100%,0.05);">
+          <div style="aspect-ratio:9/16;position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:1rem;">
+            {% if block.settings.video != blank %}
+              {%- liquid
+                assign poster_img = block.settings.image | default: block.settings.video.preview_image
+              -%}
+              <div class="stellar-ugc-video-card" style="position:absolute;inset:0;">
+                {% if poster_img != blank %}
+                  <img src="{{ poster_img | image_url: width: 400 }}" alt="{{ block.settings.username }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" loading="lazy">
+                {% endif %}
+                {{- block.settings.video | video_tag:
+                  autoplay: false,
+                  loop: true,
+                  muted: true,
+                  playsinline: true,
+                  controls: false,
+                  preload: 'metadata',
+                  image_size: '400x'
+                -}}
+              </div>
+              <div style="position:absolute;inset:0;background:linear-gradient(to top, hsla(0,0%,0%,0.6), transparent 40%);"></div>
+            {% elsif block.settings.image != blank %}
+              <img src="{{ block.settings.image | image_url: width: 400 }}" alt="{{ block.settings.username }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" loading="lazy">
+              <div style="position:absolute;inset:0;background:linear-gradient(to top, hsla(0,0%,0%,0.6), transparent 40%);"></div>
+            {% else %}
+              <div style="position:absolute;inset:0;background:linear-gradient(135deg, hsla(300,30%,20%,0.6), hsla(270,30%,20%,0.4));"></div>
+            {% endif %}
+            <span class="stellar-font-body" style="position:relative;align-self:flex-end;font-size:0.625rem;font-weight:700;background:hsla(0,0%,100%,0.1);color:hsla(0,0%,96%,0.7);padding:0.125rem 0.5rem;border-radius:999px;">
+              {{ block.settings.platform }}
+            </span>
+            <div style="position:relative;">
+              {% if block.settings.caption != blank %}
+                <p class="stellar-font-body" style="color:var(--stellar-offwhite);font-size:0.75rem;font-style:italic;margin-bottom:0.5rem;">"{{ block.settings.caption }}"</p>
+              {% endif %}
+              {% if block.settings.username != blank %}
+                <p class="stellar-font-body" style="color:var(--stellar-offwhite);font-size:0.75rem;font-weight:500;">{{ block.settings.username }}</p>
+              {% endif %}
+              {% if block.settings.city != blank %}
+                <p class="stellar-font-body" style="color:hsla(0,0%,96%,0.4);font-size:0.625rem;">{{ block.settings.city }}</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+
+
+  </div>
+  <div class="stellar-container" style="max-width:48rem;margin:2rem auto 0;">
+    {% for block in section.blocks %}
+      {% if block.type == 'heading' or block.type == 'text' or block.type == 'button' or block.type == 'image' or block.type == 'badge' or block.type == 'divider' %}
+        {% render 'stellar-standard-block', block: block %}
+      {% endif %}
+    {% endfor %}
+  </div>
+</section>
+
+<script>
+  (function() {
+    var section = document.getElementById('stellar-ugc-{{ section.id }}');
+    if (!section) return;
+
+    var cards = section.querySelectorAll('.stellar-ugc-hover-video');
+    var isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+    cards.forEach(function(card) {
+      var video = card.querySelector('video');
+      if (!video) return;
+
+      if (isTouch) {
+        /* Tap to toggle play/pause */
+        card.addEventListener('click', function(e) {
+          /* Don't intercept link clicks */
+          if (e.target.closest('a')) return;
+          if (video.paused) {
+            video.play();
+          } else {
+            video.pause();
+            video.currentTime = 0;
+          }
+        });
+      } else {
+        /* Desktop: play on hover, pause + reset on leave */
+        card.addEventListener('mouseenter', function() {
+          video.play();
+        });
+        card.addEventListener('mouseleave', function() {
+          video.pause();
+          video.currentTime = 0;
+        });
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Stellar UGC Gallery",
+  "tag": "section",
+  "class": "stellar-ugc-gallery",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "The Milky Moment" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Real people. Real dairy. No regrets." },
+    { "type": "header", "content": "Layout & Style" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 12, "step": 1, "default": 5, "unit": "rem" },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 12, "step": 1, "default": 5, "unit": "rem" },
+    { "type": "select", "id": "color_scheme", "label": "Color scheme", "options": [{ "value": "dark", "label": "Dark" },{ "value": "deepspace", "label": "Deep Space" },{ "value": "light", "label": "Light" },{ "value": "sand", "label": "Sand" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "custom", "label": "Custom" }], "default": "dark" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_bg_color", "label": "Custom background", "default": "#222222" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_text_color", "label": "Custom text", "default": "#F6F7F8" },
+    { "type": "select", "id": "bg_texture", "label": "Background texture", "options": [{ "value": "none", "label": "None" },{ "value": "stars", "label": "Stars" },{ "value": "constellation", "label": "Constellation" },{ "value": "nebula", "label": "Nebula" }], "default": "none" },
+    { "type": "select", "id": "reveal_animation", "label": "Scroll animation", "options": [{ "value": "none", "label": "None" },{ "value": "fade_up", "label": "Fade up" },{ "value": "stagger", "label": "Stagger children" }], "default": "none" }
+  ],
+  "blocks": [
+    {
+      "type": "post",
+      "name": "UGC Post",
+      "settings": [
+        { "type": "text", "id": "username", "label": "Username", "default": "@sarah_eats_cheese" },
+        { "type": "text", "id": "city", "label": "City", "default": "Brooklyn, NY" },
+        { "type": "textarea", "id": "caption", "label": "Caption", "info": "Leave blank to hide." },
+        { "type": "text", "id": "platform", "label": "Platform", "default": "TikTok" },
+        { "type": "image_picker", "id": "image", "label": "Post image", "info": "Used as poster frame when video is set, or as card background when no video is present." },
+        { "type": "video", "id": "video", "label": "Post video", "info": "Shopify-hosted video. Plays on hover/tap, loops silently. Takes priority over image." }
+      ]
+    },
+    { "type": "heading", "name": "Heading", "settings": [{ "type": "text", "id": "text", "label": "Text", "default": "Heading" },{ "type": "select", "id": "size", "label": "Size", "options": [{ "value": "h2", "label": "Large" },{ "value": "h3", "label": "Medium" },{ "value": "h4", "label": "Small" }], "default": "h3" }] },
+    { "type": "text", "name": "Text", "settings": [{ "type": "richtext", "id": "content", "label": "Content", "default": "<p>Body text</p>" }] },
+    { "type": "button", "name": "Button", "settings": [{ "type": "text", "id": "text", "label": "Label", "default": "Learn More" },{ "type": "url", "id": "url", "label": "Link" },{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "primary", "label": "Primary" },{ "value": "outline", "label": "Outline" }], "default": "primary" }] },
+    { "type": "image", "name": "Image", "settings": [{ "type": "image_picker", "id": "image", "label": "Image" },{ "type": "text", "id": "alt", "label": "Alt text", "default": "Image" }] },
+    { "type": "badge", "name": "Badge", "settings": [{ "type": "text", "id": "label", "label": "Label", "default": "New" },{ "type": "select", "id": "color", "label": "Color", "options": [{ "value": "green", "label": "Green" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "purple", "label": "Purple" },{ "value": "gold", "label": "Gold" }], "default": "skyblue" }] },
+    { "type": "divider", "name": "Divider", "settings": [{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "line", "label": "Line" },{ "value": "space", "label": "Space" },{ "value": "dotted", "label": "Dotted" }], "default": "line" },{ "type": "range", "id": "spacing", "label": "Spacing", "min": 1, "max": 6, "step": 1, "default": 2, "unit": "rem" }] }
+  ],
+  "enabled_on": {
+    "templates": ["index"]
+  },
+  "presets": [
+    { "name": "Stellar UGC Gallery" }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,110 @@
+{% comment %}
+  Stellar Product Mechanism (PDP below-fold)
+  Three-step science diagram with image zoom.
+  @concept-theme: section-type="multicolumn" or "image-with-text"
+{% endcomment %}
+
+<section id="how-it-works"
+  class="{% if section.settings.color_scheme == 'dark' %}stellar-bg-dark{% elsif section.settings.color_scheme == 'deepspace' %}stellar-bg-deepspace{% elsif section.settings.color_scheme == 'light' %}stellar-bg-light{% elsif section.settings.color_scheme == 'sand' %}stellar-bg-sand{% elsif section.settings.color_scheme == 'skyblue' %}stellar-bg-skyblue{% endif %}{% if section.settings.bg_texture == 'stars' %} stellar-stars-bg{% elsif section.settings.bg_texture == 'constellation' %} stellar-constellation-bg{% elsif section.settings.bg_texture == 'nebula' %} stellar-nebula-gradient{% endif %}{% if section.settings.reveal_animation == 'fade_up' %} stellar-reveal{% elsif section.settings.reveal_animation == 'stagger' %} stellar-reveal-stagger{% endif %}"
+  style="padding:{{ section.settings.padding_top }}rem 0 {{ section.settings.padding_bottom }}rem;{% if section.settings.color_scheme == 'custom' %}background:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+>
+  <div class="stellar-container" style="text-align:center;">
+    <p class="stellar-eyebrow" style="color:var(--stellar-skyblue);margin-bottom:0.75rem;">{{ section.settings.eyebrow }}</p>
+    <h2 class="stellar-font-display" style="font-size:clamp(1.75rem,3vw,2.5rem);margin-bottom:1rem;color:var(--stellar-offwhite);">
+      {{ section.settings.heading }}
+    </h2>
+    <p class="stellar-font-body" style="color:hsla(0,0%,100%,0.5);max-width:32rem;margin:0 auto 4rem;">{{ section.settings.subheading }}</p>
+
+    <div style="display:grid;gap:2rem;max-width:64rem;margin:0 auto 4rem;" class="stellar-mechanism-grid">
+      {% for block in section.blocks %}
+        {% if block.type == 'step' %}
+          <div {{ block.shopify_attributes }} class="stellar-hover-lift" style="text-align:center;">
+            <div class="stellar-img-zoom" style="aspect-ratio:1;border-radius:1rem;background:var(--stellar-deepspace);border:1px solid hsla(0,0%,100%,0.05);overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem;">
+              {% if block.settings.image != blank %}
+                <img src="{{ block.settings.image | image_url: width: 400 }}" alt="{{ block.settings.title }}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
+              {% endif %}
+              <span class="stellar-font-display" style="position:absolute;top:0.75rem;left:1rem;font-size:2.5rem;color:hsla(211,60%,79%,0.15);">{{ block.settings.step_number }}</span>
+            </div>
+            <h3 class="stellar-font-display" style="font-size:1.125rem;margin-bottom:0.5rem;color:var(--stellar-offwhite);">{{ block.settings.title }}</h3>
+            <p class="stellar-font-body" style="color:hsla(0,0%,100%,0.5);font-size:0.875rem;">{{ block.settings.description }}</p>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    {% if section.settings.show_timeline %}
+      <div style="display:flex;flex-direction:column;max-width:48rem;margin:0 auto;" class="stellar-timeline-row">
+        {% for block in section.blocks %}
+          {% if block.type == 'timeline' %}
+            <div {{ block.shopify_attributes }} style="flex:1;text-align:center;padding:1rem 1.5rem;">
+              <span class="stellar-font-display" style="color:var(--stellar-skyblue);font-size:0.875rem;margin-bottom:0.25rem;display:block;">{{ block.settings.time }}</span>
+              <span class="stellar-font-body" style="color:hsla(0,0%,100%,0.6);font-size:0.75rem;">{{ block.settings.benefit }}</span>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div style="max-width:48rem;margin:2rem auto 0;">
+      {% for block in section.blocks %}
+        {% if block.type == 'heading' or block.type == 'text' or block.type == 'button' or block.type == 'image' or block.type == 'badge' or block.type == 'divider' %}
+          {% render 'stellar-standard-block', block: block %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  <style>
+    @media (min-width: 768px) {
+      .stellar-mechanism-grid { grid-template-columns: repeat(3, 1fr) !important; }
+      .stellar-timeline-row { flex-direction: row !important; }
+    }
+  </style>
+</section>
+
+{% schema %}
+{
+  "name": "Stellar PDP Mechanism",
+  "tag": "section",
+  "class": "stellar-product-mechanism",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The Science" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "How Milky Works" },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "Three steps between you and dairy freedom. No magic — just enzyme science." },
+    { "type": "checkbox", "id": "show_timeline", "label": "Show timeline", "default": true },
+    { "type": "header", "content": "Layout & Style" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 12, "step": 1, "default": 5, "unit": "rem" },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 12, "step": 1, "default": 5, "unit": "rem" },
+    { "type": "select", "id": "color_scheme", "label": "Color scheme", "options": [{ "value": "dark", "label": "Dark" },{ "value": "deepspace", "label": "Deep Space" },{ "value": "light", "label": "Light" },{ "value": "sand", "label": "Sand" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "custom", "label": "Custom" }], "default": "dark" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_bg_color", "label": "Custom background", "default": "#222222" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_text_color", "label": "Custom text", "default": "#F6F7F8" },
+    { "type": "select", "id": "bg_texture", "label": "Background texture", "options": [{ "value": "none", "label": "None" },{ "value": "stars", "label": "Stars" },{ "value": "constellation", "label": "Constellation" },{ "value": "nebula", "label": "Nebula" }], "default": "constellation" },
+    { "type": "select", "id": "reveal_animation", "label": "Scroll animation", "options": [{ "value": "none", "label": "None" },{ "value": "fade_up", "label": "Fade up" },{ "value": "stagger", "label": "Stagger children" }], "default": "none" }
+  ],
+  "blocks": [
+    { "type": "step", "name": "Step", "settings": [{ "type": "text", "id": "step_number", "label": "Step number", "default": "01" },{ "type": "text", "id": "title", "label": "Title" },{ "type": "textarea", "id": "description", "label": "Description" },{ "type": "image_picker", "id": "image", "label": "Diagram image" }] },
+    { "type": "timeline", "name": "Timeline point", "settings": [{ "type": "text", "id": "time", "label": "Time", "default": "Immediately" },{ "type": "text", "id": "benefit", "label": "Benefit", "default": "Lactose broken down on contact" }] },
+    { "type": "heading", "name": "Heading", "settings": [{ "type": "text", "id": "text", "label": "Text", "default": "Heading" },{ "type": "select", "id": "size", "label": "Size", "options": [{ "value": "h2", "label": "Large" },{ "value": "h3", "label": "Medium" },{ "value": "h4", "label": "Small" }], "default": "h3" }] },
+    { "type": "text", "name": "Text", "settings": [{ "type": "richtext", "id": "content", "label": "Content", "default": "<p>Body text</p>" }] },
+    { "type": "button", "name": "Button", "settings": [{ "type": "text", "id": "text", "label": "Label", "default": "Learn More" },{ "type": "url", "id": "url", "label": "Link" },{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "primary", "label": "Primary" },{ "value": "outline", "label": "Outline" }], "default": "primary" }] },
+    { "type": "image", "name": "Image", "settings": [{ "type": "image_picker", "id": "image", "label": "Image" },{ "type": "text", "id": "alt", "label": "Alt text", "default": "Image" }] },
+    { "type": "badge", "name": "Badge", "settings": [{ "type": "text", "id": "label", "label": "Label", "default": "New" },{ "type": "select", "id": "color", "label": "Color", "options": [{ "value": "green", "label": "Green" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "purple", "label": "Purple" },{ "value": "gold", "label": "Gold" }], "default": "skyblue" }] },
+    { "type": "divider", "name": "Divider", "settings": [{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "line", "label": "Line" },{ "value": "space", "label": "Space" },{ "value": "dotted", "label": "Dotted" }], "default": "line" },{ "type": "range", "id": "spacing", "label": "Spacing", "min": 1, "max": 6, "step": 1, "default": 2, "unit": "rem" }] }
+  ],
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "presets": [
+    {
+      "name": "Stellar PDP Mechanism",
+      "blocks": [
+        { "type": "step", "settings": { "step_number": "01", "title": "Lactose enters undigested", "description": "Without enough lactase enzyme, lactose passes through your stomach intact." } },
+        { "type": "step", "settings": { "step_number": "02", "title": "Milky's lactase breaks it down", "description": "Milky delivers concentrated lactase that cleaves lactose into glucose and galactose." } },
+        { "type": "step", "settings": { "step_number": "03", "title": "Absorb naturally. Zero symptoms.", "description": "Simple sugars absorb through your intestinal wall like normal." } },
+        { "type": "timeline", "settings": { "time": "Immediately", "benefit": "Lactose broken down on contact" } },
+        { "type": "timeline", "settings": { "time": "30 min", "benefit": "Full dairy freedom" } },
+        { "type": "timeline", "settings": { "time": "Every meal", "benefit": "Take another for consistent protection" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

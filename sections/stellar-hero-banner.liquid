@@ -1,0 +1,413 @@
+{% comment %}
+  Stellar Hero Banner
+  Full-height hero with cosmic gradient, headline, CTAs.
+  Two-column layout on desktop with optional product image.
+  Image stacks first on mobile regardless of desktop position.
+
+  Background image sizing (added):
+    Height, crop (object-fit), and focal point (object-position) are now
+    controlled independently for desktop and mobile via the theme editor.
+    All heights are applied as min-height, so text content is never clipped.
+  @concept-theme: section-type="image-banner" | block-type="heading,text,button,image"
+{% endcomment %}
+
+{%- liquid
+  assign heading_text_downcase = ''
+  for block in section.blocks
+    if block.type == 'heading'
+      assign heading_text_downcase = block.settings.text | downcase
+    endif
+  endfor
+
+  assign has_dairy_keyword = false
+  assign has_nova_keyword = false
+
+  if heading_text_downcase contains 'dairy' or heading_text_downcase contains 'lactase' or heading_text_downcase contains 'lactose' or heading_text_downcase contains 'milky'
+    assign has_dairy_keyword = true
+  endif
+
+  if heading_text_downcase contains 'nova' or heading_text_downcase contains 'heartburn'
+    assign has_nova_keyword = true
+  endif
+
+  assign primary_btn_bg = '#655DC6'
+  if has_nova_keyword and has_dairy_keyword == false
+    assign primary_btn_bg = '#f36302'
+  elsif has_dairy_keyword and has_nova_keyword == false
+    assign primary_btn_bg = '#655DC6'
+  endif
+  comment
+    If neither or both are true, primary_btn_bg remains the fallback #655DC6
+  endcomment
+-%}
+
+<section
+  id="stellar-hero-{{ section.id }}"
+  class="{% case section.settings.color_scheme %}{% when 'dark' %}stellar-bg-dark{% when 'deepspace' %}stellar-bg-deepspace{% when 'light' %}stellar-bg-light{% when 'sand' %}stellar-bg-sand{% when 'skyblue' %}stellar-bg-skyblue{% endcase %}{% if section.settings.bg_texture == 'stars' %} stellar-stars-bg{% elsif section.settings.bg_texture == 'constellation' %} stellar-constellation-bg{% elsif section.settings.bg_texture == 'nebula' %} stellar-nebula-gradient{% endif %}{% if section.settings.reveal_animation == 'fade_up' %} stellar-reveal{% elsif section.settings.reveal_animation == 'stagger' %} stellar-reveal-stagger{% endif %}"
+  style="position:relative;display:flex;align-items:center;overflow:hidden;padding-top:{{ section.settings.padding_top }}px;padding-bottom:{{ section.settings.padding_bottom }}px;{% if section.settings.color_scheme == 'custom' %}background-color:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+>
+  <!-- Background image -->
+  {% if section.settings.background_image != blank or section.settings.background_image_mobile != blank %}
+    <picture style="position:absolute;inset:0;width:100%;height:100%;z-index:0;">
+      {% if section.settings.background_image_mobile != blank %}
+        <source media="(max-width: 767px)" srcset="{{ section.settings.background_image_mobile | image_url: width: 1200 }}">
+      {% endif %}
+      {% if section.settings.background_image != blank %}
+        <source media="(min-width: 768px)" srcset="{{ section.settings.background_image | image_url: width: 2400 }}">
+      {% endif %}
+      <img
+        class="stellar-hero-bg-img"
+        src="{{ section.settings.background_image | default: section.settings.background_image_mobile | image_url: width: 2400 }}"
+        alt=""
+        loading="eager"
+        aria-hidden="true"
+      >
+    </picture>
+  {% endif %}
+
+  <!-- Overlay -->
+  <div style="position:absolute;inset:0;background:{{ section.settings.overlay_color }};opacity:{{ section.settings.overlay_opacity | divided_by: 100.0 }};z-index:1;"></div>
+
+  <!-- Content -->
+  <div class="stellar-container" style="position:relative;z-index:10;width:100%;">
+    <div style="{% if section.settings.image_position != 'none' %}display:grid;grid-template-columns:1fr;gap:3rem;align-items:center;{% endif %}max-width:72rem;margin:0 auto;" class="{% if section.settings.image_position != 'none' %}stellar-hero-2col stellar-hero-img-{{ section.settings.image_position }}{% endif %}">
+
+      {%- comment -%}
+        Image is always rendered first in the DOM so it stacks on top on mobile.
+        CSS order controls desktop positioning (left or right).
+      {%- endcomment -%}
+      {% if section.settings.image_position != 'none' %}
+        {% if section.settings.hero_video != blank %}
+          <div class="stellar-hero-image" style="text-align:center;">
+            <video
+              {% if section.settings.hero_video_autoplay %}autoplay muted loop playsinline{% endif %}
+              {% unless section.settings.hero_video_autoplay %}controls playsinline preload="metadata"{% endunless %}
+              style="max-width:100%;max-height:500px;object-fit:contain;border-radius:1rem;filter:drop-shadow(0 25px 50px hsla(246,40%,57%,0.3));"
+            >
+              {% for source in section.settings.hero_video.sources %}
+                <source src="{{ source.url }}" type="{{ source.mime_type }}">
+              {% endfor %}
+            </video>
+          </div>
+        {% elsif section.settings.hero_image != blank %}
+          <div class="stellar-hero-image stellar-animate-float" style="text-align:center;">
+            <img src="{{ section.settings.hero_image | image_url: width: 800 }}" alt="{{ section.settings.hero_image_alt }}" style="max-width:100%;max-height:500px;object-fit:contain;border-radius:1rem;filter:drop-shadow(0 25px 50px hsla(246,40%,57%,0.3));" loading="eager">
+          </div>
+        {% endif %}
+      {% endif %}
+      <!-- Text content -->
+      <div class="stellar-hero-text" style="{% if section.settings.image_position != 'none' %}text-align:left;{% else %}text-align:center;max-width:48rem;margin:0 auto;{% endif %}">
+        {% for block in section.blocks %}
+          {% case block.type %}
+            {% when 'heading' %}
+              {%- liquid
+                assign processed_heading = block.settings.text
+
+                if block.settings.highlight_text != blank
+                  assign hl_text = block.settings.highlight_text
+                  assign hl_weight = block.settings.highlight_weight | default: 'inherit'
+                  assign hl_color = block.settings.highlight_color | default: 'inherit'
+                  assign hl_open = '<span class="stellar-heading-highlight" style="--stellar-highlight-weight:' | append: hl_weight | append: ';--stellar-highlight-color:' | append: hl_color | append: ';">'
+                  assign hl_close = '</span>'
+                  assign hl_replacement = hl_open | append: hl_text | append: hl_close
+                  assign processed_heading = processed_heading | replace: hl_text, hl_replacement
+                endif
+
+                if block.settings.line_break_after != blank
+                  assign break_marker = block.settings.line_break_after
+                  assign heading_parts = processed_heading | split: break_marker
+                  if heading_parts.size > 1
+                    assign line_1 = heading_parts | first | append: break_marker
+                    assign line_2_parts = heading_parts | slice: 1, heading_parts.size
+                    assign line_2 = line_2_parts | join: break_marker
+                    assign processed_heading = line_1 | append: '<span class="stellar-heading-line-2">' | append: line_2 | append: '</span>'
+                  endif
+                endif
+              -%}
+              <{{ block.settings.size }} class="stellar-font-display" style="font-size:{% if block.settings.size == 'h1' %}clamp(2.25rem,5vw,4.5rem){% elsif block.settings.size == 'h2' %}clamp(1.75rem,4vw,3.5rem){% else %}clamp(1.5rem,3vw,2.5rem){% endif %};color:var(--stellar-offwhite);line-height:1.1;margin-bottom:1.5rem;"{% if block.settings.heading_font != blank and block.settings.heading_font != 'default' %} data-heading-font="{{ block.settings.heading_font }}"{% endif %} {{ block.shopify_attributes }}>
+                {{ processed_heading }}
+              </{{ block.settings.size }}>
+            {% when 'text' %}
+              <div class="stellar-font-body" style="font-size:clamp(1rem,2vw,1.25rem);max-width:32rem;{% if section.settings.image_position == 'none' %}margin:0 auto var(--group-1-gap);{% else %}margin-bottom:var(--group-1-gap);{% endif %}line-height:1.75;{% if block.settings.color != blank %}color:{{ block.settings.color }};{% else %}color:hsla(0,0%,96%,0.6);{% endif %}" {{ block.shopify_attributes }}>
+                {{ block.settings.content }}
+              </div>
+            {% when 'button' %}
+              <div style="display:inline-block;margin:0 0.5rem 1rem 0;" {{ block.shopify_attributes }}>
+                <a href="{{ block.settings.url }}" class="stellar-font-body stellar-hover-lift" style="display:inline-block;padding:0.75rem 2rem;border-radius:0.5rem;text-decoration:none;font-family:var(--font-button-family);font-size:var(--font-button-size);text-transform:var(--font-button-text-transform);{% if block.settings.style == 'primary' %}background:{% if block.settings.bg_color != blank %}{{ block.settings.bg_color }}{% else %}{{ primary_btn_bg }}{% endif %};color:{% if block.settings.text_color != blank %}{{ block.settings.text_color }}{% else %}#ffffff{% endif %};font-weight:var(--font-button-weight);border:1px solid transparent;{% else %}background:rgba(0,0,0,0.1);border:2px solid {% if block.settings.bg_color != blank %}{{ block.settings.bg_color }}{% else %}hsla(0,0%,100%,0.3){% endif %};color:{% if block.settings.text_color != blank %}{{ block.settings.text_color }}{% else %}#ffffff{% endif %};font-weight:var(--font-button-weight);{% endif %}">
+                  {{ block.settings.text }}
+                </a>
+              </div>
+            {% when 'image' %}
+              {% if block.settings.image != blank %}
+                <div class="stellar-img-zoom" style="margin:1.5rem {% if section.settings.image_position == 'none' %}auto{% else %}0{% endif %};max-width:{{ block.settings.max_width | default: '20rem' }};border-radius:{{ block.settings.border_radius | default: '1rem' }};" {{ block.shopify_attributes }}>
+                  <img src="{{ block.settings.image | image_url: width: 800 }}" alt="{{ block.settings.alt }}" style="max-width:100%;border-radius:{{ block.settings.border_radius | default: '1rem' }};border:1px solid hsla(0,0%,100%,0.1);box-shadow:0 25px 50px -12px hsla(246,40%,57%,0.2);" loading="eager">
+                </div>
+              {% endif %}
+            {% when 'badge' %}
+              <div style="margin-bottom:1rem;" {{ block.shopify_attributes }}>
+                <span class="stellar-badge stellar-badge-{{ block.settings.color }}">{{ block.settings.label }}</span>
+              </div>
+            {% when 'divider' %}
+              {% if block.settings.style == 'space' %}
+                <div style="height:{{ block.settings.spacing }}rem;" {{ block.shopify_attributes }}></div>
+              {% elsif block.settings.style == 'dotted' %}
+                <hr style="border:none;border-top:2px dotted hsla(0,0%,100%,0.15);margin:{{ block.settings.spacing }}rem 0;" {{ block.shopify_attributes }}>
+              {% else %}
+                <hr style="border:none;border-top:1px solid hsla(0,0%,100%,0.1);margin:{{ block.settings.spacing }}rem 0;" {{ block.shopify_attributes }}>
+              {% endif %}
+          {% endcase %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* Desktop defaults */
+    #stellar-hero-{{ section.id }} {
+      --group-1-gap: 2rem;
+    }
+
+    /* Background image fills the section. Base fallback; per-breakpoint fit and
+       focal point are set in the media queries below. */
+    #stellar-hero-{{ section.id }} .stellar-hero-bg-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    /* Mobile (up to 767px): height, crop, focal point */
+    @media (max-width: 767px) {
+      #stellar-hero-{{ section.id }} {
+        --group-1-gap: {{ section.settings.mobile_group_gap | divided_by: 16.0 }}rem;
+        {% if section.settings.section_height != 'auto' %}min-height: {{ section.settings.mobile_height }}vh;{% endif %}
+      }
+      #stellar-hero-{{ section.id }} .stellar-hero-bg-img {
+        object-fit: {{ section.settings.mobile_object_fit }};
+        object-position: {{ section.settings.mobile_focal_x }}% {{ section.settings.mobile_focal_y }}%;
+      }
+    }
+
+    /* Desktop and tablet (768px and up): height, crop, focal point */
+    @media (min-width: 768px) {
+      #stellar-hero-{{ section.id }} {
+        {% if section.settings.section_height != 'auto' %}min-height: {{ section.settings.desktop_height }}vh;{% endif %}
+      }
+      #stellar-hero-{{ section.id }} .stellar-hero-bg-img {
+        object-fit: {{ section.settings.desktop_object_fit }};
+        object-position: {{ section.settings.desktop_focal_x }}% {{ section.settings.desktop_focal_y }}%;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .stellar-hero-2col {
+        grid-template-columns: 1fr 1fr !important;
+      }
+      /* Image left on desktop: image stays order 1 (default), text order 2 */
+      .stellar-hero-img-left .stellar-hero-image { order: 1; }
+      .stellar-hero-img-left .stellar-hero-text { order: 2; }
+      /* Image right on desktop: text order 1, image order 2 */
+      .stellar-hero-img-right .stellar-hero-image { order: 2; }
+      .stellar-hero-img-right .stellar-hero-text { order: 1; }
+    }
+  </style>
+</section>
+
+{% schema %}
+{
+  "name": "Stellar Hero Banner",
+  "tag": "section",
+  "class": "stellar-hero-banner",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Hero Image (2-column)"
+    },
+    { "type": "image_picker", "id": "hero_image", "label": "Product / hero image" },
+    { "type": "text", "id": "hero_image_alt", "label": "Hero image alt text", "default": "Product image" },
+    { "type": "video", "id": "hero_video", "label": "Hero video (overrides image)" },
+    { "type": "checkbox", "id": "hero_video_autoplay", "label": "Autoplay (muted)", "default": false, "info": "When enabled, video autoplays muted. When disabled, video loads paused with native controls." },
+    { "type": "select", "id": "image_position", "label": "Image position", "options": [
+      { "value": "none", "label": "No image (centered)" },
+      { "value": "left", "label": "Image left" },
+      { "value": "right", "label": "Image right" }
+    ], "default": "right" },
+    {
+      "type": "header",
+      "content": "Background & Overlay"
+    },
+    { "type": "image_picker", "id": "background_image", "label": "Background image (Desktop)" },
+    { "type": "image_picker", "id": "background_image_mobile", "label": "Background image (Mobile)" },
+    { "type": "color", "id": "overlay_color", "label": "Overlay color", "default": "#22162B" },
+    { "type": "range", "id": "overlay_opacity", "label": "Overlay opacity", "min": 0, "max": 100, "step": 5, "default": 60, "unit": "%" },
+    {
+      "type": "header",
+      "content": "Background image size & focal point",
+      "info": "Height, crop, and focal point for the background image, set separately for desktop and mobile. Heights apply as a minimum, so text is never clipped."
+    },
+    { "type": "select", "id": "section_height", "label": "Height mode", "options": [
+      { "value": "auto", "label": "Auto (fit content)" },
+      { "value": "fixed", "label": "Fixed (use height sliders)" }
+    ], "default": "fixed", "info": "Auto lets the text content set the height. Fixed uses the viewport-height sliders below." },
+    { "type": "range", "id": "desktop_height", "label": "Desktop height", "min": 30, "max": 100, "step": 5, "default": 90, "unit": "vh" },
+    { "type": "range", "id": "mobile_height", "label": "Mobile height", "min": 30, "max": 100, "step": 5, "default": 80, "unit": "vh" },
+    { "type": "select", "id": "desktop_object_fit", "label": "Desktop image fit", "options": [
+      { "value": "cover", "label": "Cover (fill, may crop)" },
+      { "value": "contain", "label": "Contain (show whole image)" }
+    ], "default": "cover" },
+    { "type": "range", "id": "desktop_focal_x", "label": "Desktop focal X (0 left, 100 right)", "min": 0, "max": 100, "step": 5, "default": 50, "unit": "%" },
+    { "type": "range", "id": "desktop_focal_y", "label": "Desktop focal Y (0 top, 100 bottom)", "min": 0, "max": 100, "step": 5, "default": 50, "unit": "%" },
+    { "type": "select", "id": "mobile_object_fit", "label": "Mobile image fit", "options": [
+      { "value": "cover", "label": "Cover (fill, may crop)" },
+      { "value": "contain", "label": "Contain (show whole image)" }
+    ], "default": "cover" },
+    { "type": "range", "id": "mobile_focal_x", "label": "Mobile focal X (0 left, 100 right)", "min": 0, "max": 100, "step": 5, "default": 50, "unit": "%" },
+    { "type": "range", "id": "mobile_focal_y", "label": "Mobile focal Y (0 top, 100 bottom)", "min": 0, "max": 100, "step": 5, "default": 50, "unit": "%" },
+    {
+      "type": "header",
+      "content": "Mobile Spacing"
+    },
+    {
+      "type": "range",
+      "id": "mobile_group_gap",
+      "label": "Space between Text and Buttons",
+      "min": 0,
+      "max": 400,
+      "step": 4,
+      "default": 32,
+      "unit": "px",
+      "info": "Adjusts the vertical space between the text block (Group 1) and the buttons (Group 2) on mobile screens."
+    },
+    {
+      "type": "header",
+      "content": "Layout & Style"
+    },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 160, "step": 4, "default": 80, "unit": "px" },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 120, "step": 4, "default": 80, "unit": "px" },
+    { "type": "select", "id": "color_scheme", "label": "Color scheme", "options": [
+      { "value": "dark", "label": "Dark" },
+      { "value": "deepspace", "label": "Deep Space" },
+      { "value": "light", "label": "Light" },
+      { "value": "sand", "label": "Sand" },
+      { "value": "skyblue", "label": "Sky Blue" },
+      { "value": "custom", "label": "Custom" }
+    ], "default": "dark" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_bg_color", "label": "Custom background", "default": "#222222" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_text_color", "label": "Custom text color", "default": "#F6F7F8" },
+    { "type": "select", "id": "bg_texture", "label": "Background texture", "options": [{ "value": "none", "label": "None" },{ "value": "stars", "label": "Stars" },{ "value": "constellation", "label": "Constellation" },{ "value": "nebula", "label": "Nebula" }], "default": "nebula" },
+    { "type": "select", "id": "reveal_animation", "label": "Scroll animation", "options": [{ "value": "none", "label": "None" },{ "value": "fade_up", "label": "Fade up" },{ "value": "stagger", "label": "Stagger children" }], "default": "none" }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "Heading",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Heading text", "default": "Heading" },
+        { "type": "select", "id": "size", "label": "Size", "options": [
+          { "value": "h1", "label": "Extra Large" },
+          { "value": "h2", "label": "Large" },
+          { "value": "h3", "label": "Medium" }
+        ], "default": "h1" },
+        {
+          "type": "select",
+          "id": "heading_font",
+          "options": [
+            { "value": "default", "label": "Default (follows heading tag)" },
+            { "value": "rowdies", "label": "Rowdies" },
+            { "value": "grotesk", "label": "NN Forever Grotesk" }
+          ],
+          "default": "default",
+          "label": "Heading font",
+          "info": "Override the font for this heading. Default uses the heading-level rule (H1-H2 = Rowdies, H3+ = NN Forever Grotesk)."
+        },
+        {
+          "type": "header",
+          "content": "Split and highlight"
+        },
+        {
+          "type": "text",
+          "id": "line_break_after",
+          "label": "Line break after",
+          "info": "Enter the last word (or words) before the line break. Everything after this text wraps to a second line. Leave blank for no break."
+        },
+        {
+          "type": "text",
+          "id": "highlight_text",
+          "label": "Highlight text",
+          "info": "Enter the exact text to highlight. This text will be styled with the weight and color below. Leave blank for no highlight."
+        },
+        {
+          "type": "select",
+          "id": "highlight_weight",
+          "options": [
+            { "value": "inherit", "label": "Inherit" },
+            { "value": "300", "label": "Light" },
+            { "value": "400", "label": "Regular" },
+            { "value": "700", "label": "Bold" }
+          ],
+          "default": "inherit",
+          "label": "Highlight font weight"
+        },
+        {
+          "type": "color",
+          "id": "highlight_color",
+          "label": "Highlight color",
+          "default": "#655DC6",
+          "info": "Color applied to the highlighted text segment."
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        { "type": "richtext", "id": "content", "label": "Text" },
+        { "type": "color", "id": "color", "label": "Text color" }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Button",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Button text", "default": "Learn More" },
+        { "type": "url", "id": "url", "label": "Link" },
+        { "type": "select", "id": "style", "label": "Style", "options": [
+          { "value": "primary", "label": "Primary" },
+          { "value": "outline", "label": "Outline" }
+        ], "default": "primary" },
+        { "type": "color", "id": "bg_color", "label": "Background color", "info": "Leave blank to use automatic color (purple for Milky, orange for Nova)." },
+        { "type": "color", "id": "text_color", "label": "Text color", "info": "Leave blank for white." }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "alt", "label": "Alt text" },
+        { "type": "text", "id": "max_width", "label": "Max width", "default": "20rem" },
+        { "type": "text", "id": "border_radius", "label": "Border radius", "default": "1rem" }
+      ]
+    },
+    { "type": "badge", "name": "Badge", "settings": [{ "type": "text", "id": "label", "label": "Label", "default": "New" },{ "type": "select", "id": "color", "label": "Color", "options": [{ "value": "green", "label": "Green" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "purple", "label": "Purple" },{ "value": "gold", "label": "Gold" }], "default": "skyblue" }] },
+    { "type": "divider", "name": "Divider", "settings": [{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "line", "label": "Line" },{ "value": "space", "label": "Space" },{ "value": "dotted", "label": "Dotted" }], "default": "space" },{ "type": "range", "id": "spacing", "label": "Spacing", "min": 1, "max": 6, "step": 1, "default": 2, "unit": "rem" }] }
+  ],
+  "enabled_on": {
+    "templates": ["index", "page"]
+  },
+  "presets": [
+    {
+      "name": "Stellar Hero Banner",
+      "settings": { "image_position": "right" },
+      "blocks": [
+        { "type": "badge", "settings": { "label": "Coming Soon: Nova", "color": "gold" } },
+        { "type": "heading", "settings": { "text": "Eat Dairy Without Fear", "size": "h1" } },
+        { "type": "text", "settings": { "content": "<p>The world's most powerful lactase supplement, designed to fit in your wallet.</p>" } },
+        { "type": "text", "settings": { "content": "<p>Trusted by 45,000+ dairy lovers · 4.9 ★ rating</p>" } },
+        { "type": "button", "settings": { "text": "Shop Now", "style": "primary" } },
+        { "type": "button", "settings": { "text": "Take the Quiz", "style": "outline" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

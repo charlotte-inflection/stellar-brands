@@ -1,0 +1,79 @@
+{% comment %}
+  Stellar About Science
+  Numbered science steps with optional diagram image.
+  @concept-theme: section-type="image-with-text"
+{% endcomment %}
+
+<section
+  class="{% if section.settings.color_scheme == 'dark' %}stellar-bg-dark{% elsif section.settings.color_scheme == 'deepspace' %}stellar-bg-deepspace{% elsif section.settings.color_scheme == 'light' %}stellar-bg-light{% elsif section.settings.color_scheme == 'sand' %}stellar-bg-sand{% elsif section.settings.color_scheme == 'skyblue' %}stellar-bg-skyblue{% endif %}{% if section.settings.bg_texture == 'stars' %} stellar-stars-bg{% elsif section.settings.bg_texture == 'constellation' %} stellar-constellation-bg{% elsif section.settings.bg_texture == 'nebula' %} stellar-nebula-gradient{% endif %}{% if section.settings.reveal_animation == 'fade_up' %} stellar-reveal{% elsif section.settings.reveal_animation == 'stagger' %} stellar-reveal-stagger{% endif %}"
+  style="{% if section.settings.section_height == 'full' %}min-height:100vh;{% endif %}padding-top:{{ section.settings.padding_top }}px;padding-bottom:{{ section.settings.padding_bottom }}px;{% if section.settings.color_scheme == 'custom' %}background-color:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+>
+  <div class="stellar-container" style="max-width:64rem;margin:0 auto;">
+    <h2 class="stellar-font-display" style="font-size:clamp(1.75rem,3vw,2.25rem);text-align:center;margin-bottom:3rem;color:var(--stellar-offwhite);">
+      {{ section.settings.heading }}
+    </h2>
+    <div style="display:grid;grid-template-columns:1fr;gap:3rem;align-items:center;" class="stellar-grid-md-2">
+      <div style="display:flex;flex-direction:column;gap:1.5rem;">
+        {% for block in section.blocks %}
+          {% if block.type == 'step' %}
+            <div style="display:flex;gap:1rem;" {{ block.shopify_attributes }}>
+              <span class="stellar-font-display" style="font-size:1.5rem;color:hsla(0,0%,100%,0.3);">{{ block.settings.number }}</span>
+              <div>
+                <h3 class="stellar-font-display" style="font-size:1.125rem;margin-bottom:0.25rem;color:var(--stellar-offwhite);">{{ block.settings.title }}</h3>
+                <p class="stellar-font-body" style="font-size:0.875rem;color:hsla(0,0%,100%,0.5);">{{ block.settings.text }}</p>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <div>
+        {% if section.settings.image != blank %}
+          <div style="aspect-ratio:1;border-radius:1rem;overflow:hidden;">
+            <img src="{{ section.settings.image | image_url: width: 800 }}" alt="{{ section.settings.heading }}" style="width:100%;height:100%;object-fit:cover;" loading="lazy" />
+          </div>
+        {% else %}
+          <div style="aspect-ratio:1;border-radius:1rem;background:var(--stellar-deepspace);border:1px solid hsla(0,0%,100%,0.05);display:flex;align-items:center;justify-content:center;">
+            <p class="stellar-font-body" style="color:hsla(0,0%,100%,0.15);font-size:0.625rem;font-style:italic;text-align:center;padding:2rem;">Science diagram placeholder</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div style="max-width:48rem;margin:2rem auto 0;">
+      {% for block in section.blocks %}
+        {% if block.type == 'heading' or block.type == 'text' or block.type == 'button' or block.type == 'image' or block.type == 'badge' or block.type == 'divider' %}
+          {% render 'stellar-standard-block', block: block %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Stellar About Science",
+  "tag": "section",
+  "class": "stellar-about-science",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "The Science" },
+    { "type": "image_picker", "id": "image", "label": "Diagram image" },
+    { "type": "header", "content": "Layout & Style" },
+    { "type": "select", "id": "section_height", "label": "Section height", "options": [{ "value": "auto", "label": "Auto (content)" },{ "value": "full", "label": "Full viewport" }], "default": "auto" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 120, "step": 4, "default": 80, "unit": "px" },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 120, "step": 4, "default": 80, "unit": "px" },
+    { "type": "select", "id": "color_scheme", "label": "Color scheme", "options": [{ "value": "dark", "label": "Dark" },{ "value": "deepspace", "label": "Deep Space" },{ "value": "light", "label": "Light" },{ "value": "sand", "label": "Sand" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "custom", "label": "Custom" }], "default": "dark" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_bg_color", "label": "Custom background", "default": "#222222" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_text_color", "label": "Custom text color", "default": "#F6F7F8" },
+    { "type": "select", "id": "bg_texture", "label": "Background texture", "options": [{ "value": "none", "label": "None" },{ "value": "stars", "label": "Stars" },{ "value": "constellation", "label": "Constellation" },{ "value": "nebula", "label": "Nebula" }], "default": "none" },
+    { "type": "select", "id": "reveal_animation", "label": "Scroll animation", "options": [{ "value": "none", "label": "None" },{ "value": "fade_up", "label": "Fade up" },{ "value": "stagger", "label": "Stagger children" }], "default": "none" }
+  ],
+  "blocks": [
+    { "type": "step", "name": "Step", "settings": [{ "type": "text", "id": "number", "label": "Step number", "default": "01" },{ "type": "text", "id": "title", "label": "Title", "default": "Lactose enters undigested" },{ "type": "textarea", "id": "text", "label": "Description", "default": "Without enough lactase enzyme, lactose passes through your stomach intact." }] },
+    { "type": "heading", "name": "Heading", "settings": [{ "type": "text", "id": "text", "label": "Heading text", "default": "Heading" },{ "type": "select", "id": "size", "label": "Size", "options": [{ "value": "h2", "label": "Large" },{ "value": "h3", "label": "Medium" },{ "value": "h4", "label": "Small" }], "default": "h3" }] },
+    { "type": "text", "name": "Text", "settings": [{ "type": "richtext", "id": "content", "label": "Text" }] },
+    { "type": "button", "name": "Button", "settings": [{ "type": "text", "id": "text", "label": "Button text", "default": "Learn More" },{ "type": "url", "id": "url", "label": "Link" },{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "primary", "label": "Primary" },{ "value": "outline", "label": "Outline" }], "default": "primary" }] },
+    { "type": "image", "name": "Image", "settings": [{ "type": "image_picker", "id": "image", "label": "Image" },{ "type": "text", "id": "alt", "label": "Alt text" }] },
+    { "type": "badge", "name": "Badge", "settings": [{ "type": "text", "id": "label", "label": "Label", "default": "New" },{ "type": "select", "id": "color", "label": "Color", "options": [{ "value": "green", "label": "Green" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "purple", "label": "Purple" },{ "value": "gold", "label": "Gold" }], "default": "skyblue" }] },
+    { "type": "divider", "name": "Divider", "settings": [{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "line", "label": "Line" },{ "value": "space", "label": "Space" },{ "value": "dotted", "label": "Dotted" }], "default": "line" },{ "type": "range", "id": "spacing", "label": "Spacing", "min": 1, "max": 6, "step": 1, "default": 2, "unit": "rem" }] }
+  ]}
+{% endschema %}

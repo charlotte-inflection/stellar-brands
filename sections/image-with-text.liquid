@@ -1,0 +1,349 @@
+{% comment %}
+  Stellar Image with Text
+  Two-column layout with image and rich text content.
+  Image stacks first on mobile regardless of desktop position.
+  @concept-theme: section-type="image-with-text"
+{% endcomment %}
+
+<section
+  class="{% case section.settings.color_scheme %}{% when 'dark' %}stellar-bg-dark{% when 'deepspace' %}stellar-bg-deepspace{% when 'light' %}stellar-bg-light{% when 'sand' %}stellar-bg-sand{% when 'skyblue' %}stellar-bg-skyblue{% endcase %}{% if section.settings.bg_texture == 'stars' %} stellar-stars-bg{% elsif section.settings.bg_texture == 'constellation' %} stellar-constellation-bg{% elsif section.settings.bg_texture == 'nebula' %} stellar-nebula-gradient{% endif %}{% if section.settings.reveal_animation == 'fade_up' %} stellar-reveal{% elsif section.settings.reveal_animation == 'stagger' %} stellar-reveal-stagger{% endif %}"
+  style="padding:{{ section.settings.padding_top }}rem 0 {{ section.settings.padding_bottom }}rem;{% if section.settings.color_scheme == 'custom' %}background:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+>
+  <div class="stellar-container">
+    <div class="stellar-iwt-grid stellar-iwt-img-{{ section.settings.layout }}" style="display:grid;grid-template-columns:1fr;gap:2rem;align-items:{{ section.settings.content_position }};max-width:72rem;margin:0 auto;">
+
+      {%- comment -%}
+        Image is always first in the DOM (stacks first on mobile).
+        CSS order controls desktop positioning.
+      {%- endcomment -%}
+      {% if section.settings.image != blank %}
+        <div class="stellar-iwt-image stellar-iwt-image-wrap" style="border-radius:{{ section.settings.image_radius }};">
+          {%- assign img = section.settings.image -%}
+          <div style="aspect-ratio:{% if section.settings.image_aspect != 'auto' %}{{ section.settings.image_aspect }}{% else %}{{ img.width }}/{{ img.height }}{% endif %};overflow:hidden;">
+            <picture>
+              {% if section.settings.image_mobile != blank %}
+                {%- assign img_m = section.settings.image_mobile -%}
+                <source
+                  media="(max-width: 767px)"
+                  srcset="{{ img_m | image_url: width: 400 }} 400w, {{ img_m | image_url: width: 600 }} 600w, {{ img_m | image_url: width: 800 }} 800w"
+                  width="{{ img_m.width }}"
+                  height="{{ img_m.height }}"
+                >
+              {% endif %}
+              <img
+                src="{{ img | image_url: width: 1200 }}"
+                srcset="{{ img | image_url: width: 400 }} 400w, {{ img | image_url: width: 600 }} 600w, {{ img | image_url: width: 800 }} 800w, {{ img | image_url: width: 1000 }} 1000w, {{ img | image_url: width: 1200 }} 1200w"
+                sizes="(max-width: 1023px) 100vw, 50vw"
+                alt="{{ section.settings.image_alt | escape }}"
+                style="display:block;width:100%;height:100%;object-fit:{{ section.settings.image_fit | default: 'cover' }};"
+                loading="lazy"
+              >
+            </picture>
+          </div>
+        </div>
+      {% else %}
+        <div class="stellar-iwt-image" style="aspect-ratio:4/3;border-radius:{{ section.settings.image_radius }};background:linear-gradient(135deg, hsla(246,40%,57%,0.15), hsla(211,60%,79%,0.08));display:flex;align-items:center;justify-content:center;">
+          <span class="stellar-font-display" style="opacity:0.15;font-size:1.5rem;">Image</span>
+        </div>
+      {% endif %}
+
+      {%- comment -%} Text content {%- endcomment -%}
+      <div class="stellar-iwt-content" style="text-align:{{ section.settings.text_alignment }};">
+        {% for block in section.blocks %}
+          {% case block.type %}
+            {% when 'eyebrow' %}
+              {% if block.settings.text != blank %}
+                <p class="stellar-eyebrow" style="color:{% if block.settings.color != blank %}{{ block.settings.color }}{% else %}var(--stellar-purple){% endif %};margin-bottom:0.75rem;" {{ block.shopify_attributes }}>
+                  {{ block.settings.text }}
+                </p>
+              {% endif %}
+
+            {% when 'heading' %}
+              {% if block.settings.text != blank %}
+                {%- liquid
+                  assign processed_heading = block.settings.text
+
+                  if block.settings.highlight_text != blank
+                    assign hl_text = block.settings.highlight_text
+                    assign hl_weight = block.settings.highlight_weight | default: 'inherit'
+                    assign hl_color = block.settings.highlight_color | default: 'inherit'
+                    assign hl_open = '<span class="stellar-heading-highlight" style="--stellar-highlight-weight:' | append: hl_weight | append: ';--stellar-highlight-color:' | append: hl_color | append: ';">'
+                    assign hl_close = '</span>'
+                    assign hl_replacement = hl_open | append: hl_text | append: hl_close
+                    assign processed_heading = processed_heading | replace: hl_text, hl_replacement
+                  endif
+
+                  if block.settings.line_break_after != blank
+                    assign break_marker = block.settings.line_break_after
+                    assign heading_parts = processed_heading | split: break_marker
+                    if heading_parts.size > 1
+                      assign line_1 = heading_parts | first | append: break_marker
+                      assign line_2_parts = heading_parts | slice: 1, heading_parts.size
+                      assign line_2 = line_2_parts | join: break_marker
+                      assign processed_heading = line_1 | append: '<span class="stellar-heading-line-2">' | append: line_2 | append: '</span>'
+                    endif
+                  endif
+                -%}
+                <{{ block.settings.tag }} class="stellar-font-display" style="font-size:{% if block.settings.size == 'h1' %}clamp(2rem,4vw,3.5rem){% elsif block.settings.size == 'h2' %}clamp(1.75rem,3vw,2.5rem){% else %}clamp(1.25rem,2.5vw,2rem){% endif %};line-height:1.15;margin-bottom:1rem;" {{ block.shopify_attributes }}>
+                  {{ processed_heading }}
+                </{{ block.settings.tag }}>
+              {% endif %}
+
+            {% when 'text' %}
+              {% if block.settings.content != blank %}
+                <div class="stellar-font-body" style="font-size:{% if block.settings.size == 'lg' %}1.125rem{% elsif block.settings.size == 'sm' %}0.8125rem{% else %}0.9375rem{% endif %};line-height:1.75;margin-bottom:1.25rem;{% if block.settings.color != blank %}color:{{ block.settings.color }};{% else %}opacity:0.7;{% endif %}" {{ block.shopify_attributes }}>
+                  {{ block.settings.content }}
+                </div>
+              {% endif %}
+
+            {% when 'button' %}
+              {% if block.settings.text != blank %}
+                <div style="margin-bottom:1rem;{% if section.settings.text_alignment == 'center' %}display:flex;justify-content:center;{% endif %}" {{ block.shopify_attributes }}>
+                  <a href="{{ block.settings.url | default: '#' }}" class="stellar-font-body stellar-hover-lift" style="display:inline-block;padding:0.75rem 2rem;border-radius:0.5rem;{% if block.settings.style == 'primary' %}background:var(--stellar-skyblue);color:var(--stellar-black);font-weight:var(--font-button-weight);{% else %}border:1px solid currentColor;opacity:0.7;font-weight:var(--font-button-weight);{% endif %}text-decoration:none;font-family:var(--font-button-family);font-size:var(--font-button-size);text-transform:var(--font-button-text-transform);">
+                    {{ block.settings.text }}
+                  </a>
+                </div>
+              {% endif %}
+
+            {% when 'badge' %}
+              <div style="margin-bottom:1rem;" {{ block.shopify_attributes }}>
+                <span class="stellar-badge stellar-badge-{{ block.settings.color }}">{{ block.settings.label }}</span>
+              </div>
+
+            {% when 'divider' %}
+              {% if block.settings.style == 'space' %}
+                <div style="height:{{ block.settings.spacing }}rem;" {{ block.shopify_attributes }}></div>
+              {% elsif block.settings.style == 'dotted' %}
+                <hr style="border:none;border-top:2px dotted currentColor;opacity:0.15;margin:{{ block.settings.spacing }}rem 0;" {{ block.shopify_attributes }}>
+              {% else %}
+                <hr style="border:none;border-top:1px solid currentColor;opacity:0.1;margin:{{ block.settings.spacing }}rem 0;" {{ block.shopify_attributes }}>
+              {% endif %}
+
+            {% when 'image' %}
+              {% if block.settings.image != blank %}
+                <div class="stellar-img-zoom" style="margin-bottom:1rem;{% if block.settings.max_width != blank %}max-width:{{ block.settings.max_width }};{% endif %}" {{ block.shopify_attributes }}>
+                  <img src="{{ block.settings.image | image_url: width: 800 }}" alt="{{ block.settings.alt | escape }}" style="max-width:100%;border-radius:0.75rem;" loading="lazy">
+                </div>
+              {% endif %}
+
+            {% when 'icon' %}
+              {% if block.settings.image != blank %}
+                <div style="margin-bottom:1rem;" {{ block.shopify_attributes }}>
+                  <img src="{{ block.settings.image | image_url: width: 200 }}" alt="{{ block.settings.alt | escape }}" style="height:{{ block.settings.height | default: 48 }}px;width:auto;" loading="lazy">
+                </div>
+              {% endif %}
+
+            {% when 'liquid' %}
+              {% if block.settings.liquid != blank %}
+                <div class="stellar-font-body" style="margin-bottom:1rem;" {{ block.shopify_attributes }}>
+                  {{ block.settings.liquid }}
+                </div>
+              {% endif %}
+          {% endcase %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @media (min-width: 1024px) {
+      .stellar-iwt-grid {
+        grid-template-columns: {{ section.settings.image_width }}fr {{ section.settings.text_width }}fr !important;
+        gap: 3rem !important;
+      }
+      .stellar-iwt-img-image_right .stellar-iwt-image { order: 2; }
+      .stellar-iwt-img-image_right .stellar-iwt-content { order: 1; }
+      .stellar-iwt-img-image_left .stellar-iwt-image { order: 1; }
+      .stellar-iwt-img-image_left .stellar-iwt-content { order: 2; }
+    }
+  </style>
+</section>
+
+{% schema %}
+{
+  "name": "Stellar Image + Text",
+  "tag": "section",
+  "class": "stellar-image-with-text",
+  "settings": [
+    { "type": "header", "content": "Image" },
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "image_picker", "id": "image_mobile", "label": "Mobile image", "info": "Optional. Overrides the main image on mobile." },
+    { "type": "text", "id": "image_alt", "label": "Image alt text" },
+    { "type": "select", "id": "image_radius", "label": "Image corners", "options": [
+      { "value": "0", "label": "Square" },
+      { "value": "0.5rem", "label": "Slight" },
+      { "value": "1rem", "label": "Rounded" },
+      { "value": "2rem", "label": "Extra rounded" }
+    ], "default": "1rem" },
+    { "type": "select", "id": "image_aspect", "label": "Image aspect ratio", "options": [
+      { "value": "auto", "label": "Original (native)" },
+      { "value": "1/1", "label": "Square (1:1)" },
+      { "value": "4/3", "label": "Landscape (4:3)" },
+      { "value": "3/4", "label": "Portrait (3:4)" },
+      { "value": "4/5", "label": "Tall portrait (4:5)" },
+      { "value": "16/9", "label": "Wide (16:9)" },
+      { "value": "3/2", "label": "Photo (3:2)" }
+    ], "default": "4/5", "info": "Set all image-with-text sections to the same ratio for uniform heights." },
+    { "type": "select", "id": "image_fit", "label": "Image fit", "options": [
+      { "value": "cover", "label": "Cover (fill, may crop)" },
+      { "value": "contain", "label": "Contain (fit, may letterbox)" },
+      { "value": "fill", "label": "Fill (stretch to fit)" }
+    ], "default": "cover", "info": "How the image fills the aspect ratio container." },
+    { "type": "header", "content": "Layout" },
+    { "type": "select", "id": "layout", "label": "Image position (desktop)", "options": [
+      { "value": "image_left", "label": "Image left" },
+      { "value": "image_right", "label": "Image right" }
+    ], "default": "image_left", "info": "Image always stacks first on mobile." },
+    { "type": "select", "id": "image_width", "label": "Image column width", "options": [
+      { "value": "1", "label": "Narrow" },
+      { "value": "1.2", "label": "Medium" },
+      { "value": "1.5", "label": "Wide" }
+    ], "default": "1" },
+    { "type": "select", "id": "text_width", "label": "Text column width", "options": [
+      { "value": "1", "label": "Narrow" },
+      { "value": "1.2", "label": "Medium" },
+      { "value": "1.5", "label": "Wide" }
+    ], "default": "1" },
+    { "type": "select", "id": "content_position", "label": "Vertical alignment", "options": [
+      { "value": "start", "label": "Top" },
+      { "value": "center", "label": "Center" },
+      { "value": "end", "label": "Bottom" }
+    ], "default": "center" },
+    { "type": "select", "id": "text_alignment", "label": "Text alignment", "options": [
+      { "value": "left", "label": "Left" },
+      { "value": "center", "label": "Center" }
+    ], "default": "left" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 12, "step": 1, "default": 5, "unit": "rem" },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 12, "step": 1, "default": 5, "unit": "rem" },
+    { "type": "header", "content": "Style" },
+    { "type": "select", "id": "color_scheme", "label": "Color scheme", "options": [
+      { "value": "dark", "label": "Dark" },
+      { "value": "deepspace", "label": "Deep Space" },
+      { "value": "light", "label": "Light" },
+      { "value": "sand", "label": "Sand" },
+      { "value": "skyblue", "label": "Sky Blue" },
+      { "value": "custom", "label": "Custom" }
+    ], "default": "dark" },
+    { "type": "color", "id": "custom_bg_color", "label": "Custom background", "default": "#222222" },
+    { "type": "color", "id": "custom_text_color", "label": "Custom text", "default": "#F6F7F8" },
+    { "type": "select", "id": "bg_texture", "label": "Background texture", "options": [{ "value": "none", "label": "None" },{ "value": "stars", "label": "Stars" },{ "value": "constellation", "label": "Constellation" },{ "value": "nebula", "label": "Nebula" }], "default": "none" },
+    { "type": "select", "id": "reveal_animation", "label": "Scroll animation", "options": [{ "value": "none", "label": "None" },{ "value": "fade_up", "label": "Fade up" },{ "value": "stagger", "label": "Stagger children" }], "default": "none" }
+  ],
+  "blocks": [
+    { "type": "eyebrow", "name": "Eyebrow", "settings": [
+      { "type": "text", "id": "text", "label": "Text", "default": "About Us" },
+      { "type": "color", "id": "color", "label": "Color" }
+    ] },
+    { "type": "heading", "name": "Heading", "settings": [
+      { "type": "text", "id": "text", "label": "Text", "default": "Image with text" },
+      { "type": "select", "id": "size", "label": "Size", "options": [
+        { "value": "h1", "label": "Extra large" },
+        { "value": "h2", "label": "Large" },
+        { "value": "h3", "label": "Medium" }
+      ], "default": "h2" },
+      { "type": "select", "id": "tag", "label": "HTML tag", "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "p", "label": "Paragraph" }
+      ], "default": "h2" },
+      {
+        "type": "header",
+        "content": "Split and highlight"
+      },
+      {
+        "type": "text",
+        "id": "line_break_after",
+        "label": "Line break after",
+        "info": "Enter the last word(s) before the line break. Everything after wraps to a second line. Leave blank for no break."
+      },
+      {
+        "type": "text",
+        "id": "highlight_text",
+        "label": "Highlight text",
+        "info": "Enter the exact text to highlight. Styled with the weight and color below. Leave blank for no highlight."
+      },
+      {
+        "type": "select",
+        "id": "highlight_weight",
+        "options": [
+          { "value": "inherit", "label": "Inherit" },
+          { "value": "300", "label": "Light" },
+          { "value": "400", "label": "Regular" },
+          { "value": "700", "label": "Bold" }
+        ],
+        "default": "inherit",
+        "label": "Highlight font weight"
+      },
+      {
+        "type": "color",
+        "id": "highlight_color",
+        "label": "Highlight color",
+        "default": "#655DC6",
+        "info": "Color applied to the highlighted text segment."
+      }
+    ] },
+    { "type": "text", "name": "Text", "settings": [
+      { "type": "richtext", "id": "content", "label": "Content", "default": "<p>Use this text to share information about your brand with your customers.</p>" },
+      { "type": "select", "id": "size", "label": "Size", "options": [
+        { "value": "sm", "label": "Small" },
+        { "value": "md", "label": "Medium" },
+        { "value": "lg", "label": "Large" }
+      ], "default": "md" },
+      { "type": "color", "id": "color", "label": "Text color", "info": "Leave blank for default." }
+    ] },
+    { "type": "button", "name": "Button", "settings": [
+      { "type": "text", "id": "text", "label": "Label", "default": "Learn More" },
+      { "type": "url", "id": "url", "label": "Link" },
+      { "type": "select", "id": "style", "label": "Style", "options": [
+        { "value": "primary", "label": "Primary" },
+        { "value": "outline", "label": "Outline" }
+      ], "default": "primary" }
+    ] },
+    { "type": "badge", "name": "Badge", "settings": [
+      { "type": "text", "id": "label", "label": "Label", "default": "New" },
+      { "type": "select", "id": "color", "label": "Color", "options": [
+        { "value": "green", "label": "Green" },
+        { "value": "skyblue", "label": "Sky Blue" },
+        { "value": "purple", "label": "Purple" },
+        { "value": "gold", "label": "Gold" }
+      ], "default": "skyblue" }
+    ] },
+    { "type": "icon", "name": "Icon / Logo", "settings": [
+      { "type": "image_picker", "id": "image", "label": "Image" },
+      { "type": "text", "id": "alt", "label": "Alt text" },
+      { "type": "range", "id": "height", "label": "Height", "min": 16, "max": 120, "step": 4, "default": 48, "unit": "px" }
+    ] },
+    { "type": "image", "name": "Image", "settings": [
+      { "type": "image_picker", "id": "image", "label": "Image" },
+      { "type": "text", "id": "alt", "label": "Alt text" },
+      { "type": "text", "id": "max_width", "label": "Max width", "default": "20rem", "info": "CSS value, e.g. 20rem or 300px" }
+    ] },
+    { "type": "divider", "name": "Divider", "settings": [
+      { "type": "select", "id": "style", "label": "Style", "options": [
+        { "value": "line", "label": "Line" },
+        { "value": "space", "label": "Space" },
+        { "value": "dotted", "label": "Dotted" }
+      ], "default": "space" },
+      { "type": "range", "id": "spacing", "label": "Spacing", "min": 1, "max": 6, "step": 1, "default": 2, "unit": "rem" }
+    ] },
+    { "type": "liquid", "name": "Custom Liquid", "settings": [
+      { "type": "liquid", "id": "liquid", "label": "Liquid", "info": "Add custom HTML or Liquid code." }
+    ] }
+  ],
+  "enabled_on": {
+    "templates": ["index", "page", "product"]
+  },
+  "presets": [
+    {
+      "name": "Stellar Image + Text",
+      "blocks": [
+        { "type": "eyebrow", "settings": { "text": "Our Story" } },
+        { "type": "heading", "settings": { "text": "Built for Dairy Lovers", "size": "h2" } },
+        { "type": "text", "settings": { "content": "<p>We created Milky because we believe everyone deserves to enjoy the foods they love without compromise.</p>" } },
+        { "type": "button", "settings": { "text": "Learn More", "style": "primary" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

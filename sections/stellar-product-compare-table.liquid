@@ -1,0 +1,740 @@
+{% comment %}
+  Stellar Product Compare Table (PDP)
+  Side-by-side comparison via blocks.
+  @concept-theme: section-type="custom-liquid"
+{% endcomment %}
+
+<style>
+  .stellar-compare-tbl {
+    table-layout: auto;
+  }
+  .stellar-compare-tbl th:not(:first-child) {
+    text-align: center;
+  }
+  .stellar-compare-tbl td:not(:first-child) {
+    white-space: nowrap;
+  }
+
+  @media (max-width: 600px) {
+    .stellar-compare-scroll {
+      padding: 0 0.5rem !important;
+    }
+    .stellar-compare-tbl {
+      table-layout: fixed !important;
+    }
+    .stellar-compare-tbl col.stellar-compare-feature-col {
+      width: 30%;
+    }
+    .stellar-compare-tbl th,
+    .stellar-compare-tbl td {
+      padding: 0.5rem 0.375rem !important;
+      font-size: 0.6875rem !important;
+    }
+    .stellar-compare-tbl td:first-child {
+      white-space: normal;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+  }
+</style>
+
+<section id="compare"
+  class="{% if section.settings.color_scheme == 'dark' %}stellar-bg-dark{% elsif section.settings.color_scheme == 'deepspace' %}stellar-bg-deepspace{% elsif section.settings.color_scheme == 'light' %}stellar-bg-light{% elsif section.settings.color_scheme == 'skyblue' %}stellar-bg-skyblue{% endif %}{% if section.settings.bg_texture == 'stars' %} stellar-stars-bg{% elsif section.settings.bg_texture == 'constellation' %} stellar-constellation-bg{% elsif section.settings.bg_texture == 'nebula' %} stellar-nebula-gradient{% endif %}{% if section.settings.reveal_animation == 'fade_up' %} stellar-reveal{% elsif section.settings.reveal_animation == 'stagger' %} stellar-reveal-stagger{% endif %}"
+  style="padding:{{ section.settings.padding_top }}rem 0 {{ section.settings.padding_bottom }}rem;{% if section.settings.color_scheme == 'custom' %}background:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+  {% if section.settings.toggle_group != blank %}data-toggle-group="{{ section.settings.toggle_group }}"{% endif %}
+>
+  <div class="stellar-container" style="text-align:center;">
+    <p class="stellar-eyebrow" style="color:{% if section.settings.color_scheme == 'custom' %}inherit{% else %}var(--stellar-skyblue){% endif %};margin-bottom:0.75rem;">{{ section.settings.eyebrow }}</p>
+    <h2 class="stellar-font-display" style="color:{% if section.settings.heading_color != blank %}{{ section.settings.heading_color }}{% else %}var(--stellar-offwhite){% endif %};font-size:clamp(1.75rem,3vw,2.5rem);margin-bottom:4rem;">
+      {{ section.settings.heading }}{%- if section.settings.heading_line_2 != blank -%}<span class="stellar-heading-line-2" {% if section.settings.heading_line_2_color != blank %}style="color:{{ section.settings.heading_line_2_color }};"{% endif %}>{{ section.settings.heading_line_2 }}</span>{%- endif -%}
+    </h2>
+  </div>
+
+  <div class="stellar-scrollbar-hide stellar-compare-scroll" style="max-width:56rem;margin:0 auto;overflow-x:auto;padding:0 1rem;">
+    {%- comment -%} Count column blocks for colgroup {%- endcomment -%}
+    {%- assign col_count = 0 -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'column' -%}
+        {%- assign col_count = col_count | plus: 1 -%}
+      {%- endif -%}
+    {%- endfor -%}
+
+    <table class="stellar-font-body stellar-compare-tbl" style="width:100%;font-size:0.875rem;border-collapse:collapse;">
+      <colgroup>
+        <col class="stellar-compare-feature-col">
+        {% for block in section.blocks %}
+          {% if block.type == 'column' %}
+            <col>
+          {% endif %}
+        {% endfor %}
+      </colgroup>
+      <thead>
+        <tr style="border-bottom:1px solid hsla(0,0%,100%,0.1);">
+          <th style="text-align:left;padding:0.75rem 1rem;color:hsla(0,0%,100%,0.4);font-weight:normal;">Feature</th>
+          {% for block in section.blocks %}
+            {% if block.type == 'column' %}
+              <th style="text-align:center;padding:0.75rem 1rem;{% if block.settings.highlight %}border-left:1px solid hsla(211,60%,79%,0.2);border-right:1px solid hsla(211,60%,79%,0.2);background:hsla(211,60%,79%,0.05);{% endif %}" {{ block.shopify_attributes }}>
+                <span {% if block.settings.highlight %}class="stellar-font-display" style="color:var(--stellar-skyblue);"{% else %}style="color:hsla(0,0%,100%,0.6);"{% endif %}>{{ block.settings.name }}</span>
+              </th>
+            {% endif %}
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for block in section.blocks %}
+          {% if block.type == 'row' %}
+            <tr style="border-bottom:1px solid hsla(0,0%,100%,0.05);" {{ block.shopify_attributes }}>
+              <td style="color:hsla(0,0%,100%,0.6);padding:0.75rem 1rem;font-size:0.75rem;">{{ block.settings.label }}</td>
+              {%- assign col_idx = 0 -%}
+              {%- for b in section.blocks -%}
+                {%- if b.type == 'column' -%}
+                  {%- assign col_idx = col_idx | plus: 1 -%}
+                  {%- assign val_key = 'col_' | append: col_idx -%}
+                  {%- assign val = block.settings[val_key] -%}
+                  <td style="text-align:center;padding:0.75rem 1rem;font-size:0.75rem;{% if b.settings.highlight %}border-left:1px solid hsla(211,60%,79%,0.2);border-right:1px solid hsla(211,60%,79%,0.2);background:hsla(211,60%,79%,0.05);font-weight:500;color:var(--stellar-offwhite);{% else %}color:hsla(0,0%,100%,0.5);{% endif %}">
+                    {%- if val == 'true' -%}<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--stellar-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;"><polyline points="20 6 9 17 4 12"/></svg>{%- elsif val == 'false' -%}<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="hsla(0,60%,60%,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>{%- elsif val == '—' -%}<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="hsla(0,0%,96%,0.2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;"><line x1="5" y1="12" x2="19" y2="12"/></svg>{%- else -%}{{ val }}{%- endif -%}
+                  </td>
+                {%- endif -%}
+              {%- endfor -%}
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if section.settings.footnote != blank %}
+    <p class="stellar-font-body" style="max-width:56rem;margin:0.5rem auto 0;padding:0 1rem;font-size:0.6875rem;opacity:0.35;line-height:1.4;text-align:left;">
+      {{ section.settings.footnote }}
+    </p>
+  {% endif %}
+
+  {% if section.settings.cta_text != blank %}
+    <div style="text-align:center;margin-top:2.5rem;">
+      <a href="{{ section.settings.cta_url }}" class="stellar-font-body stellar-hover-lift" style="display:inline-block;padding:0.625rem 2rem;border-radius:0.5rem;background:{% if section.settings.cta_bg_color != blank %}{{ section.settings.cta_bg_color }}{% else %}var(--stellar-cta-bg){% endif %};color:{% if section.settings.cta_text_color != blank %}{{ section.settings.cta_text_color }}{% else %}var(--stellar-cta-text){% endif %};font-weight:500;text-decoration:none;">{{ section.settings.cta_text }}</a>
+    </div>
+  {% endif %}
+
+  {% for block in section.blocks %}
+    {% if block.type == 'heading' or block.type == 'text' or block.type == 'button' or block.type == 'image' or block.type == 'badge' or block.type == 'divider' %}
+      <div class="stellar-container" style="margin-top:2rem;">{% render 'stellar-standard-block', block: block %}</div>
+    {% endif %}
+  {% endfor %}
+</section>
+
+{% schema %}
+{
+  "name": "Stellar Compare Table",
+  "tag": "section",
+  "class": "stellar-product-compare-table",
+  "settings": [
+    {
+      "type": "text",
+      "id": "toggle_group",
+      "label": "Toggle group",
+      "info": "Used with the Resources Toggle. Set to 'lactose' or 'heartburn'. Leave blank if not toggled."
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Side by Side"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "How Milky Compares"
+    },
+    {
+      "type": "text",
+      "id": "heading_line_2",
+      "label": "Heading line 2",
+      "info": "Optional second line with separate color"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color"
+    },
+    {
+      "type": "color",
+      "id": "heading_line_2_color",
+      "label": "Heading line 2 color",
+      "info": "Highlight color for second line"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "CTA text",
+      "default": "Shop Milky Ultra"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "CTA link"
+    },
+    {
+      "type": "color",
+      "id": "cta_bg_color",
+      "label": "CTA button color",
+      "info": "Overrides default purple"
+    },
+    {
+      "type": "color",
+      "id": "cta_text_color",
+      "label": "CTA text color"
+    },
+    {
+      "type": "textarea",
+      "id": "footnote",
+      "label": "Table footnote",
+      "info": "Optional small text below the table"
+    },
+    {
+      "type": "header",
+      "content": "Layout & Style"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 12,
+      "step": 1,
+      "default": 5,
+      "unit": "rem"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 12,
+      "step": 1,
+      "default": 5,
+      "unit": "rem"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        {
+          "value": "dark",
+          "label": "Dark"
+        },
+        {
+          "value": "deepspace",
+          "label": "Deep Space"
+        },
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "skyblue",
+          "label": "Sky Blue"
+        },
+        {
+          "value": "custom",
+          "label": "Custom"
+        }
+      ],
+      "default": "dark"
+    },
+    {
+      "visible_if": "{{ section.settings.color_scheme == 'custom' }}",
+      "type": "color",
+      "id": "custom_bg_color",
+      "label": "Custom background",
+      "default": "#222222"
+    },
+    {
+      "visible_if": "{{ section.settings.color_scheme == 'custom' }}",
+      "type": "color",
+      "id": "custom_text_color",
+      "label": "Custom text",
+      "default": "#F6F7F8"
+    },
+    {
+      "type": "select",
+      "id": "bg_texture",
+      "label": "Background texture",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "stars",
+          "label": "Stars"
+        },
+        {
+          "value": "constellation",
+          "label": "Constellation"
+        },
+        {
+          "value": "nebula",
+          "label": "Nebula"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "select",
+      "id": "reveal_animation",
+      "label": "Scroll animation",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "fade_up",
+          "label": "Fade up"
+        },
+        {
+          "value": "stagger",
+          "label": "Stagger children"
+        }
+      ],
+      "default": "none"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "column",
+      "name": "Column",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Column name",
+          "default": "Original"
+        },
+        {
+          "type": "checkbox",
+          "id": "highlight",
+          "label": "Highlight column",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "row",
+      "name": "Row",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Feature label",
+          "default": "Feature"
+        },
+        {
+          "type": "text",
+          "id": "col_1",
+          "label": "Column 1 value"
+        },
+        {
+          "type": "text",
+          "id": "col_2",
+          "label": "Column 2 value"
+        },
+        {
+          "type": "text",
+          "id": "col_3",
+          "label": "Column 3 value"
+        },
+        {
+          "type": "text",
+          "id": "col_4",
+          "label": "Column 4 value"
+        },
+        {
+          "type": "text",
+          "id": "col_5",
+          "label": "Column 5 value"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "name": "Heading",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Heading"
+        },
+        {
+          "type": "text",
+          "id": "line_2",
+          "label": "Line 2 (optional)",
+          "info": "Splits heading into two styled lines"
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "Size",
+          "options": [
+            {
+              "value": "h2",
+              "label": "Large"
+            },
+            {
+              "value": "h3",
+              "label": "Medium"
+            },
+            {
+              "value": "h4",
+              "label": "Small"
+            }
+          ],
+          "default": "h3"
+        },
+        {
+          "type": "color",
+          "id": "heading_color",
+          "label": "Text color"
+        },
+        {
+          "type": "color",
+          "id": "line_2_color",
+          "label": "Line 2 color",
+          "info": "Highlight color for second line"
+        },
+        {
+          "type": "select",
+          "id": "font_weight",
+          "label": "Font weight",
+          "options": [
+            {
+              "value": "300",
+              "label": "Light"
+            },
+            {
+              "value": "400",
+              "label": "Regular"
+            },
+            {
+              "value": "700",
+              "label": "Bold"
+            }
+          ],
+          "default": "400"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Content",
+          "default": "<p>Body text</p>"
+        },
+        {
+          "type": "select",
+          "id": "font_size",
+          "label": "Text size",
+          "options": [
+            {
+              "value": "small",
+              "label": "Small (0.875rem)"
+            },
+            {
+              "value": "base",
+              "label": "Base (1rem)"
+            },
+            {
+              "value": "large",
+              "label": "Large (1.125rem)"
+            },
+            {
+              "value": "xl",
+              "label": "Extra large (1.25rem)"
+            }
+          ],
+          "default": "base"
+        },
+        {
+          "type": "select",
+          "id": "font_weight",
+          "label": "Font weight",
+          "options": [
+            {
+              "value": "normal",
+              "label": "Normal"
+            },
+            {
+              "value": "500",
+              "label": "Medium"
+            },
+            {
+              "value": "700",
+              "label": "Bold"
+            }
+          ],
+          "default": "normal"
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Button",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Label",
+          "default": "Learn More"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link"
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Style",
+          "options": [
+            {
+              "value": "primary",
+              "label": "Primary"
+            },
+            {
+              "value": "outline",
+              "label": "Outline"
+            }
+          ],
+          "default": "primary"
+        },
+        {
+          "type": "color",
+          "id": "bg_color",
+          "label": "Button color",
+          "info": "Overrides default. Primary: purple, Outline: transparent."
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Button text color"
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "alt",
+          "label": "Alt text",
+          "default": "Image"
+        },
+        {
+          "type": "text",
+          "id": "max_width",
+          "label": "Max width",
+          "default": "100%",
+          "info": "CSS value, e.g. 400px, 50%, 20rem"
+        }
+      ]
+    },
+    {
+      "type": "badge",
+      "name": "Badge",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "New"
+        },
+        {
+          "type": "select",
+          "id": "color",
+          "label": "Color",
+          "options": [
+            {
+              "value": "green",
+              "label": "Green"
+            },
+            {
+              "value": "skyblue",
+              "label": "Sky Blue"
+            },
+            {
+              "value": "purple",
+              "label": "Purple"
+            },
+            {
+              "value": "gold",
+              "label": "Gold"
+            }
+          ],
+          "default": "skyblue"
+        }
+      ]
+    },
+    {
+      "type": "divider",
+      "name": "Divider",
+      "settings": [
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Style",
+          "options": [
+            {
+              "value": "line",
+              "label": "Line"
+            },
+            {
+              "value": "space",
+              "label": "Space"
+            },
+            {
+              "value": "dotted",
+              "label": "Dotted"
+            }
+          ],
+          "default": "line"
+        },
+        {
+          "type": "range",
+          "id": "spacing",
+          "label": "Spacing",
+          "min": 1,
+          "max": 6,
+          "step": 1,
+          "default": 2,
+          "unit": "rem"
+        }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "templates": ["index", "page", "product"]
+  },
+  "presets": [
+    {
+      "name": "Stellar Compare Table",
+      "blocks": [
+        {
+          "type": "column",
+          "settings": {
+            "name": "Original",
+            "highlight": false
+          }
+        },
+        {
+          "type": "column",
+          "settings": {
+            "name": "Ultra \u2605",
+            "highlight": true
+          }
+        },
+        {
+          "type": "column",
+          "settings": {
+            "name": "Lactaid",
+            "highlight": false
+          }
+        },
+        {
+          "type": "row",
+          "settings": {
+            "label": "Lactase per dose",
+            "col_1": "10,800 FCC",
+            "col_2": "21,000 FCC",
+            "col_3": "3,000 FCC"
+          }
+        },
+        {
+          "type": "row",
+          "settings": {
+            "label": "Format",
+            "col_1": "Credit-card",
+            "col_2": "Credit-card",
+            "col_3": "Bottle of pills"
+          }
+        },
+        {
+          "type": "row",
+          "settings": {
+            "label": "Fits in wallet",
+            "col_1": "true",
+            "col_2": "true",
+            "col_3": "false"
+          }
+        },
+        {
+          "type": "row",
+          "settings": {
+            "label": "Doses per pack",
+            "col_1": "24",
+            "col_2": "24",
+            "col_3": "32"
+          }
+        },
+        {
+          "type": "row",
+          "settings": {
+            "label": "NSF Certified",
+            "col_1": "true",
+            "col_2": "true",
+            "col_3": "false"
+          }
+        },
+        {
+          "type": "row",
+          "settings": {
+            "label": "Third-party tested",
+            "col_1": "true",
+            "col_2": "true",
+            "col_3": "false"
+          }
+        },
+        {
+          "type": "row",
+          "settings": {
+            "label": "HSA/FSA eligible",
+            "col_1": "true",
+            "col_2": "true",
+            "col_3": "false"
+          }
+        },
+        {
+          "type": "row",
+          "settings": {
+            "label": "Money-back guarantee",
+            "col_1": "60 days",
+            "col_2": "60 days",
+            "col_3": "None"
+          }
+        },
+        {
+          "type": "row",
+          "settings": {
+            "label": "Price from",
+            "col_1": "$29",
+            "col_2": "$34",
+            "col_3": "~$12"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,85 @@
+{% comment %}
+  Stellar Font Styles
+  Loads Rowdies via Google Fonts and NN Forever Grotesk via self-hosted OTF.
+  Applies heading and body font rules.
+  Include in layout/theme.liquid: {% render 'stellar-font-styles' %}
+{% endcomment %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rowdies:wght@300;400;700&display=swap" rel="stylesheet">
+
+<style>
+  /* --- NN Forever Grotesk STD — self-hosted @font-face --- */
+
+  @font-face {
+    font-family: 'NN Forever Grotesk STD';
+    src: url('{{ "NNForeverGroteskSTD-Normal.otf" | asset_url }}') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'NN Forever Grotesk STD';
+    src: url('{{ "NNForeverGroteskSTD-NormalDiagonal.otf" | asset_url }}') format('opentype');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+
+  /* --- Stellar font utility classes --- */
+
+  .stellar-font-display {
+    font-family: 'Rowdies', cursive, system-ui, sans-serif;
+    line-height: 1.2;
+  }
+
+  .stellar-font-grotesk {
+    font-family: 'NN Forever Grotesk STD', system-ui, -apple-system, sans-serif;
+    line-height: 1.3;
+  }
+
+  .stellar-font-body {
+    font-family: Arial, Helvetica, sans-serif;
+    letter-spacing: 0.01em;
+    line-height: 1.75;
+  }
+
+  .stellar-eyebrow {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.625rem;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  /* --- Heading rules: H1-H2 = Rowdies, H3+ = NN Forever Grotesk STD --- */
+
+  h1, h2,
+  .h1, .h2 {
+    font-family: 'Rowdies', cursive, system-ui, sans-serif;
+  }
+
+  h3, h4, h5, h6,
+  .h3, .h4, .h5, .h6,
+  .heading {
+    font-family: 'NN Forever Grotesk STD', system-ui, -apple-system, sans-serif;
+  }
+
+  h1.heading, h2.heading {
+    font-family: 'Rowdies', cursive, system-ui, sans-serif;
+  }
+
+  [data-heading-font="rowdies"] {
+    font-family: 'Rowdies', cursive, system-ui, sans-serif !important;
+  }
+  [data-heading-font="grotesk"] {
+    font-family: 'NN Forever Grotesk STD', system-ui, -apple-system, sans-serif !important;
+  }
+
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+  }
+</style>

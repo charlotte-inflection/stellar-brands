@@ -1,0 +1,120 @@
+{%- doc -%}
+  Renders product ratings with visual stars, numeric values, and review counts.
+
+  When called with a rating block, supports editor-configurable overrides for rating
+  number, star count, and visibility of each element. Falls back to Shopify review
+  metafields when custom values are blank.
+
+  When called without a block (e.g. from the title block), renders the compact
+  metafield-based display with no configurability.
+
+  @param {object} product - Product with review metafields
+  @param {object} [block] - Section block with rating display settings
+
+  @example
+  {% render 'product-rating', product: product, block: block %}
+{%- enddoc -%}
+
+{%- liquid
+  comment
+    Determine rating value and scale.
+    Block custom_rating overrides the metafield when present.
+    Block star_count overrides the default 5-star scale when present.
+  endcomment
+
+  assign has_metafield = false
+  if product.metafields.reviews.rating.value != blank and product.metafields.reviews.rating_count.value > 0
+    assign has_metafield = true
+  endif
+
+  assign display_rating = nil
+  assign display_max = 5
+  assign display_count = nil
+  assign use_custom_stars = false
+
+  if block != blank and block.settings.custom_rating != blank
+    assign display_rating = block.settings.custom_rating | plus: 0
+  elsif has_metafield
+    assign display_rating = product.metafields.reviews.rating.value.rating
+  endif
+
+  if block != blank and block.settings.star_count != blank and block.settings.star_count != 5
+    assign display_max = block.settings.star_count
+    assign use_custom_stars = true
+  elsif has_metafield
+    assign display_max = product.metafields.reviews.rating.value.scale_max
+  endif
+
+  if has_metafield
+    assign display_count = product.metafields.reviews.rating_count.value
+  endif
+
+  comment
+    Visibility toggles. Default to true when block is blank (title-block context).
+  endcomment
+  assign show_stars = true
+  assign show_rating_number = true
+  assign show_review_count = true
+  if block != blank
+    assign show_stars = block.settings.show_stars
+    assign show_rating_number = block.settings.show_rating_number
+    assign show_review_count = block.settings.show_review_count
+  endif
+-%}
+
+{%- if display_rating != nil -%}
+  {%- liquid
+    assign rating_decimal = 0
+    assign decimal = display_rating | modulo: 1
+    if decimal >= 0.3 and decimal <= 0.7
+      assign rating_decimal = 0.5
+    elsif decimal > 0.7
+      assign rating_decimal = 1
+    endif
+  -%}
+  <div class="product__rating flex items-center gap-2" {{ block.shopify_attributes }}>
+    {%- if show_stars -%}
+      <div
+        class="rating text-lg leading-none"
+        role="img"
+        aria-label="{{ 'general.accessibility.star_reviews_info' | t: rating_value: display_rating, rating_max: display_max }}"
+      >
+        {%- liquid
+          if block == blank
+            render 'icon', icon: 'star', size: 'xs lg:hidden'
+          endif
+        -%}
+        {%- if use_custom_stars -%}
+          {%- comment -%} Render configurable number of stars inline {%- endcomment -%}
+          <span
+            aria-hidden="true"
+            class="rating-star rating-star--custom{% if block == blank %} hidden lg:block{% endif %}"
+            style="--rating: {{ display_rating | floor }};--rating-max: {{ display_max }};--rating-decimal: {{ rating_decimal }};--percent: calc(({{ display_rating | floor }} / {{ display_max }} + {{ rating_decimal }} * var(--font-size) / ({{ display_max }} * (var(--letter-spacing) + var(--font-size)))) * 100%);--letter-spacing: 0;--font-size: 2;"
+          >
+            {%- for i in (1..display_max) -%}&#9733;{%- endfor -%}
+          </span>
+        {%- else -%}
+          <span
+            aria-hidden="true"
+            class="rating-star{% if block == blank %} hidden lg:block{% endif %}"
+            style="--rating: {{ display_rating | floor }};--rating-max: {{ display_max }};--rating-decimal: {{ rating_decimal }};"
+          ></span>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+    {%- if show_rating_number -%}
+      <p class="rating-text text-sm leading-none">
+        <span aria-hidden="true">{{ display_rating }}</span>
+      </p>
+    {%- endif -%}
+    {%- if show_review_count and display_count != nil -%}
+      <p class="rating-count text-sm leading-none{% if block == blank %} hidden xl:block{% endif %}">
+        <span aria-hidden="true">{{ 'general.accessibility.star_reviews_count' | t: count: display_count }}</span>
+        <span class="sr-only">
+          {{- display_count }}
+          {{ 'general.accessibility.total_reviews' | t -}}
+        </span>
+      </p>
+    {%- endif -%}
+  </div>
+{%- endif -%}

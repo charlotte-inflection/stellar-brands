@@ -1,0 +1,81 @@
+{% comment %}
+  Stellar Subscription CTA
+  Glass card over dark gradient background.
+  @concept-theme: section-type="rich-text"
+{% endcomment %}
+
+<section
+  class="{% if section.settings.color_scheme == 'dark' %}stellar-bg-dark{% elsif section.settings.color_scheme == 'deepspace' %}stellar-bg-deepspace{% elsif section.settings.color_scheme == 'light' %}stellar-bg-light{% elsif section.settings.color_scheme == 'sand' %}stellar-bg-sand{% elsif section.settings.color_scheme == 'skyblue' %}stellar-bg-skyblue{% endif %}{% if section.settings.bg_texture == 'stars' %} stellar-stars-bg{% elsif section.settings.bg_texture == 'constellation' %} stellar-constellation-bg{% elsif section.settings.bg_texture == 'nebula' %} stellar-nebula-gradient{% endif %}{% if section.settings.reveal_animation == 'fade_up' %} stellar-reveal{% elsif section.settings.reveal_animation == 'stagger' %} stellar-reveal-stagger{% endif %}"
+  style="position:relative;padding-top:{{ section.settings.padding_top }}px;padding-bottom:{{ section.settings.padding_bottom }}px;overflow:hidden;{% if section.settings.color_scheme == 'custom' %}background-color:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+>
+  <div style="position:absolute;inset:0;background:linear-gradient(135deg, var(--stellar-black), var(--stellar-deepspace), var(--stellar-black));"></div>
+
+  <div style="position:relative;z-index:10;" class="stellar-container">
+    <div class="stellar-glass stellar-rounded-2xl" style="padding:2rem 3rem;max-width:32rem;margin:0 auto;text-align:center;">
+      <p class="stellar-eyebrow" style="color:var(--stellar-green);margin-bottom:0.75rem;">{{ section.settings.eyebrow }}</p>
+      <h2 class="stellar-font-display" style="font-size:clamp(1.75rem,3vw,2.5rem);color:var(--stellar-offwhite);margin-bottom:1rem;">
+        {{ section.settings.heading }}
+      </h2>
+      <p class="stellar-font-body" style="color:hsla(0,0%,96%,0.6);margin-bottom:0.5rem;">{{ section.settings.description }}</p>
+      <p class="stellar-font-body" style="color:var(--stellar-green);font-weight:700;font-size:0.875rem;margin-bottom:2rem;">{{ section.settings.savings_text }}</p>
+      <div style="display:flex;flex-wrap:wrap;gap:0.75rem;justify-content:center;">
+        {% if section.settings.cta_text != blank %}
+          <a href="{{ section.settings.cta_url }}" class="stellar-font-body" style="display:inline-block;padding:0.75rem 2rem;border-radius:0.5rem;background:var(--stellar-skyblue);color:var(--stellar-black);font-weight:500;text-decoration:none;">
+            {{ section.settings.cta_text }}
+          </a>
+        {% endif %}
+        {% if section.settings.cta2_text != blank %}
+          <a href="{{ section.settings.cta2_url }}" class="stellar-font-body" style="display:inline-block;padding:0.75rem 2rem;border-radius:0.5rem;border:1px solid hsla(0,0%,100%,0.3);color:var(--stellar-offwhite);text-decoration:none;">
+            {{ section.settings.cta2_text }}
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div style="max-width:48rem;margin:2rem auto 0;">
+      {% for block in section.blocks %}
+        {% if block.type == 'heading' or block.type == 'text' or block.type == 'button' or block.type == 'image' or block.type == 'badge' or block.type == 'divider' %}
+          {% render 'stellar-standard-block', block: block %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Stellar Subscription CTA",
+  "tag": "section",
+  "class": "stellar-subscription-cta",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Subscribe & Save" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Never Run Out. Never Worry." },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Subscribe and save 10%. Free shipping always. Skip or cancel anytime." },
+    { "type": "text", "id": "savings_text", "label": "Savings text", "default": "Save $2.90+ on every order" },
+    { "type": "text", "id": "cta_text", "label": "Primary CTA", "default": "Subscribe Now" },
+    { "type": "url", "id": "cta_url", "label": "Primary CTA link" },
+    { "type": "text", "id": "cta2_text", "label": "Secondary CTA", "default": "Learn More" },
+    { "type": "url", "id": "cta2_url", "label": "Secondary CTA link" },
+    { "type": "header", "content": "Layout & Style" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 120, "step": 4, "default": 80, "unit": "px" },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 120, "step": 4, "default": 80, "unit": "px" },
+    { "type": "select", "id": "color_scheme", "label": "Color scheme", "options": [{ "value": "dark", "label": "Dark" }, { "value": "deepspace", "label": "Deep Space" }, { "value": "light", "label": "Light" }, { "value": "sand", "label": "Sand" }, { "value": "skyblue", "label": "Sky Blue" }, { "value": "custom", "label": "Custom" }], "default": "dark" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_bg_color", "label": "Custom background", "default": "#222222" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_text_color", "label": "Custom text color", "default": "#F6F7F8" },
+    { "type": "select", "id": "bg_texture", "label": "Background texture", "options": [{ "value": "none", "label": "None" },{ "value": "stars", "label": "Stars" },{ "value": "constellation", "label": "Constellation" },{ "value": "nebula", "label": "Nebula" }], "default": "none" },
+    { "type": "select", "id": "reveal_animation", "label": "Scroll animation", "options": [{ "value": "none", "label": "None" },{ "value": "fade_up", "label": "Fade up" },{ "value": "stagger", "label": "Stagger children" }], "default": "none" }
+  ],
+  "blocks": [
+    { "type": "heading", "name": "Heading", "settings": [{ "type": "text", "id": "text", "label": "Heading text", "default": "Heading" }, { "type": "select", "id": "size", "label": "Size", "options": [{ "value": "h1", "label": "Extra Large" }, { "value": "h2", "label": "Large" }, { "value": "h3", "label": "Medium" }], "default": "h2" }] },
+    { "type": "text", "name": "Text", "settings": [{ "type": "richtext", "id": "content", "label": "Text" }, { "type": "color", "id": "color", "label": "Text color" }] },
+    { "type": "button", "name": "Button", "settings": [{ "type": "text", "id": "text", "label": "Button text", "default": "Learn More" }, { "type": "url", "id": "url", "label": "Link" }, { "type": "select", "id": "style", "label": "Style", "options": [{ "value": "primary", "label": "Primary" }, { "value": "outline", "label": "Outline" }], "default": "primary" }] },
+    { "type": "image", "name": "Image", "settings": [{ "type": "image_picker", "id": "image", "label": "Image" }, { "type": "text", "id": "alt", "label": "Alt text" }] },
+    { "type": "badge", "name": "Badge", "settings": [{ "type": "text", "id": "label", "label": "Label", "default": "New" },{ "type": "select", "id": "color", "label": "Color", "options": [{ "value": "green", "label": "Green" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "purple", "label": "Purple" },{ "value": "gold", "label": "Gold" }], "default": "skyblue" }] },
+    { "type": "divider", "name": "Divider", "settings": [{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "line", "label": "Line" },{ "value": "space", "label": "Space" },{ "value": "dotted", "label": "Dotted" }], "default": "line" },{ "type": "range", "id": "spacing", "label": "Spacing", "min": 1, "max": 6, "step": 1, "default": 2, "unit": "rem" }] }
+  ],
+  "enabled_on": {
+    "templates": ["index"]
+  },
+  "presets": [{ "name": "Stellar Subscription CTA" }]
+}
+{% endschema %}

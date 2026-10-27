@@ -1,0 +1,40 @@
+{% comment %}
+  Stellar Scrolling Marquee
+  Full-width ticker on sky-blue background.
+  @concept-theme: section-type="scrolling-text" (Concept native)
+{% endcomment %}
+
+<section
+  class="{% if section.settings.color_scheme == 'dark' %}stellar-bg-dark{% elsif section.settings.color_scheme == 'deepspace' %}stellar-bg-deepspace{% elsif section.settings.color_scheme == 'light' %}stellar-bg-light{% elsif section.settings.color_scheme == 'sand' %}stellar-bg-sand{% elsif section.settings.color_scheme == 'skyblue' %}stellar-bg-skyblue{% endif %}{% if section.settings.bg_texture == 'stars' %} stellar-stars-bg{% elsif section.settings.bg_texture == 'constellation' %} stellar-constellation-bg{% elsif section.settings.bg_texture == 'nebula' %} stellar-nebula-gradient{% endif %}"
+  style="padding-top:{{ section.settings.padding_top }}px;padding-bottom:{{ section.settings.padding_bottom }}px;overflow:hidden;{% if section.settings.color_scheme == 'custom' %}background-color:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+>
+  <div class="stellar-animate-marquee" style="white-space:nowrap;display:flex;width:max-content;">
+    {% for i in (1..8) %}
+      <span class="stellar-font-display" style="font-size:clamp(1rem,2vw,1.5rem);color:var(--stellar-black);letter-spacing:0.05em;padding-right:3rem;">
+        {{ section.settings.text }}
+      </span>
+    {% endfor %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Stellar Scrolling Marquee",
+  "tag": "section",
+  "class": "stellar-scrolling-marquee",
+  "settings": [
+    { "type": "text", "id": "text", "label": "Marquee text", "default": "TRUSTED BY 45,000+ DAIRY LOVERS · NSF CERTIFIED · 4.9 ★ RATING · 60-DAY GUARANTEE" },
+    { "type": "header", "content": "Layout & Style" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 120, "step": 4, "default": 16, "unit": "px" },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 120, "step": 4, "default": 16, "unit": "px" },
+    { "type": "select", "id": "color_scheme", "label": "Color scheme", "options": [{ "value": "dark", "label": "Dark" }, { "value": "deepspace", "label": "Deep Space" }, { "value": "light", "label": "Light" }, { "value": "sand", "label": "Sand" }, { "value": "skyblue", "label": "Sky Blue" }, { "value": "custom", "label": "Custom" }], "default": "skyblue" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_bg_color", "label": "Custom background", "default": "#8DB8D4" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_text_color", "label": "Custom text color", "default": "#222222" },
+    { "type": "select", "id": "bg_texture", "label": "Background texture", "options": [{ "value": "none", "label": "None" },{ "value": "stars", "label": "Stars" },{ "value": "constellation", "label": "Constellation" },{ "value": "nebula", "label": "Nebula" }], "default": "none" }
+  ],
+  "enabled_on": {
+    "templates": ["index"]
+  },
+  "presets": [{ "name": "Stellar Scrolling Marquee" }]
+}
+{% endschema %}

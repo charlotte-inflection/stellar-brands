@@ -1,0 +1,508 @@
+/* ==========================================================================
+   Stellar Custom CSS — Additive styles for Concept theme
+   Load via: {{ 'stellar-custom.css' | asset_url | stylesheet_tag }}
+   ========================================================================== */
+
+/* ---- Typography ---- */
+.stellar-font-display {
+  font-family: 'Rowdies', cursive, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.2;
+}
+
+.stellar-font-grotesk {
+  font-family: 'NN Forever Grotesk STD', system-ui, -apple-system, sans-serif;
+  line-height: 1.3;
+}
+
+.stellar-font-body {
+  font-family: Arial, Helvetica, sans-serif;
+  letter-spacing: 0.01em;
+  line-height: 1.75;
+}
+
+.stellar-eyebrow {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.625rem;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+:root {
+  --stellar-black: #222222;
+  --stellar-offwhite: #F6F7F8;
+  --stellar-deepspace: #22162B;
+  --stellar-skyblue: #A5C5ED;
+  --stellar-green: #70D44B;
+  --stellar-purple: #655DC6;
+  --stellar-orange: #FFAA4D;
+  --stellar-gold: #C9A84C;
+
+  --stellar-primary: var(--stellar-purple);
+  --stellar-secondary: var(--stellar-skyblue);
+  --stellar-accent: var(--stellar-green);
+
+  /* CTA defaults — overridable via block settings / inline style */
+  --stellar-cta-bg: var(--stellar-purple);
+  --stellar-cta-text: var(--stellar-offwhite);
+}
+
+/* ---- Backgrounds ---- */
+
+.stellar-stars-bg {
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, hsla(0,0%,100%,0.4), transparent),
+    radial-gradient(1px 1px at 90px 40px, hsla(0,0%,100%,0.5), transparent),
+    radial-gradient(1px 1px at 160px 80px, hsla(0,0%,100%,0.25), transparent);
+  background-size: 200px 100px;
+}
+
+.stellar-nebula-gradient {
+  background-image:
+    radial-gradient(ellipse 80% 60% at 20% 50%, hsla(271, 28%, 20%, 0.4), transparent),
+    radial-gradient(ellipse 60% 80% at 80% 30%, hsla(211, 60%, 30%, 0.15), transparent);
+}
+
+.stellar-constellation-bg {
+  background-image: url("data:image/svg+xml,%3Csvg width='400' height='300' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='rgba(255,255,255,0.03)' stroke-width='0.5'%3E%3Cline x1='50' y1='30' x2='150' y2='80'/%3E%3Cline x1='150' y1='80' x2='200' y2='20'/%3E%3Cline x1='200' y1='20' x2='350' y2='100'/%3E%3Cline x1='80' y1='200' x2='250' y2='150'/%3E%3Cline x1='250' y1='150' x2='380' y2='250'/%3E%3C/g%3E%3Cg fill='rgba(255,255,255,0.05)'%3E%3Ccircle cx='50' cy='30' r='1.5'/%3E%3Ccircle cx='150' cy='80' r='1'/%3E%3Ccircle cx='200' cy='20' r='1.5'/%3E%3Ccircle cx='350' cy='100' r='1'/%3E%3Ccircle cx='80' cy='200' r='1'/%3E%3Ccircle cx='250' cy='150' r='1.5'/%3E%3Ccircle cx='380' cy='250' r='1'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 400px 300px;
+}
+
+.stellar-glass {
+  background: hsla(0, 0%, 0%, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid hsla(0, 0%, 100%, 0.08);
+}
+
+/* ---- Animations ---- */
+
+@keyframes stellar-marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.stellar-animate-marquee {
+  animation: stellar-marquee 30s linear infinite;
+}
+
+@keyframes stellar-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.stellar-animate-float {
+  animation: stellar-float 6s ease-in-out infinite;
+}
+
+/* ---- Scroll-triggered reveal ---- */
+
+.stellar-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.stellar-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger children */
+.stellar-reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.stellar-reveal-stagger.is-visible > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+.stellar-reveal-stagger.is-visible > *:nth-child(1) { transition-delay: 0s; }
+.stellar-reveal-stagger.is-visible > *:nth-child(2) { transition-delay: 0.08s; }
+.stellar-reveal-stagger.is-visible > *:nth-child(3) { transition-delay: 0.16s; }
+.stellar-reveal-stagger.is-visible > *:nth-child(4) { transition-delay: 0.24s; }
+.stellar-reveal-stagger.is-visible > *:nth-child(5) { transition-delay: 0.32s; }
+.stellar-reveal-stagger.is-visible > *:nth-child(6) { transition-delay: 0.40s; }
+.stellar-reveal-stagger.is-visible > *:nth-child(7) { transition-delay: 0.48s; }
+.stellar-reveal-stagger.is-visible > *:nth-child(8) { transition-delay: 0.56s; }
+
+/* ---- Hover interactions ---- */
+
+.stellar-hover-lift {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+}
+.stellar-hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px hsla(0,0%,0%,0.15);
+}
+
+.stellar-hover-glow {
+  transition: box-shadow 0.3s ease;
+}
+.stellar-hover-glow:hover {
+  box-shadow: 0 0 0 2px var(--stellar-purple), 0 4px 16px hsla(246,40%,57%,0.2);
+}
+
+/* ---- Stellar button global overrides ---- */
+/* Rounds all inline-styled stellar buttons to match the theme's button radius
+   and adds a hover brightness shift. Targets elements whose inline style
+   contains border-radius:0.5rem (the value used across all stellar sections). */
+
+[class*="stellar-"] a[style*="border-radius:0.5rem"],
+[class*="stellar-"] button[style*="border-radius:0.5rem"],
+.stellar-card-btn {
+  /* border-radius: var(--rounded-button) !important; */
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+}
+
+[class*="stellar-"] a[style*="border-radius:0.5rem"]:hover,
+[class*="stellar-"] button[style*="border-radius:0.5rem"]:hover,
+.stellar-card-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px hsla(0,0%,0%,0.2);
+}
+
+/* ---- Badge pills ---- */
+
+.stellar-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.stellar-badge-green { background: hsla(100,55%,55%,0.1); color: var(--stellar-green); }
+.stellar-badge-skyblue { background: hsla(211,60%,79%,0.1); color: var(--stellar-skyblue); }
+.stellar-badge-purple { background: hsla(246,40%,57%,0.1); color: var(--stellar-purple); }
+.stellar-badge-gold { background: hsla(42,50%,54%,0.1); color: var(--stellar-gold); }
+.stellar-badge-orange { background: hsla(31,100%,65%,0.1); color: var(--stellar-orange); }
+
+/* ---- Image zoom on hover ---- */
+
+.stellar-img-zoom {
+  overflow: hidden;
+  border-radius: 1rem;
+}
+.stellar-img-zoom img {
+  transition: transform 0.4s ease;
+}
+.stellar-img-zoom:hover img {
+  transform: scale(1.05);
+}
+
+/* ---- Utility classes ---- */
+
+.stellar-container {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.stellar-header-inner.stellar-container {
+  max-width: var(--page-width);
+}
+
+.stellar-rounded-2xl { border-radius: 1rem; }
+
+.stellar-scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.stellar-scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---- Responsive grid helpers ---- */
+
+@media (min-width: 768px) {
+  .stellar-cert-item { width: calc(25% - 1.5rem) !important; }
+}
+
+/* ---- Section backgrounds ---- */
+
+.stellar-bg-dark {
+  background-color: var(--stellar-black);
+  color: var(--stellar-offwhite);
+}
+
+.stellar-bg-deepspace {
+  background-color: var(--stellar-deepspace);
+  color: var(--stellar-offwhite);
+}
+
+.stellar-bg-light {
+  background-color: var(--stellar-offwhite);
+  color: var(--stellar-black);
+}
+
+.stellar-bg-skyblue {
+  background-color: var(--stellar-skyblue);
+  color: var(--stellar-black);
+}
+
+/* ---- Split heading ---- */
+
+.stellar-heading-line-2 {
+  display: block;
+  margin-top: 0.15em;
+}
+
+/* ---- Heading highlight ---- */
+
+.stellar-heading-highlight {
+  color: var(--stellar-highlight-color, inherit);
+  font-weight: var(--stellar-highlight-weight, inherit);
+}
+
+/* ---- Variant picker label weights ---- */
+
+.variant-label-name {
+  font-weight: 400;
+}
+.variant-label-value {
+  font-weight: 600;
+}
+
+/* ---- Reduce motion ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .stellar-reveal,
+  .stellar-reveal-stagger > *,
+  .stellar-hover-lift,
+  .stellar-hover-glow,
+  .stellar-img-zoom img,
+  .stellar-animate-float,
+  .stellar-animate-marquee {
+    transition: none !important;
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ==========================================================================
+   GLOBAL BUTTON RADIUS — match card radius
+   ========================================================================== */
+
+:root {
+  --rounded-button: var(--rounded-card);
+}
+
+/* Stellar PDP elements with hardcoded inline border-radius */
+.stellar-pi-variant-btn,
+.stellar-pi-strength-link,
+.stellar-pi-sub-card,
+.stellar-pi-sub-btn,
+.stellar-pi-thumb-btn {
+  border-radius: var(--rounded-card) !important;
+}
+
+/* ==========================================================================
+   BUY BUTTON — remove purple border
+   Broadened to #MainContent to catch app-block buttons (Loop, etc.)
+   that render .button--primary outside stellar-scoped containers.
+   ========================================================================== */
+
+#MainContent .button--primary::after,
+#stellar-product-form .button::after {
+  border-color: transparent !important;
+}
+
+/* Stellar PDP buy button (inline-styled, not .button class) */
+#stellar-product-form button[type="submit"] {
+  border-color: #FFFFFF !important;
+}
+
+/* ==========================================================================
+   VARIANT PICKER — single line on mobile
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  .variant-picker .swatches {
+    gap: 0.375rem !important;
+  }
+  .variant-picker .label-swatch {
+    padding: var(--sp-3) var(--sp-3d5);
+    font-size: 0.8125rem;
+  }
+  .stellar-pi-variant-btn {
+    padding: 0.375rem 0.625rem;
+    font-size: 0.8125rem;
+  }
+}
+
+/* ==========================================================================
+   LOGO-LIST OVERLAY — sits over content to tint logos
+   ========================================================================== */
+
+.logo-list-overlay-wrap {
+  position: relative;
+}
+
+.logo-list-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ==========================================================================
+   UGC VIDEO — cover full card container
+   ========================================================================== */
+
+.stellar-ugc-video-card video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ==========================================================================
+   IMAGE-WITH-TEXT — uniform image heights
+   ========================================================================== */
+
+.stellar-iwt-image-wrap {
+  overflow: hidden;
+}
+
+.stellar-iwt-image-wrap img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ==========================================================================
+   GLOBAL BUTTON FONT UNIFORMITY
+   Scoped to theme containers (#MainContent, header, cart drawer, stellar
+   sections) so app block buttons (Junip, Rebuy, Skio, etc.) are not
+   overridden. If a new theme container needs coverage, add it here.
+   ========================================================================== */
+
+/* Theme-owned sections */
+#MainContent .button,
+#MainContent button[type="submit"],
+#MainContent .product-form__submit,
+
+/* Stellar custom sections */
+.stellar-section .button,
+.stellar-section button[type="submit"],
+.stellar-section .stellar-card-btn,
+
+/* Stellar PDP form */
+#stellar-product-form button,
+
+/* Cart */
+.cart__submit,
+.cart-drawer button[type="submit"],
+
+/* Shopify system buttons (login, challenge, etc.) */
+.shopify-challenge__button,
+
+/* Header / announcement bar */
+#shopify-section-header .button,
+
+/* Shopify payment buttons (rendered outside app blocks) */
+#MainContent .shopify-payment-button [role="button"],
+#MainContent button.shopify-payment-button__button--unbranded {
+  font-family: var(--font-button-family) !important;
+  font-size: var(--font-button-size) !important;
+  font-weight: var(--font-button-weight) !important;
+  text-transform: var(--font-button-text-transform) !important;
+}
+
+/* ==========================================================================
+   MOBILE THUMBNAIL GALLERY — prevent first image clipping
+   The mobile-beside thumbnail layout positions thumbnails absolutely with
+   overflow-y:auto. The thumbnails-list grid has an items-end utility class
+   that can push thumbnails down within their cells. This overrides to
+   items-start and resets scroll padding so the container starts flush.
+
+   If this CSS fix alone does not fully resolve the clipping, the cause is
+   likely JS-driven (e.g. scrollIntoView on the active thumbnail
+   overshooting). In that case, add a scrollTop = 0 reset after the
+   gallery's whenDefined callback in product-media-gallery.liquid.
+   ========================================================================== */
+
+@media (max-width: 1023px) {
+  .mobile-thumbnails-beside > .product__thumbnails {
+    scroll-padding-block-start: 0;
+  }
+
+  .mobile-thumbnails-beside > .product__thumbnails .product__thumbnails-list {
+    align-items: start;
+    scroll-padding-block-start: 0;
+  }
+
+  .mobile-thumbnails-beside > .product__thumbnails .product__thumbnail:first-child {
+    scroll-margin-block-start: 0;
+    margin-block-start: 0;
+  }
+}
+
+
+/* ---- Remove fill-sweep animation from buy + checkout buttons ---- */
+
+button[name="add"] > .btn-fill,
+button[name="checkout"] > .btn-fill {
+  display: none !important;
+}
+
+button[name="add"],
+button[name="checkout"] {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+}
+
+button[name="add"]:hover:not([disabled]),
+button[name="checkout"]:hover:not([disabled]) {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px hsla(0, 0%, 0%, 0.15);
+}
+
+.js [data-button-hover=standard] button[name="add"].button--primary:hover:not([disabled]),
+.js [data-button-hover=standard] button[name="checkout"].button--primary:hover:not([disabled]) {
+  color: rgb(var(--color-button-text));
+}
+
+/* ==========================================================================
+   STOQ / Restock Rocket: text hierarchy only.
+   Layout, padding, border are set in section-level custom CSS on the PDP.
+   ========================================================================== */
+
+.preorder-description-details {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-size: 0.8725rem;
+  opacity: 1;
+}
+
+.restock-rocket-preorder-description {
+  font-size: 0.8125rem;
+  font-weight: 300 !important;
+  font-style: italic;
+  font-size: 0.8725rem;
+  opacity: 1;
+}
+
+/* ==========================================================================
+   JUNIP REVIEWS — dark background for junip-theme-dark
+   The widget sets white text via its own junip-theme-dark class, but the
+   apps section renders with no background override. Force a dark container
+   so the white text is readable.
+   ========================================================================== */
+
+.junip-theme-dark {
+  background-color: #171717;
+  color: #ffffff;
+}
+.shopify-section:has(.junip-theme-dark) {
+  background-color: #171717;
+}

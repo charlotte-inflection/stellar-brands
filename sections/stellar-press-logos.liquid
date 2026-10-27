@@ -1,0 +1,78 @@
+{% comment %}
+  Stellar Press Logos
+  Logo bar on sand background.
+  @concept-theme: section-type="logo-list"
+{% endcomment %}
+
+<section
+  class="{% if section.settings.color_scheme == 'dark' %}stellar-bg-dark{% elsif section.settings.color_scheme == 'deepspace' %}stellar-bg-deepspace{% elsif section.settings.color_scheme == 'light' %}stellar-bg-light{% elsif section.settings.color_scheme == 'sand' %}stellar-bg-sand{% elsif section.settings.color_scheme == 'skyblue' %}stellar-bg-skyblue{% endif %}{% if section.settings.bg_texture == 'stars' %} stellar-stars-bg{% elsif section.settings.bg_texture == 'constellation' %} stellar-constellation-bg{% elsif section.settings.bg_texture == 'nebula' %} stellar-nebula-gradient{% endif %}{% if section.settings.reveal_animation == 'fade_up' %} stellar-reveal{% elsif section.settings.reveal_animation == 'stagger' %} stellar-reveal-stagger{% endif %}"
+  style="padding-top:{{ section.settings.padding_top }}px;padding-bottom:{{ section.settings.padding_bottom }}px;border-top:1px solid hsla(0,0%,13%,0.05);border-bottom:1px solid hsla(0,0%,13%,0.05);{% if section.settings.color_scheme == 'custom' %}background-color:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+>
+  <div class="stellar-scrollbar-hide" style="display:flex;align-items:center;gap:2.5rem;overflow-x:auto;padding:0 1rem;justify-content:center;">
+    {% for block in section.blocks %}
+      {% if block.type == 'logo' %}
+        <div {{ block.shopify_attributes }} style="flex-shrink:0;padding:0.75rem 1.5rem;">
+          {% if block.settings.logo != blank %}
+            <img src="{{ block.settings.logo | image_url: width: 200 }}" alt="{{ block.settings.name }}" style="height:1.5rem;width:auto;opacity:0.3;filter:grayscale(1);" loading="lazy">
+          {% else %}
+            <span class="stellar-font-body" style="color:hsla(0,0%,13%,0.2);font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;white-space:nowrap;">
+              {{ block.settings.name }}
+            </span>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+  <div class="stellar-container" style="max-width:48rem;margin:2rem auto 0;">
+    {% for block in section.blocks %}
+      {% if block.type == 'heading' or block.type == 'text' or block.type == 'button' or block.type == 'image' or block.type == 'badge' or block.type == 'divider' %}
+        {% render 'stellar-standard-block', block: block %}
+      {% endif %}
+    {% endfor %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Stellar Press Logos",
+  "tag": "section",
+  "class": "stellar-press-logos",
+  "settings": [
+    { "type": "header", "content": "Layout & Style" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 120, "step": 4, "default": 40, "unit": "px" },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 120, "step": 4, "default": 40, "unit": "px" },
+    { "type": "select", "id": "color_scheme", "label": "Color scheme", "options": [{ "value": "dark", "label": "Dark" }, { "value": "deepspace", "label": "Deep Space" }, { "value": "light", "label": "Light" }, { "value": "sand", "label": "Sand" }, { "value": "skyblue", "label": "Sky Blue" }, { "value": "custom", "label": "Custom" }], "default": "sand" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_bg_color", "label": "Custom background", "default": "#FAF8F5" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_text_color", "label": "Custom text color", "default": "#222222" },
+    { "type": "select", "id": "bg_texture", "label": "Background texture", "options": [{ "value": "none", "label": "None" },{ "value": "stars", "label": "Stars" },{ "value": "constellation", "label": "Constellation" },{ "value": "nebula", "label": "Nebula" }], "default": "none" },
+    { "type": "select", "id": "reveal_animation", "label": "Scroll animation", "options": [{ "value": "none", "label": "None" },{ "value": "fade_up", "label": "Fade up" },{ "value": "stagger", "label": "Stagger children" }], "default": "none" }
+  ],
+  "blocks": [
+    { "type": "logo", "name": "Publication", "settings": [
+      { "type": "text", "id": "name", "label": "Name", "default": "New York Times" },
+      { "type": "image_picker", "id": "logo", "label": "Logo image" }
+    ] },
+    { "type": "heading", "name": "Heading", "settings": [{ "type": "text", "id": "text", "label": "Heading text", "default": "Heading" }, { "type": "select", "id": "size", "label": "Size", "options": [{ "value": "h1", "label": "Extra Large" }, { "value": "h2", "label": "Large" }, { "value": "h3", "label": "Medium" }], "default": "h2" }] },
+    { "type": "text", "name": "Text", "settings": [{ "type": "richtext", "id": "content", "label": "Text" }, { "type": "color", "id": "color", "label": "Text color" }] },
+    { "type": "button", "name": "Button", "settings": [{ "type": "text", "id": "text", "label": "Button text", "default": "Learn More" }, { "type": "url", "id": "url", "label": "Link" }, { "type": "select", "id": "style", "label": "Style", "options": [{ "value": "primary", "label": "Primary" }, { "value": "outline", "label": "Outline" }], "default": "primary" }] },
+    { "type": "image", "name": "Image", "settings": [{ "type": "image_picker", "id": "image", "label": "Image" }, { "type": "text", "id": "alt", "label": "Alt text" }] },
+    { "type": "badge", "name": "Badge", "settings": [{ "type": "text", "id": "label", "label": "Label", "default": "New" },{ "type": "select", "id": "color", "label": "Color", "options": [{ "value": "green", "label": "Green" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "purple", "label": "Purple" },{ "value": "gold", "label": "Gold" }], "default": "skyblue" }] },
+    { "type": "divider", "name": "Divider", "settings": [{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "line", "label": "Line" },{ "value": "space", "label": "Space" },{ "value": "dotted", "label": "Dotted" }], "default": "line" },{ "type": "range", "id": "spacing", "label": "Spacing", "min": 1, "max": 6, "step": 1, "default": 2, "unit": "rem" }] }
+  ],
+  "enabled_on": {
+    "templates": ["index"]
+  },
+  "presets": [
+    {
+      "name": "Stellar Press Logos",
+      "blocks": [
+        { "type": "logo", "settings": { "name": "New York Times" } },
+        { "type": "logo", "settings": { "name": "Packaging of the World" } },
+        { "type": "logo", "settings": { "name": "Graphic Design USA" } },
+        { "type": "logo", "settings": { "name": "TikTok Trending" } },
+        { "type": "logo", "settings": { "name": "Asian Hustle Network" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

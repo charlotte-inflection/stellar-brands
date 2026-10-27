@@ -1,0 +1,16 @@
+{% comment %}
+  Stellar Trust Badge Snippet
+  Single icon + label trust badge.
+
+  Usage: {% render 'stellar-trust-badge', icon_emoji: '🛡️', label: 'NSF Certified' %}
+  Or:   {% render 'stellar-trust-badge', icon_image: image, label: 'NSF Certified' %}
+{% endcomment %}
+
+<div style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;">
+  {% if icon_image %}
+    <img src="{{ icon_image | image_url: width: 48 }}" alt="{{ label }}" width="22" height="22" loading="lazy" style="opacity:0.5;">
+  {% elsif icon_emoji %}
+    <span style="font-size:1.25rem;opacity:0.25;">{{ icon_emoji }}</span>
+  {% endif %}
+  <span class="stellar-font-body" style="font-size:0.625rem;color:hsla(0,0%,13%,0.3);letter-spacing:0.15em;text-transform:uppercase;">{{ label }}</span>
+</div>

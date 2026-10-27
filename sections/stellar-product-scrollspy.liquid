@@ -1,0 +1,67 @@
+{% comment %}
+  Stellar Product Scrollspy
+  Sticky navigation bar for PDP below-fold sections.
+  @concept-theme: Custom sticky nav
+{% endcomment %}
+
+<div id="stellar-scrollspy" style="display:none;position:fixed;top:5rem;left:0;right:0;z-index:40;{% if section.settings.color_scheme == 'dark' %}background:hsla(0,0%,13%,0.95);{% elsif section.settings.color_scheme == 'deepspace' %}background:hsla(271,28%,13%,0.95);{% elsif section.settings.color_scheme == 'light' %}background:hsla(0,0%,97%,0.95);{% elsif section.settings.color_scheme == 'custom' %}background:{{ section.settings.custom_bg_color }};{% else %}background:hsla(0,0%,13%,0.95);{% endif %}backdrop-filter:blur(12px);border-bottom:1px solid hsla(0,0%,100%,0.05);transition:all 0.3s;">
+  <div class="stellar-container">
+    <div class="stellar-scrollbar-hide" style="display:flex;align-items:center;gap:0.25rem;overflow-x:auto;padding:0.75rem 0;">
+      {% for block in section.blocks %}
+        {% if block.type == 'link' %}
+          <a href="#{{ block.settings.target_id }}" class="stellar-scrollspy-link stellar-font-body" data-target="{{ block.settings.target_id }}" style="padding:0.375rem 1rem;border-radius:999px;font-size:0.875rem;font-weight:500;white-space:nowrap;color:hsla(0,0%,96%,0.6);text-decoration:none;transition:all 0.2s;">
+            {{ block.settings.label }}
+          </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    var spy = document.getElementById('stellar-scrollspy');
+    var links = spy ? spy.querySelectorAll('.stellar-scrollspy-link') : [];
+    var sections = [];
+    links.forEach(function(link) {
+      var id = link.getAttribute('data-target');
+      if (id) sections.push(id);
+    });
+
+    function onScroll() {
+      if (!spy) return;
+      spy.style.display = window.scrollY > 700 ? 'block' : 'none';
+
+      var active = '';
+      for (var i = sections.length - 1; i >= 0; i--) {
+        var el = document.getElementById(sections[i]);
+        if (el && el.getBoundingClientRect().top <= 120) {
+          active = sections[i];
+          break;
+        }
+      }
+      links.forEach(function(link) {
+        var isActive = link.getAttribute('data-target') === active;
+        link.style.background = isActive ? 'var(--stellar-skyblue)' : 'transparent';
+        link.style.color = isActive ? 'var(--stellar-black)' : 'hsla(0,0%,96%,0.6)';
+      });
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Stellar PDP Scrollspy",
+  "tag": "section",
+  "class": "stellar-product-scrollspy",
+  "settings": [
+    { "type": "select", "id": "color_scheme", "label": "Bar color", "options": [{ "value": "dark", "label": "Dark" },{ "value": "deepspace", "label": "Deep Space" },{ "value": "light", "label": "Light" },{ "value": "custom", "label": "Custom" }], "default": "dark" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_bg_color", "label": "Custom bar color", "default": "#222222" }
+  ],
+  "blocks": [
+    { "type": "link", "name": "Nav Link", "settings": [{ "type": "text", "id": "label", "label": "Label", "default": "How It Works" },{ "type": "text", "id": "target_id", "label": "Section ID (no #)", "default": "how-it-works" }] }
+  ]}
+{% endschema %}

@@ -1,0 +1,197 @@
+{% comment %}
+  Stellar Product Comparison
+  Product cards + Nova coming-soon card with hover lift.
+  @concept-theme: section-type="featured-collection" or "multicolumn"
+{% endcomment %}
+
+<section
+  class="{% if section.settings.color_scheme == 'dark' %}stellar-bg-dark{% elsif section.settings.color_scheme == 'deepspace' %}stellar-bg-deepspace{% elsif section.settings.color_scheme == 'light' %}stellar-bg-light{% elsif section.settings.color_scheme == 'sand' %}stellar-bg-sand{% elsif section.settings.color_scheme == 'skyblue' %}stellar-bg-skyblue{% endif %}{% if section.settings.bg_texture == 'stars' %} stellar-stars-bg{% elsif section.settings.bg_texture == 'constellation' %} stellar-constellation-bg{% elsif section.settings.bg_texture == 'nebula' %} stellar-nebula-gradient{% endif %}{% if section.settings.reveal_animation == 'fade_up' %} stellar-reveal{% elsif section.settings.reveal_animation == 'stagger' %} stellar-reveal-stagger{% endif %}"
+  style="padding:{{ section.settings.padding_top }}rem 0 {{ section.settings.padding_bottom }}rem;{% if section.settings.color_scheme == 'custom' %}background:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+>
+  <div class="stellar-container" style="text-align:center;">
+    {% if section.settings.eyebrow != blank %}
+      <p class="stellar-eyebrow" style="color:var(--stellar-skyblue);margin-bottom:0.75rem;">{{ section.settings.eyebrow }}</p>
+    {% endif %}
+    {% if section.settings.heading != blank %}
+      {%- liquid
+        assign processed_heading = section.settings.heading
+
+        if section.settings.line_break_after != blank
+          assign break_marker = section.settings.line_break_after
+          assign heading_parts = processed_heading | split: break_marker
+          if heading_parts.size > 1
+            assign line_1 = heading_parts | first | append: break_marker
+            assign line_2_parts = heading_parts | slice: 1, heading_parts.size
+            assign line_2 = line_2_parts | join: break_marker
+            assign processed_heading = line_1 | append: '<span class="stellar-heading-line-2">' | append: line_2 | append: '</span>'
+          endif
+        endif
+
+        if section.settings.highlight_text != blank
+          assign hl_text = section.settings.highlight_text
+          assign hl_weight = section.settings.highlight_weight | default: 'inherit'
+          assign hl_color = section.settings.highlight_color | default: 'inherit'
+          assign hl_open = '<span class="stellar-heading-highlight" style="--stellar-highlight-weight:' | append: hl_weight | append: ';--stellar-highlight-color:' | append: hl_color | append: ';">'
+          assign hl_close = '</span>'
+          assign hl_replacement = hl_open | append: hl_text | append: hl_close
+          assign processed_heading = processed_heading | replace: hl_text, hl_replacement
+        endif
+      -%}
+      <h2 class="stellar-font-display" style="font-size:clamp(1.75rem,3vw,2.5rem);margin-bottom:0.75rem;color:#fff;">
+        {{ processed_heading }}
+      </h2>
+    {% endif %}
+    {% if section.settings.subheading != blank %}
+      <p class="stellar-font-body" style="color:hsla(0,0%,96%,0.5);margin-bottom:3rem;">{{ section.settings.subheading }}</p>
+    {% elsif section.settings.heading != blank %}
+      <div style="margin-bottom:3rem;"></div>
+    {% endif %}
+
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:1.5rem;max-width:64rem;margin:0 auto;" class="stellar-product-comparison-grid">
+      {% for block in section.blocks %}
+        {% if block.type == 'product_card' or block.type == 'nova_card' %}
+          <div class="stellar-product-comparison-card">
+            {% if block.type == 'product_card' %}
+              {% render 'stellar-product-card', block: block %}
+            {% elsif block.type == 'nova_card' %}
+              {% render 'stellar-nova-waitlist-card', block: block %}
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div style="max-width:48rem;margin:2rem auto 0;">
+      {% for block in section.blocks %}
+        {% if block.type == 'heading' or block.type == 'text' or block.type == 'button' or block.type == 'image' or block.type == 'badge' or block.type == 'divider' %}
+          {% render 'stellar-standard-block', block: block %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  <style>
+    /* ── Product name: always single line, never truncated ── */
+    #shopify-section-{{ section.id }} .stellar-product-comparison-card h3 {
+      white-space: nowrap;
+      overflow: visible;
+      text-overflow: unset;
+    }
+
+    /* ── Mobile default: full-width cards ── */
+    #shopify-section-{{ section.id }} .stellar-product-comparison-card {
+      width: 100%;
+    }
+
+    /* ── Optional: side-by-side on mobile ── */
+    {% if section.settings.mobile_single_row %}
+      #shopify-section-{{ section.id }} .stellar-product-comparison-grid {
+        gap: 0.625rem !important;
+      }
+      #shopify-section-{{ section.id }} .stellar-product-comparison-card {
+        width: calc(50% - 0.3125rem);
+        min-width: 0;
+      }
+      /* Scale down product name on small screens to stay on one line */
+      @media (max-width: 767px) {
+        #shopify-section-{{ section.id }} .stellar-product-comparison-card h3 {
+          font-size: clamp(0.75rem, 3.5vw, 1.125rem) !important;
+        }
+      }
+    {% endif %}
+
+    /* ── Desktop: two cards per row, larger text ── */
+    @media (min-width: 768px) {
+      #shopify-section-{{ section.id }} .stellar-product-comparison-card {
+        width: calc(50% - 0.75rem);
+      }
+
+      #shopify-section-{{ section.id }} .stellar-product-comparison-card h3 {
+        font-size: 1.625rem !important;
+      }
+      #shopify-section-{{ section.id }} .stellar-product-comparison-card .stellar-detail-1 {
+        font-size: 1.3125rem !important;
+      }
+      #shopify-section-{{ section.id }} .stellar-product-comparison-card .stellar-detail-2 {
+        font-size: 1.0625rem !important;
+      }
+      #shopify-section-{{ section.id }} .stellar-product-comparison-card .stellar-card-price {
+        font-size: 1.4375rem !important;
+      }
+      #shopify-section-{{ section.id }} .stellar-product-comparison-card .stellar-card-btn {
+        font-size: 1.125rem !important;
+        padding: 0.75rem !important;
+      }
+    }
+
+    /* ── Large desktop: scale up further ── */
+    @media (min-width: 1200px) {
+      #shopify-section-{{ section.id }} .stellar-product-comparison-card h3 {
+        font-size: 1.875rem !important;
+      }
+      #shopify-section-{{ section.id }} .stellar-product-comparison-card .stellar-detail-1 {
+        font-size: 1.5rem !important;
+      }
+      #shopify-section-{{ section.id }} .stellar-product-comparison-card .stellar-detail-2 {
+        font-size: 1.1875rem !important;
+      }
+      #shopify-section-{{ section.id }} .stellar-product-comparison-card .stellar-card-price {
+        font-size: 1.625rem !important;
+      }
+      #shopify-section-{{ section.id }} .stellar-product-comparison-card .stellar-card-btn {
+        font-size: 1.25rem !important;
+        padding: 0.875rem !important;
+      }
+    }
+  </style>
+</section>
+
+{% schema %}
+{
+  "name": "Stellar Product Comp",
+  "tag": "section",
+  "class": "stellar-product-comparison",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Choose Your Strength" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Two Strengths. One Mission." },
+    { "type": "text", "id": "subheading", "label": "Subheading" },
+    { "type": "header", "content": "Heading split and highlight" },
+    { "type": "text", "id": "line_break_after", "label": "Line break after", "info": "Enter the last word(s) before the line break. Everything after wraps to a second line." },
+    { "type": "text", "id": "highlight_text", "label": "Highlight text", "info": "Enter the exact text to highlight. Styled with the weight and color below." },
+    { "type": "select", "id": "highlight_weight", "options": [{ "value": "inherit", "label": "Inherit" },{ "value": "300", "label": "Light" },{ "value": "400", "label": "Regular" },{ "value": "700", "label": "Bold" }], "default": "inherit", "label": "Highlight font weight" },
+    { "type": "color", "id": "highlight_color", "label": "Highlight color", "default": "#655DC6" },
+    { "type": "header", "content": "Layout & Style" },
+    { "type": "checkbox", "id": "mobile_single_row", "label": "Cards in single row on mobile", "default": false },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 12, "step": 1, "default": 5, "unit": "rem" },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 12, "step": 1, "default": 5, "unit": "rem" },
+    { "type": "select", "id": "color_scheme", "label": "Color scheme", "options": [{ "value": "dark", "label": "Dark" },{ "value": "deepspace", "label": "Deep Space" },{ "value": "light", "label": "Light" },{ "value": "sand", "label": "Sand" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "custom", "label": "Custom" }], "default": "dark" },
+    { "type": "color", "id": "custom_bg_color", "label": "Custom background", "default": "#222222" },
+    { "type": "color", "id": "custom_text_color", "label": "Custom text", "default": "#F6F7F8" },
+    { "type": "select", "id": "bg_texture", "label": "Background texture", "options": [{ "value": "none", "label": "None" },{ "value": "stars", "label": "Stars" },{ "value": "constellation", "label": "Constellation" },{ "value": "nebula", "label": "Nebula" }], "default": "none" },
+    { "type": "select", "id": "reveal_animation", "label": "Scroll animation", "options": [{ "value": "none", "label": "None" },{ "value": "fade_up", "label": "Fade up" },{ "value": "stagger", "label": "Stagger children" }], "default": "none" }
+  ],
+  "blocks": [
+    { "type": "product_card", "name": "Product Card", "settings": [
+      { "type": "product", "id": "product", "label": "Product" },
+      { "type": "image_picker", "id": "image", "label": "Card image", "info": "Overrides the product featured image if set." },
+      { "type": "select", "id": "badge", "label": "Badge", "options": [{ "value": "none", "label": "None" }, { "value": "NEW", "label": "New" }], "default": "none" },
+      { "type": "text", "id": "detail_1", "label": "Detail line 1", "info": "e.g. 10,800 FCC" },
+      { "type": "text", "id": "detail_2", "label": "Detail line 2", "info": "e.g. Best for moderate dairy meals" },
+      { "type": "text", "id": "price", "label": "Price override", "info": "Leave blank to hide price entirely." },
+      { "type": "text", "id": "button_text", "label": "Button text", "default": "Shop Now" }
+    ] },
+    { "type": "nova_card", "name": "Nova Card", "settings": [
+      { "type": "text", "id": "heading", "label": "Title", "default": "Nova" },
+      { "type": "text", "id": "description", "label": "Description", "default": "Heartburn & indigestion relief" },
+      { "type": "text", "id": "detail", "label": "Detail line", "info": "e.g. 3,200+ people on the waitlist" },
+      { "type": "url", "id": "url", "label": "Waitlist link" },
+      { "type": "text", "id": "button_text", "label": "Button text", "default": "Join Waitlist" },
+      { "type": "image_picker", "id": "image", "label": "Nova image" },
+      { "type": "select", "id": "badge", "label": "Badge", "options": [{ "value": "none", "label": "None" }, { "value": "NEW", "label": "New" }], "default": "none" }
+    ] },
+    { "type": "heading", "name": "Heading", "settings": [{ "type": "text", "id": "text", "label": "Text", "default": "Heading" },{ "type": "select", "id": "size", "label": "Size", "options": [{ "value": "h2", "label": "Large" },{ "value": "h3", "label": "Medium" },{ "value": "h4", "label": "Small" }], "default": "h3" }] },
+    { "type": "text", "name": "Text", "settings": [{ "type": "richtext", "id": "content", "label": "Content", "default": "<p>Body text</p>" }] },
+    { "type": "button", "name": "Button", "settings": [{ "type": "text", "id": "text", "label": "Label", "default": "Learn More" },{ "type": "url", "id": "url", "label": "Link" },{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "primary", "label": "Primary" },{ "value": "outline", "label": "Outline" }], "default": "primary" }] },
+    { "type": "image", "name": "Image", "settings": [{ "type": "image_picker", "id": "image", "label": "Image" },{ "type": "text", "id": "alt", "label": "Alt text", "default": "Image" }] },
+    { "type": "badge", "name": "Badge", "settings": [{ "type": "text", "id": "label", "label": "Label", "default": "New" },{ "type": "select", "id": "color", "label": "Color", "options": [{ "value": "green", "label": "Green" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "purple", "label": "Purple" },{ "value": "gold", "label": "Gold" }], "default": "skyblue" }] },
+    { "type": "divider", "name": "Divider", "settings": [{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "line", "label": "Line" },{ "value": "space", "label": "Space" },{ "value": "dotted", "label": "Dotted" }], "default": "line" },{ "type": "range", "id": "spacing", "label": "Spacing", "min": 1, "max": 6, "step": 1, "default": 2, "unit": "rem" }] }
+  ]}
+{% endschema %}

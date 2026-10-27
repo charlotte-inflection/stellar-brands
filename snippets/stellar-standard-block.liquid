@@ -1,0 +1,34 @@
+{% comment %}
+  Stellar Standard Block Renderer
+  Renders standard block types: heading, text, button, image, badge, divider.
+  Usage: {% render 'stellar-standard-block', block: block %}
+{% endcomment %}
+
+{% case block.type %}
+  {% when 'heading' %}
+    <{{ block.settings.size }} class="stellar-font-display" style="margin-bottom:1rem;" {{ block.shopify_attributes }}>{{ block.settings.text }}</{{ block.settings.size }}>
+  {% when 'text' %}
+    <div class="stellar-font-body" style="margin-bottom:1rem;line-height:1.75;" {{ block.shopify_attributes }}>{{ block.settings.content }}</div>
+  {% when 'button' %}
+    <div style="margin-bottom:1rem;" {{ block.shopify_attributes }}>
+      <a href="{{ block.settings.url }}" class="stellar-font-body stellar-hover-lift" style="display:inline-block;padding:0.625rem 1.5rem;border-radius:0.5rem;{% if block.settings.style == 'primary' %}background:rgb(var(--color-base-button));color:rgb(var(--color-base-button-text));{% else %}border:1px solid currentColor;{% endif %}font-weight:500;text-decoration:none;">{{ block.settings.text }}</a>
+    </div>
+  {% when 'image' %}
+    {% if block.settings.image != blank %}
+      <div class="stellar-img-zoom" style="margin-bottom:1rem;" {{ block.shopify_attributes }}>
+        <img src="{{ block.settings.image | image_url: width: 800 }}" alt="{{ block.settings.alt }}" style="max-width:100%;border-radius:1rem;" loading="lazy">
+      </div>
+    {% endif %}
+  {% when 'badge' %}
+    <div style="margin-bottom:1rem;" {{ block.shopify_attributes }}>
+      <span class="stellar-badge stellar-badge-{{ block.settings.color }}">{{ block.settings.label }}</span>
+    </div>
+  {% when 'divider' %}
+    {% if block.settings.style == 'space' %}
+      <div style="height:{{ block.settings.spacing }}rem;" {{ block.shopify_attributes }}></div>
+    {% elsif block.settings.style == 'dotted' %}
+      <hr style="border:none;border-top:2px dotted currentColor;opacity:0.15;margin:{{ block.settings.spacing }}rem 0;" {{ block.shopify_attributes }}>
+    {% else %}
+      <hr style="border:none;border-top:1px solid currentColor;opacity:0.1;margin:{{ block.settings.spacing }}rem 0;" {{ block.shopify_attributes }}>
+    {% endif %}
+{% endcase %}

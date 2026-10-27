@@ -1,0 +1,540 @@
+{% comment %}
+  Stellar Menu Drawer
+  Self-contained header + drawer navigation.
+  Includes its own header bar with logo, hamburger, and cart.
+  No dependency on the Stellar Header or any other section.
+  Can coexist with or replace the Stellar Header in the header group.
+  z-index 30 for the header bar, 29 for the drawer, 28 for the overlay.
+  Cart drawer (z-35) always renders above everything.
+{% endcomment %}
+
+{{ 'stellar-menu-drawer.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign drawer_bg = section.settings.bg_color | default: '#F6F7F8'
+  assign drawer_text = section.settings.text_color | default: '#222222'
+
+  comment
+    Determine whether the header bar should start solid.
+    Matches the Stellar Header pattern: solid on product pages and Skio portal,
+    transparent elsewhere (unless force_solid is on).
+  endcomment
+
+  assign bar_solid = false
+  assign is_solid_override = false
+
+  if template.name == 'product'
+    assign bar_solid = true
+    assign is_solid_override = true
+  endif
+
+  if request.path contains '/pages/ourstory' or request.path contains '/a/account'
+    assign bar_solid = true
+    assign is_solid_override = true
+  endif
+
+  if section.settings.force_solid
+    assign bar_solid = true
+  endif
+
+  if section.settings.force_transparent
+    assign bar_solid = false
+    assign is_solid_override = false
+  endif
+-%}
+
+{%- comment %} ============ HEADER BAR ============ {% endcomment -%}
+<header
+  class="smd-header-bar{% if is_solid_override %} smd-header-solid{% endif %}{% if bar_solid %} smd-header-scrolled{% endif %}"
+  id="smd-header-bar"
+  style="background:{% if is_solid_override %}{{ section.settings.product_bg_color }}{% else %}{{ section.settings.bar_bg_color }}{% endif %};color:{% if is_solid_override %}{{ section.settings.product_text_color }}{% else %}{{ section.settings.bar_text_color }}{% endif %};"
+  {% unless bar_solid %}data-smd-transparent{% endunless %}
+  {% if is_solid_override %}data-smd-product{% endif %}
+>
+  <div class="smd-header-bar-inner">
+    <div class="smd-header-left">
+      <button type="button" class="smd-hamburger" aria-label="Menu" aria-expanded="false" id="smd-hamburger">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+
+    <a href="/" class="smd-logo-link">
+      {% if section.settings.logo != blank %}
+        <img
+          src="{{ section.settings.logo | image_url: height: 80 }}"
+          alt="{{ shop.name }}"
+          style="height:{{ section.settings.logo_height }}px;"
+          loading="eager"
+        >
+      {% else %}
+        <span class="stellar-font-display" style="font-size:1.5rem;">{{ shop.name }}</span>
+      {% endif %}
+    </a>
+
+    <div class="smd-header-right">
+      {% if section.settings.show_account %}
+        <a href="{{ routes.account_url }}" class="smd-account-link" aria-label="Account">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </a>
+      {% endif %}
+      {% if settings.cart_type == 'drawer' %}
+        <button type="button" class="smd-cart-btn" aria-controls="CartDrawer" aria-expanded="false" aria-label="Cart">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          {% if cart.item_count > 0 %}
+            <span class="smd-cart-count">{{ cart.item_count }}</span>
+          {% endif %}
+        </button>
+      {% else %}
+        <a href="{{ routes.cart_url }}" class="smd-cart-link" aria-label="Cart">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          {% if cart.item_count > 0 %}
+            <span class="smd-cart-count">{{ cart.item_count }}</span>
+          {% endif %}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+{%- comment %} ============ OVERLAY ============ {% endcomment -%}
+<div class="smd-overlay" id="smd-overlay"></div>
+
+{%- comment %} ============ DRAWER ============ {% endcomment -%}
+<div
+  class="smd-drawer"
+  id="StellarMenuDrawer"
+  aria-hidden="true"
+  role="dialog"
+  aria-label="Navigation menu"
+  style="--smd-bg: {{ drawer_bg }}; --smd-text: {{ drawer_text }};"
+>
+  <div class="smd-panel">
+    {%- comment %} Drawer header with heading + close {% endcomment -%}
+    <div class="smd-drawer-header">
+      <span class="smd-section-heading stellar-font-body" style="margin:0;">
+        {{ section.settings.cards_heading | default: 'Shop by product line' }}
+      </span>
+      <button type="button" class="smd-close" id="smd-close" aria-label="Close menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    {%- comment %} Scrollable body {% endcomment -%}
+    <div class="smd-body">
+
+      {%- comment %} Collection cards {% endcomment -%}
+      {%- assign has_cards = false -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'collection_card' -%}
+          {%- unless has_cards -%}
+            <div class="smd-cards">
+          {%- endunless -%}
+          {%- assign has_cards = true -%}
+          {% render 'stellar-menu-card', block: block, index: forloop.index, section: section %}
+        {%- endif -%}
+      {%- endfor -%}
+      {%- if has_cards -%}
+        </div>
+      {%- endif -%}
+
+      {%- comment %} Shop links with optional badges {% endcomment -%}
+      {%- assign has_shop_links = false -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'shop_link' and block.settings.link != blank -%}
+          {%- unless has_shop_links -%}
+            <ul class="smd-links">
+          {%- endunless -%}
+          {%- assign has_shop_links = true -%}
+          <li class="smd-link-item" {{ block.shopify_attributes }}>
+            <a href="{{ block.settings.link }}" class="stellar-font-body">
+              {{ block.settings.link_label | default: block.settings.link.title | escape }}
+            </a>
+            {%- if block.settings.badge_text != blank -%}
+              <span class="stellar-badge stellar-badge-{{ block.settings.badge_color | default: 'purple' }}">
+                {{ block.settings.badge_text | escape }}
+              </span>
+            {%- endif -%}
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+      {%- if has_shop_links -%}
+        </ul>
+      {%- endif -%}
+
+      {%- comment %} Divider {% endcomment -%}
+      {%- assign has_nav_links = false -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'nav_link' and block.settings.link != blank -%}
+          {%- assign has_nav_links = true -%}
+          {%- break -%}
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- if has_shop_links and has_nav_links -%}
+        <hr class="smd-divider">
+      {%- endif -%}
+
+      {%- comment %} Navigation links {% endcomment -%}
+      {%- if has_nav_links -%}
+        <ul class="smd-nav-links stellar-font-body">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'nav_link' and block.settings.link != blank -%}
+              <li {{ block.shopify_attributes }}>
+                <a href="{{ block.settings.link }}">
+                  {{ block.settings.link_label | default: block.settings.link.title | escape }}
+                </a>
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+
+    </div>
+  </div>
+</div>
+
+{%- comment %} ============ SCRIPTS ============ {% endcomment -%}
+<script>
+  (function() {
+    /* ---- Elements ---- */
+    var headerBar = document.getElementById('smd-header-bar');
+    var hamburger = document.getElementById('smd-hamburger');
+    var drawer = document.getElementById('StellarMenuDrawer');
+    var overlay = document.getElementById('smd-overlay');
+    var closeBtn = document.getElementById('smd-close');
+    if (!drawer || !hamburger) return;
+
+    /* ---- Drawer open / close ---- */
+    function openDrawer() {
+      drawer.setAttribute('aria-hidden', 'false');
+      overlay.classList.add('smd-visible');
+      document.body.classList.add('smd-open');
+      hamburger.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeDrawer() {
+      /* Collapse any open sub-panels */
+      drawer.querySelectorAll('.smd-subpanel-open').forEach(function(p) {
+        p.classList.remove('smd-subpanel-open');
+        p.setAttribute('aria-hidden', 'true');
+      });
+      drawer.querySelectorAll('[data-smd-card][aria-expanded="true"]').forEach(function(c) {
+        c.setAttribute('aria-expanded', 'false');
+      });
+
+      drawer.setAttribute('aria-hidden', 'true');
+      overlay.classList.remove('smd-visible');
+      document.body.classList.remove('smd-open');
+      hamburger.setAttribute('aria-expanded', 'false');
+    }
+
+    function toggleDrawer() {
+      drawer.getAttribute('aria-hidden') === 'true' ? openDrawer() : closeDrawer();
+    }
+
+    /* Public API (optional, for external integration) */
+    window.StellarMenuDrawer = { open: openDrawer, close: closeDrawer, toggle: toggleDrawer };
+
+    /* ---- Triggers ---- */
+    hamburger.addEventListener('click', toggleDrawer);
+    closeBtn.addEventListener('click', closeDrawer);
+    overlay.addEventListener('click', closeDrawer);
+
+    /* ---- Escape key ---- */
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && drawer.getAttribute('aria-hidden') === 'false') {
+        var openPanel = drawer.querySelector('.smd-subpanel-open');
+        if (openPanel) {
+          closeSubpanel(openPanel);
+        } else {
+          closeDrawer();
+        }
+      }
+    });
+
+    /* ---- Card -> Sub-panel ---- */
+    drawer.querySelectorAll('[data-smd-card]').forEach(function(card) {
+      card.addEventListener('click', function() {
+        var idx = card.getAttribute('data-smd-card');
+        var panel = document.getElementById('smd-subpanel-' + idx);
+        if (!panel) return;
+        card.setAttribute('aria-expanded', 'true');
+        panel.classList.add('smd-subpanel-open');
+        panel.setAttribute('aria-hidden', 'false');
+      });
+    });
+
+    /* ---- Back button ---- */
+    drawer.querySelectorAll('[data-smd-back]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var panel = btn.closest('.smd-subpanel');
+        if (panel) closeSubpanel(panel);
+      });
+    });
+
+    function closeSubpanel(panel) {
+      panel.classList.remove('smd-subpanel-open');
+      panel.setAttribute('aria-hidden', 'true');
+      var idx = panel.id.replace('smd-subpanel-', '');
+      var card = drawer.querySelector('[data-smd-card="' + idx + '"]');
+      if (card) card.setAttribute('aria-expanded', 'false');
+    }
+
+    /* ---- Header bar scroll behavior ---- */
+    if (headerBar && !headerBar.hasAttribute('data-smd-product')) {
+      var startedSolid = !headerBar.hasAttribute('data-smd-transparent');
+      if (!startedSolid) {
+        var threshold = {{ section.settings.scroll_threshold }};
+        function onScroll() {
+          /* Keep header solid while drawer is open */
+          if (drawer.getAttribute('aria-hidden') === 'false') {
+            headerBar.classList.add('smd-header-scrolled');
+            return;
+          }
+          if (window.scrollY > threshold) {
+            headerBar.removeAttribute('data-smd-transparent');
+            headerBar.classList.add('smd-header-scrolled');
+          } else {
+            headerBar.setAttribute('data-smd-transparent', '');
+            headerBar.classList.remove('smd-header-scrolled');
+          }
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+      }
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Stellar menu drawer",
+  "tag": "section",
+  "class": "stellar-menu-drawer-section",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Self-contained header + drawer navigation. Includes its own logo, hamburger, and cart button. Can coexist with or replace the Stellar Header."
+    },
+    {
+      "type": "header",
+      "content": "Header bar"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo image"
+    },
+    {
+      "type": "range",
+      "id": "logo_height",
+      "label": "Logo height",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "default": 32,
+      "unit": "px"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_account",
+      "label": "Show account icon",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "bar_bg_color",
+      "label": "Header background",
+      "default": "#222222"
+    },
+    {
+      "type": "color",
+      "id": "bar_text_color",
+      "label": "Header text color",
+      "default": "#F6F7F8"
+    },
+    {
+      "type": "header",
+      "content": "Product page style"
+    },
+    {
+      "type": "color",
+      "id": "product_bg_color",
+      "label": "Product page background",
+      "default": "#22162B"
+    },
+    {
+      "type": "color",
+      "id": "product_text_color",
+      "label": "Product page text color",
+      "default": "#F6F7F8"
+    },
+    {
+      "type": "header",
+      "content": "Scroll behavior"
+    },
+    {
+      "type": "range",
+      "id": "scroll_threshold",
+      "label": "Scroll distance before solid",
+      "min": 10,
+      "max": 300,
+      "step": 10,
+      "default": 50,
+      "unit": "px",
+      "info": "How far the user scrolls before the header background appears. Does not apply to product pages."
+    },
+    {
+      "type": "checkbox",
+      "id": "force_solid",
+      "label": "Always start solid",
+      "default": true,
+      "info": "Overrides transparent behavior on all non-product pages."
+    },
+    {
+      "type": "checkbox",
+      "id": "force_transparent",
+      "label": "Always start transparent",
+      "default": false,
+      "info": "Overrides the product page solid default. Use with caution on light backgrounds."
+    },
+    {
+      "type": "header",
+      "content": "Drawer"
+    },
+    {
+      "type": "text",
+      "id": "cards_heading",
+      "label": "Cards section heading",
+      "default": "Shop by product line"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Drawer background",
+      "default": "#F6F7F8"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Drawer text color",
+      "default": "#222222"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection_card",
+      "name": "Collection card",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "url",
+          "id": "direct_link",
+          "label": "Direct link (skip sub-panel)",
+          "info": "When set, clicking the card navigates directly to this URL instead of opening the product sub-panel. Use for single-product collections like individual PDPs."
+        },
+        {
+          "type": "text",
+          "id": "card_label",
+          "label": "Card label",
+          "info": "Defaults to the collection title if left blank."
+        },
+        {
+          "type": "image_picker",
+          "id": "card_image",
+          "label": "Card image",
+          "info": "Shown at 56x56. Falls back to the collection image."
+        },
+        {
+          "type": "image_picker",
+          "id": "card_logo",
+          "label": "Card logo / icon",
+          "info": "Optional brand logo shown above the label."
+        },
+        {
+          "type": "color",
+          "id": "card_bg_color",
+          "label": "Card background",
+          "default": "#f0e8f5"
+        },
+        {
+          "type": "color",
+          "id": "card_text_color",
+          "label": "Card text color",
+          "default": "#222222"
+        },
+        {
+          "type": "range",
+          "id": "product_limit",
+          "label": "Products to show",
+          "min": 3,
+          "max": 20,
+          "step": 1,
+          "default": 10,
+          "info": "How many products from this collection appear in the sub-panel."
+        }
+      ]
+    },
+    {
+      "type": "shop_link",
+      "name": "Shop link",
+      "limit": 8,
+      "settings": [
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Link label",
+          "info": "Defaults to the link title if left blank."
+        },
+        {
+          "type": "text",
+          "id": "badge_text",
+          "label": "Badge text",
+          "info": "Optional inline tag, e.g. 'Save 20%' or 'New'."
+        },
+        {
+          "type": "select",
+          "id": "badge_color",
+          "label": "Badge color",
+          "options": [
+            { "value": "green", "label": "Green" },
+            { "value": "purple", "label": "Purple" },
+            { "value": "skyblue", "label": "Sky Blue" },
+            { "value": "orange", "label": "Orange" },
+            { "value": "gold", "label": "Gold" }
+          ],
+          "default": "purple"
+        }
+      ]
+    },
+    {
+      "type": "nav_link",
+      "name": "Navigation link",
+      "limit": 10,
+      "settings": [
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Link label",
+          "info": "Defaults to the link title if left blank."
+        }
+      ]
+    }
+  ]}
+{% endschema %}

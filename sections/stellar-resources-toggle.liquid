@@ -1,0 +1,347 @@
+{% comment %}
+  Stellar Resources Toggle
+  Two- or three-tab toggle that controls which downstream sections are visible.
+  Downstream sections must have a data-toggle-group attribute matching a tab value.
+  Sections without data-toggle-group are always visible.
+  Tab 3 is optional: leave its label blank to use a two-tab layout.
+  @stellar-custom
+{% endcomment %}
+
+{%- liquid
+  assign tab_1_id = section.settings.tab_1_value | default: 'lactose'
+  assign tab_2_id = section.settings.tab_2_value | default: 'heartburn'
+  assign tab_3_id = section.settings.tab_3_value
+  assign tab_3_label = section.settings.tab_3_label
+  assign has_tab_3 = false
+  if tab_3_label != blank and tab_3_id != blank
+    assign has_tab_3 = true
+  endif
+  assign default_tab = section.settings.default_tab | default: tab_1_id
+-%}
+
+<section
+  class="stellar-resources-toggle"
+  style="padding:{{ section.settings.padding_top }}rem 0 {{ section.settings.padding_bottom }}rem;{% if section.settings.bg_image != blank %}background:url('{{ section.settings.bg_image | image_url: width: 1920 }}') center/cover no-repeat;{% else %}background:{{ section.settings.bg_color }};{% endif %}color:{{ section.settings.text_color }};"
+  data-resources-toggle
+  data-default-tab="{{ default_tab }}"
+>
+  <div class="stellar-container" style="max-width:44rem;margin:0 auto;display:flex;justify-content:center;">
+    {%- liquid
+      assign tab_count = 2
+      if has_tab_3
+        assign tab_count = 3
+      endif
+      assign default_index = 0
+      if default_tab == tab_2_id
+        assign default_index = 1
+      elsif has_tab_3 and default_tab == tab_3_id
+        assign default_index = 2
+      endif
+    -%}
+    <div class="srt-tabs" role="tablist" style="--srt-tab-count:{{ tab_count }};--srt-active-index:{{ default_index }}">
+      <button
+        type="button"
+        role="tab"
+        class="srt-tab stellar-font-body"
+        data-srt-tab="{{ tab_1_id }}"
+        aria-selected="{% if default_tab == tab_1_id %}true{% else %}false{% endif %}"
+        id="srt-tab-{{ tab_1_id }}"
+      >
+        {{ section.settings.tab_1_label | default: 'Lactose Intolerance' }}
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="srt-tab stellar-font-body"
+        data-srt-tab="{{ tab_2_id }}"
+        aria-selected="{% if default_tab == tab_2_id %}true{% else %}false{% endif %}"
+        id="srt-tab-{{ tab_2_id }}"
+      >
+        {{ section.settings.tab_2_label | default: 'Heartburn' }}
+      </button>
+      {% if has_tab_3 %}
+        <button
+          type="button"
+          role="tab"
+          class="srt-tab stellar-font-body"
+          data-srt-tab="{{ tab_3_id }}"
+          aria-selected="{% if default_tab == tab_3_id %}true{% else %}false{% endif %}"
+          id="srt-tab-{{ tab_3_id }}"
+        >
+          {{ tab_3_label }}
+        </button>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<style>
+  .srt-tabs {
+    display: inline-grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    max-width: 100%;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1.5px solid {{ section.settings.tab_border_color | default: '#ffffff' }};
+    background: {{ section.settings.tab_bg | default: '#000000' }};
+    position: relative;
+  }
+
+  /* Sliding pill indicator */
+  .srt-tabs::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: calc(100% / var(--srt-tab-count, 2));
+    background: {{ section.settings.tab_active_bg | default: '#ffffff' }};
+    border-radius: 999px;
+    transition: transform 0.3s ease;
+    transform: translateX(calc(var(--srt-active-index, 0) * 100%));
+    z-index: 0;
+  }
+
+  .srt-tab {
+    position: relative;
+    z-index: 1;
+    padding: clamp(0.4rem, 1.5vw, 0.625rem) clamp(0.75rem, 3vw, 1.5rem);
+    font-size: clamp(0.6875rem, 2.5vw, 0.875rem);
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: color 0.25s ease;
+    background: transparent;
+    color: {{ section.settings.tab_text | default: '#ffffff' }};
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  .srt-tab[aria-selected="true"] {
+    color: {{ section.settings.tab_active_text | default: '#000000' }};
+  }
+
+  .srt-tab[aria-selected="false"]:hover {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  /* Hide toggled sections by default, show via JS */
+  [data-toggle-group] {
+    display: none;
+  }
+  [data-toggle-group].srt-active {
+    display: block;
+  }
+</style>
+
+<script>
+  (function() {
+    function initToggle() {
+      var toggleSection = document.querySelector('[data-resources-toggle]');
+      if (!toggleSection) return;
+
+      var tabsContainer = toggleSection.querySelector('.srt-tabs');
+      var tabs = toggleSection.querySelectorAll('[data-srt-tab]');
+      var defaultTab = toggleSection.getAttribute('data-default-tab');
+
+      function activateTab(tabValue) {
+        var activeIndex = 0;
+        tabs.forEach(function(tab, i) {
+          var isActive = tab.getAttribute('data-srt-tab') === tabValue;
+          tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+          if (isActive) activeIndex = i;
+        });
+
+        /* Slide the pill to the active tab */
+        if (tabsContainer) {
+          tabsContainer.style.setProperty('--srt-active-index', activeIndex);
+        }
+
+        document.querySelectorAll('[data-toggle-group]').forEach(function(section) {
+          var group = section.getAttribute('data-toggle-group');
+          var wrapper = section.closest('.shopify-section') || section;
+          if (group === tabValue) {
+            section.classList.add('srt-active');
+            wrapper.style.display = '';
+          } else {
+            section.classList.remove('srt-active');
+            wrapper.style.display = 'none';
+          }
+        });
+      }
+
+      tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          activateTab(tab.getAttribute('data-srt-tab'));
+        });
+      });
+
+      activateTab(defaultTab);
+    }
+
+    /* Run after full DOM is ready so downstream sections exist */
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initToggle);
+    } else {
+      initToggle();
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Stellar Resources Toggle",
+  "tag": "section",
+  "class": "stellar-resources-toggle-section",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Toggle that controls which sections are visible. Downstream sections with a matching 'Toggle group' setting will show/hide based on the active tab. Tab 3 is optional."
+    },
+    {
+      "type": "header",
+      "content": "Tab 1"
+    },
+    {
+      "type": "text",
+      "id": "tab_1_label",
+      "label": "Label",
+      "default": "Lactose Intolerance"
+    },
+    {
+      "type": "text",
+      "id": "tab_1_value",
+      "label": "Group value",
+      "default": "lactose",
+      "info": "Must match the 'Toggle group' value on sections for this tab."
+    },
+    {
+      "type": "header",
+      "content": "Tab 2"
+    },
+    {
+      "type": "text",
+      "id": "tab_2_label",
+      "label": "Label",
+      "default": "Heartburn"
+    },
+    {
+      "type": "text",
+      "id": "tab_2_value",
+      "label": "Group value",
+      "default": "heartburn",
+      "info": "Must match the 'Toggle group' value on sections for this tab."
+    },
+    {
+      "type": "header",
+      "content": "Tab 3 (optional)"
+    },
+    {
+      "type": "text",
+      "id": "tab_3_label",
+      "label": "Label",
+      "info": "Leave blank to hide this tab."
+    },
+    {
+      "type": "text",
+      "id": "tab_3_value",
+      "label": "Group value",
+      "info": "Must match the 'Toggle group' value on sections for this tab."
+    },
+    {
+      "type": "header",
+      "content": "Behavior"
+    },
+    {
+      "type": "text",
+      "id": "default_tab",
+      "label": "Default active tab value",
+      "default": "lactose",
+      "info": "Enter the group value of the tab that should be active on page load."
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 6,
+      "step": 0.5,
+      "default": 1.5,
+      "unit": "rem"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 6,
+      "step": 0.5,
+      "default": 1.5,
+      "unit": "rem"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Background image",
+      "info": "Overrides background color when set. Use the same image as the hero for a seamless look."
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#22162B",
+      "info": "Used when no background image is set."
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#F6F7F8"
+    },
+    {
+      "type": "color",
+      "id": "tab_border_color",
+      "label": "Tab border color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "tab_bg",
+      "label": "Tab background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "tab_text",
+      "label": "Tab text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "tab_active_bg",
+      "label": "Active tab background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "tab_active_text",
+      "label": "Active tab text",
+      "default": "#000000"
+    }
+  ],
+  "enabled_on": {
+    "templates": ["page"]
+  },
+  "presets": [
+    {
+      "name": "Stellar Resources Toggle"
+    }
+  ]
+}
+{% endschema %}

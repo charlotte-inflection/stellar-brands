@@ -1,0 +1,784 @@
+{% comment %}
+  Stellar Product Info Section
+  Block-based product layout: media gallery + reorderable product info blocks.
+  Each piece of content (title, price, variant picker, buy buttons, etc.) is a
+  block so merchants can add, remove, and reorder them in the theme editor.
+{% endcomment %}
+
+{%- liquid
+  assign pad_top = section.settings.padding_top | default: 2
+  assign pad_bot = section.settings.padding_bottom | default: 4
+  assign bg_class = section.settings.color_scheme | default: 'stellar-bg-light'
+-%}
+
+<section class="{{ bg_class }}" style="padding-top:{{ pad_top }}rem;padding-bottom:{{ pad_bot }}rem;" {% if section.settings.toggle_group != blank %}data-toggle-group="{{ section.settings.toggle_group }}"{% endif %} {{ section.shopify_attributes }}>
+  <div class="stellar-container">
+
+    {%- comment -%} Breadcrumb {%- endcomment -%}
+    <nav class="stellar-font-body" style="font-size:0.75rem;color:hsla(0,0%,40%,1);margin-bottom:1.5rem;">
+      <a href="{{ routes.root_url }}" style="text-decoration:none;color:inherit;">Home</a>
+      {% if product.collections.size > 0 %}
+        / <a href="{{ product.collections.first.url }}" style="text-decoration:none;color:inherit;">{{ product.collections.first.title }}</a>
+      {% endif %}
+      / <span style="color:var(--stellar-black);">{{ product.title }}</span>
+    </nav>
+
+    <div class="stellar-pi-grid">
+
+      {%- comment -%} ============ Gallery Column ============ {%- endcomment -%}
+      <div class="stellar-pi-gallery">
+
+        {%- comment -%} Thumbnail strip {%- endcomment -%}
+        <div class="stellar-pi-thumbs">
+          {% for media in product.media %}
+            {% if media.media_type == 'image' %}
+              <button
+                type="button"
+                class="stellar-pi-thumb-btn{% if forloop.first %} is-active{% endif %}"
+                data-media-index="{{ forloop.index0 }}"
+                aria-label="View {{ media.alt | default: product.title }}"
+              >
+                <img
+                  src="{{ media | image_url: width: 128 }}"
+                  alt="{{ media.alt | default: product.title }}"
+                  width="128"
+                  height="128"
+                  loading="lazy"
+                >
+              </button>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        {%- comment -%} Main image {%- endcomment -%}
+        <div class="stellar-pi-main-img stellar-rounded-2xl">
+          {% if product.featured_image %}
+            {% for media in product.media %}
+              {% if media.media_type == 'image' %}
+                <img
+                  src="{{ media | image_url: width: 900 }}"
+                  alt="{{ media.alt | default: product.title }}"
+                  width="900"
+                  height="1200"
+                  class="stellar-pi-gallery-img{% if forloop.first %} is-active{% endif %}"
+                  data-media-index="{{ forloop.index0 }}"
+                  loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                >
+              {% endif %}
+            {% endfor %}
+          {% else %}
+            <div class="stellar-pi-placeholder">
+              <span class="stellar-font-display" style="color:hsla(0,0%,13%,0.2);font-size:1.5rem;">{{ product.title }}</span>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      {%- comment -%} ============ Info Column (block-based) ============ {%- endcomment -%}
+      <div class="stellar-pi-info">
+
+        {% for block in section.blocks %}
+          {% case block.type %}
+
+            {%- comment -%} ── Badge ── {%- endcomment -%}
+            {% when 'badge' %}
+              <div {{ block.shopify_attributes }}>
+                <span class="stellar-badge stellar-badge-{{ block.settings.color | default: 'gold' }}">
+                  {{ block.settings.text | default: 'Best Seller' }}
+                </span>
+              </div>
+
+            {%- comment -%} ── Rating ── {%- endcomment -%}
+            {% when 'rating' %}
+              <div style="display:flex;align-items:center;gap:0.5rem;" {{ block.shopify_attributes }}>
+                <div style="display:flex;gap:2px;">
+                  {% for i in (1..5) %}
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--stellar-skyblue)" stroke="var(--stellar-skyblue)" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  {% endfor %}
+                </div>
+                <span class="stellar-font-body" style="font-size:0.875rem;color:hsla(0,0%,40%,1);">
+                  {%- if block.settings.rating_average != blank or block.settings.review_count != blank -%}
+                    {{ block.settings.rating_average | default: '4.9' }}{% if block.settings.review_count != blank %} ({{ block.settings.review_count }} reviews){% endif %}
+                  {%- else -%}
+                    {{ block.settings.text | default: '4.9 (2,027 reviews)' }}
+                  {%- endif -%}
+                </span>
+              </div>
+
+            {%- comment -%} ── Title ── {%- endcomment -%}
+            {% when 'title' %}
+              <h1 class="stellar-font-display" style="font-size:clamp(1.875rem,4vw,2.25rem);color:var(--stellar-black);margin:0;" {{ block.shopify_attributes }}>
+                {{ product.title }}
+              </h1>
+
+            {%- comment -%} ── Price ── {%- endcomment -%}
+            {% when 'price' %}
+              <p class="stellar-font-body" style="font-size:0.875rem;color:hsla(0,0%,40%,1);margin:0;" {{ block.shopify_attributes }}>
+                From <strong style="color:var(--stellar-black);">{{ product.selected_or_first_available_variant.price | money }}</strong>
+                {% if block.settings.unit_label != blank %}
+                  <span>/{{ block.settings.unit_label }}</span>
+                {% endif %}
+                {% if block.settings.descriptor != blank %}
+                  · {{ block.settings.descriptor }}
+                {% endif %}
+              </p>
+
+            {%- comment -%} ── Description ── {%- endcomment -%}
+            {% when 'description' %}
+              <div class="stellar-font-body" style="color:hsla(0,0%,40%,1);line-height:1.75;" {{ block.shopify_attributes }}>
+                {{ product.description }}
+              </div>
+
+            {%- comment -%} ── Strength Picker ── {%- endcomment -%}
+            {% when 'strength_picker' %}
+              {%- assign strength_items = block.settings.items | split: '||' -%}
+              {% if strength_items.size > 0 %}
+                <div {{ block.shopify_attributes }}>
+                  <label class="stellar-eyebrow" style="display:block;margin-bottom:0.5rem;color:hsla(0,0%,40%,1);font-weight:500;">Strength</label>
+                  <div style="display:flex;gap:0.5rem;flex-wrap:wrap;" id="stellar-strengths">
+                    {%- comment -%} Populated via sub-blocks below {%- endcomment -%}
+                  </div>
+                </div>
+              {% endif %}
+
+            {%- comment -%} ── Strength Link (sub-item) ── {%- endcomment -%}
+            {% when 'strength_link' %}
+              {%- comment -%} Rendered inside the strength picker area via JS {%- endcomment -%}
+
+            {%- comment -%} ── Variant Picker ── {%- endcomment -%}
+            {% when 'variant_picker' %}
+              {% if product.variants.size > 1 %}
+                <div {{ block.shopify_attributes }}>
+                  <label class="stellar-eyebrow" style="display:block;margin-bottom:0.5rem;color:hsla(0,0%,40%,1);font-weight:500;">
+                    {{ block.settings.label | default: 'Pack Size' }}
+                  </label>
+                  <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                    {% for variant in product.variants %}
+                      <button
+                        type="button"
+                        class="stellar-font-body stellar-pi-variant-btn{% if forloop.first %} is-active{% endif %}"
+                        data-variant-id="{{ variant.id }}"
+                        data-variant-price="{{ variant.price | money }}"
+                        {% unless variant.available %}disabled{% endunless %}
+                      >
+                        {{ variant.title }}
+                      </button>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endif %}
+
+            {%- comment -%} ── Subscription Toggle ── {%- endcomment -%}
+            {% when 'subscription_toggle' %}
+              <div class="stellar-pi-sub-card" {{ block.shopify_attributes }}>
+                <button type="button" class="stellar-font-body stellar-pi-sub-btn is-active" data-plan="onetime">
+                  <span style="font-size:0.875rem;font-weight:500;">One-time Purchase</span>
+                  <span style="font-weight:700;" class="stellar-pi-onetime-price">{{ product.selected_or_first_available_variant.price | money }}</span>
+                </button>
+                <button type="button" class="stellar-font-body stellar-pi-sub-btn" data-plan="subscribe">
+                  <div style="text-align:left;">
+                    <span style="font-size:0.875rem;font-weight:500;">Subscribe & Save</span>
+                    <span style="color:var(--stellar-green);font-size:0.75rem;font-weight:700;margin-left:0.5rem;">
+                      Save {{ block.settings.discount_percent | default: 10 }}%
+                    </span>
+                  </div>
+                  <div style="text-align:right;">
+                    <span style="font-weight:700;" class="stellar-pi-sub-price"></span>
+                    <span style="font-size:0.75rem;color:hsla(0,0%,40%,1);text-decoration:line-through;margin-left:0.25rem;" class="stellar-pi-sub-compare"></span>
+                  </div>
+                </button>
+                <p class="stellar-font-body stellar-pi-sub-details" style="display:none;font-size:0.75rem;color:hsla(0,0%,40%,1);margin:0;">
+                  {{ block.settings.sub_note | default: 'Free shipping · Skip or cancel anytime' }}
+                </p>
+              </div>
+
+            {%- comment -%} ── Buy Buttons ── {%- endcomment -%}
+            {% when 'buy_buttons' %}
+              <div {{ block.shopify_attributes }}>
+                {% form 'product', product, id: 'stellar-product-form' %}
+                  <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" class="stellar-pi-variant-input">
+                  <input type="hidden" name="quantity" value="1">
+                  <button
+                    type="submit"
+                    class="stellar-font-body stellar-hover-lift"
+                    style="width:100%;padding:0.875rem;border-radius:0.5rem;background:var(--stellar-skyblue);color:var(--stellar-black);font-weight:700;font-size:1rem;border:none;cursor:pointer;"
+                  >
+                    Add to Cart — <span class="stellar-pi-cart-price">{{ product.selected_or_first_available_variant.price | money }}</span>
+                  </button>
+
+                  {% if block.settings.show_express %}
+                    <div style="margin-top:1rem;">
+                      <p class="stellar-eyebrow" style="text-align:center;color:hsla(0,0%,40%,1);margin-bottom:0.5rem;">Express checkout</p>
+                      <div style="display:flex;gap:0.5rem;">
+                        {{ form | payment_button }}
+                      </div>
+                    </div>
+                  {% endif %}
+                {% endform %}
+              </div>
+
+            {%- comment -%} ── Trust Icons ── {%- endcomment -%}
+            {% when 'trust_icon' %}
+              {%- comment -%} Collected and rendered together after the loop {%- endcomment -%}
+
+            {%- comment -%} ── Collapsible Row ── {%- endcomment -%}
+            {% when 'collapsible_row' %}
+              <details class="stellar-pi-collapsible" {{ block.shopify_attributes }}>
+                <summary class="stellar-font-body">
+                  {{ block.settings.title | default: 'Details' }}
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </summary>
+                <div class="stellar-font-body" style="padding:0 0 1rem;font-size:0.875rem;color:hsla(0,0%,40%,1);line-height:1.75;">
+                  {{ block.settings.content }}
+                </div>
+              </details>
+
+          {% endcase %}
+        {% endfor %}
+
+        {%- comment -%} ── Trust Icons Row (collected) ── {%- endcomment -%}
+        {%- assign trust_blocks = section.blocks | where: "type", "trust_icon" -%}
+        {% if trust_blocks.size > 0 %}
+          <div style="display:flex;justify-content:center;gap:1.5rem;padding:0.5rem 0;flex-wrap:wrap;">
+            {% for block in trust_blocks %}
+              <div {{ block.shopify_attributes }}>
+                {% render 'stellar-trust-badge', icon_emoji: block.settings.icon, label: block.settings.label %}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        {%- comment -%} ── Strength Links (collected) ── {%- endcomment -%}
+        {%- assign strength_blocks = section.blocks | where: "type", "strength_link" -%}
+        {% if strength_blocks.size > 0 %}
+          <div id="stellar-strength-links" style="display:none;">
+            {% for block in strength_blocks %}
+              {%- assign is_current = false -%}
+              {%- if block.settings.product == product.handle -%}{%- assign is_current = true -%}{%- endif -%}
+              <a
+                href="{{ block.settings.url | default: '#' }}"
+                class="stellar-font-body stellar-pi-strength-link{% if is_current %} is-active{% endif %}"
+                {{ block.shopify_attributes }}
+              >
+                {{ block.settings.label }}
+              </a>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+
+  {%- comment -%} ---- Inline JS ---- {%- endcomment -%}
+  <script>
+    (function() {
+      var s = document.querySelector('[{{ section.shopify_attributes }}]') || document.currentScript.closest('section');
+      if (!s) return;
+
+      /* Move strength links into the picker placeholder if present */
+      var linksEl = s.querySelector('#stellar-strength-links');
+      var pickerEl = s.querySelector('#stellar-strengths');
+      if (linksEl && pickerEl) {
+        while (linksEl.firstChild) pickerEl.appendChild(linksEl.firstChild);
+        linksEl.remove();
+      } else if (linksEl) {
+        linksEl.remove();
+      }
+
+      /* Thumbnail switching */
+      var thumbs = s.querySelectorAll('.stellar-pi-thumb-btn');
+      var imgs = s.querySelectorAll('.stellar-pi-gallery-img');
+      thumbs.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var idx = this.dataset.mediaIndex;
+          imgs.forEach(function(img) { img.classList.toggle('is-active', img.dataset.mediaIndex === idx); });
+          thumbs.forEach(function(t) { t.classList.toggle('is-active', t.dataset.mediaIndex === idx); });
+        });
+      });
+
+      /* Variant selection */
+      var vBtns = s.querySelectorAll('.stellar-pi-variant-btn');
+      var vInput = s.querySelector('.stellar-pi-variant-input');
+      var cartPrice = s.querySelector('.stellar-pi-cart-price');
+      var onetimePrice = s.querySelector('.stellar-pi-onetime-price');
+      vBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          vBtns.forEach(function(b) { b.classList.remove('is-active'); });
+          this.classList.add('is-active');
+          if (vInput) vInput.value = this.dataset.variantId;
+          if (cartPrice) cartPrice.textContent = this.dataset.variantPrice;
+          if (onetimePrice) onetimePrice.textContent = this.dataset.variantPrice;
+        });
+      });
+
+      /* Subscription toggle */
+      var subBtns = s.querySelectorAll('.stellar-pi-sub-btn');
+      var subDetails = s.querySelector('.stellar-pi-sub-details');
+      subBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var plan = this.dataset.plan;
+          subBtns.forEach(function(t) {
+            t.classList.toggle('is-active', t.dataset.plan === plan);
+          });
+          if (subDetails) subDetails.style.display = plan === 'subscribe' ? '' : 'none';
+        });
+      });
+
+      /* Collapsible chevron */
+      s.querySelectorAll('.stellar-pi-collapsible').forEach(function(d) {
+        d.addEventListener('toggle', function() {
+          var svg = this.querySelector('summary svg');
+          if (svg) svg.style.transform = this.open ? 'rotate(180deg)' : '';
+        });
+      });
+    })();
+  </script>
+
+  <style>
+    /* ---- Grid ---- */
+    .stellar-pi-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    @media (min-width: 768px) {
+      .stellar-pi-grid {
+        grid-template-columns: 1.2fr 1fr;
+        gap: 3rem;
+      }
+      .stellar-pi-info {
+        position: sticky;
+        top: 6rem;
+        align-self: start;
+      }
+    }
+
+    /* ---- Gallery ---- */
+    .stellar-pi-gallery {
+      display: flex;
+      gap: 0.75rem;
+    }
+    .stellar-pi-thumbs {
+      display: none;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-height: 600px;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+    @media (min-width: 768px) {
+      .stellar-pi-thumbs { display: flex; }
+    }
+    .stellar-pi-thumb-btn {
+      width: 4rem;
+      height: 4rem;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      border: 2px solid transparent;
+      cursor: pointer;
+      background: none;
+      padding: 0;
+      flex-shrink: 0;
+      transition: border-color 0.2s;
+    }
+    .stellar-pi-thumb-btn.is-active {
+      border-color: var(--stellar-skyblue);
+    }
+    .stellar-pi-thumb-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .stellar-pi-main-img {
+      flex: 1;
+      min-height: 0;
+      max-height: 700px;
+      overflow: hidden;
+      border: 1px solid hsla(0,0%,13%,0.05);
+      position: relative;
+    }
+    .stellar-pi-gallery-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: none;
+    }
+    .stellar-pi-gallery-img.is-active {
+      display: block;
+    }
+    .stellar-pi-placeholder {
+      width: 100%;
+      height: 100%;
+      min-height: 400px;
+      background: linear-gradient(135deg, hsla(246,40%,57%,0.1), hsla(211,60%,79%,0.1));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    /* ---- Info column ---- */
+    .stellar-pi-info {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    /* ---- Variant pills ---- */
+    .stellar-pi-variant-btn {
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: hsla(0,0%,13%,0.05);
+      color: hsla(0,0%,40%,1);
+    }
+    .stellar-pi-variant-btn.is-active {
+      background: var(--stellar-black);
+      color: var(--stellar-offwhite);
+    }
+    .stellar-pi-variant-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    /* ---- Strength links ---- */
+    .stellar-pi-strength-link {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s;
+      background: hsla(0,0%,13%,0.05);
+      color: hsla(0,0%,40%,1);
+    }
+    .stellar-pi-strength-link.is-active {
+      background: var(--stellar-purple);
+      color: var(--stellar-offwhite);
+    }
+
+    /* ---- Subscription card ---- */
+    .stellar-pi-sub-card {
+      border-radius: 0.75rem;
+      border: 1px solid hsla(0,0%,13%,0.1);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .stellar-pi-sub-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      border: none;
+      cursor: pointer;
+      background: transparent;
+      transition: all 0.2s;
+    }
+    .stellar-pi-sub-btn.is-active {
+      background: hsla(0,0%,13%,0.05);
+      box-shadow: 0 0 0 2px var(--stellar-skyblue);
+    }
+    .stellar-pi-sub-btn.is-active[data-plan="subscribe"] {
+      box-shadow: 0 0 0 2px var(--stellar-green);
+    }
+
+    /* ---- Collapsible ---- */
+    .stellar-pi-collapsible {
+      border-bottom: 1px solid hsla(0,0%,13%,0.1);
+    }
+    .stellar-pi-collapsible:first-of-type {
+      border-top: 1px solid hsla(0,0%,13%,0.1);
+    }
+    .stellar-pi-collapsible summary {
+      padding: 1rem 0;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--stellar-black);
+    }
+    .stellar-pi-collapsible summary::-webkit-details-marker { display: none; }
+    .stellar-pi-collapsible summary svg {
+      transition: transform 0.2s;
+    }
+  </style>
+</section>
+
+{% schema %}
+{
+  "name": "Stellar Product Info",
+  "tag": "section",
+  "class": "stellar-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "toggle_group",
+      "label": "Toggle group",
+      "info": "Used with the Resources Toggle section. Set to 'lactose' or 'heartburn'. Leave blank if not on a toggled page."
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding (rem)",
+      "min": 0,
+      "max": 12,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding (rem)",
+      "min": 0,
+      "max": 12,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "stellar-bg-light", "label": "Light" },
+        { "value": "stellar-bg-dark", "label": "Dark" },
+        { "value": "stellar-bg-sand", "label": "Sand" },
+        { "value": "stellar-bg-deepspace", "label": "Deep Space" }
+      ],
+      "default": "stellar-bg-light"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "badge",
+      "name": "Badge",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Badge text",
+          "default": "Best Seller"
+        },
+        {
+          "type": "select",
+          "id": "color",
+          "label": "Badge color",
+          "options": [
+            { "value": "gold", "label": "Gold" },
+            { "value": "green", "label": "Green" },
+            { "value": "skyblue", "label": "Sky Blue" },
+            { "value": "purple", "label": "Purple" }
+          ],
+          "default": "gold"
+        }
+      ]
+    },
+    {
+      "type": "rating",
+      "name": "Star Rating",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "rating_average",
+          "label": "Rating average",
+          "default": "4.9"
+        },
+        {
+          "type": "text",
+          "id": "review_count",
+          "label": "Review count",
+          "default": "2,027"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Rating text (legacy)",
+          "info": "Only used if the fields above are both empty. Kept for backward compatibility."
+        }
+      ]
+    },
+    {
+      "type": "title",
+      "name": "Product Title",
+      "limit": 1,
+      "settings": []
+    },
+    {
+      "type": "price",
+      "name": "Price",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "unit_label",
+          "label": "Unit label (e.g. tablet)",
+          "default": "tablet"
+        },
+        {
+          "type": "text",
+          "id": "descriptor",
+          "label": "Short descriptor",
+          "default": "Credit-card sized · 24 tablets"
+        }
+      ]
+    },
+    {
+      "type": "description",
+      "name": "Description",
+      "limit": 1,
+      "settings": []
+    },
+    {
+      "type": "strength_picker",
+      "name": "Strength Picker",
+      "limit": 1,
+      "settings": []
+    },
+    {
+      "type": "strength_link",
+      "name": "Strength Link",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Original · 10,800 FCC"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Product URL"
+        },
+        {
+          "type": "text",
+          "id": "product",
+          "label": "Product handle (current)",
+          "info": "Enter the product handle to highlight as current"
+        }
+      ]
+    },
+    {
+      "type": "variant_picker",
+      "name": "Variant Picker",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Picker label",
+          "default": "Pack Size"
+        }
+      ]
+    },
+    {
+      "type": "subscription_toggle",
+      "name": "Subscribe & Save",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "range",
+          "id": "discount_percent",
+          "label": "Discount %",
+          "min": 5,
+          "max": 30,
+          "step": 5,
+          "default": 10
+        },
+        {
+          "type": "text",
+          "id": "sub_note",
+          "label": "Subscription note",
+          "default": "Free shipping · Skip or cancel anytime"
+        }
+      ]
+    },
+    {
+      "type": "buy_buttons",
+      "name": "Buy Buttons",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_express",
+          "label": "Show express checkout",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "trust_icon",
+      "name": "Trust Icon",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon emoji",
+          "default": "🛡️"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "NSF Certified"
+        }
+      ]
+    },
+    {
+      "type": "collapsible_row",
+      "name": "Collapsible Row",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "How to Use"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Content",
+          "default": "<p>Details go here.</p>"
+        }
+      ]
+    },
+    {
+      "type": "@app"
+    }
+  ],
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "presets": [
+    {
+      "name": "Stellar Product Info",
+      "blocks": [
+        { "type": "badge" },
+        { "type": "rating" },
+        { "type": "title" },
+        { "type": "price" },
+        { "type": "description" },
+        { "type": "variant_picker" },
+        { "type": "subscription_toggle" },
+        { "type": "buy_buttons" },
+        { "type": "collapsible_row", "settings": { "title": "How to Use" } },
+        { "type": "collapsible_row", "settings": { "title": "Supplement Facts" } },
+        { "type": "collapsible_row", "settings": { "title": "Shipping & Returns" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

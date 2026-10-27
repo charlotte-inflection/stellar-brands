@@ -1,0 +1,95 @@
+{% comment %}
+  Stellar Product Card Snippet
+  Reusable product card used in collection grids, cross-sell, and comparison.
+  Image area uses the source image's aspect ratio for proportional sizing.
+
+  Usage: {% render 'stellar-product-card', product: product %}
+  Or with a block: {% render 'stellar-product-card', block: block %}
+{% endcomment %}
+
+{% if product %}
+  <a href="{{ product.url }}" style="text-decoration:none;color:inherit;display:block;border-radius:1rem;overflow:hidden;border:1px solid hsla(0,0%,13%,0.05);transition:transform 0.5s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+    {% if product.featured_image %}
+      <div style="aspect-ratio:{{ product.featured_image.width }}/{{ product.featured_image.height }};overflow:hidden;">
+        <img src="{{ product.featured_image | image_url: width: 800 }}" alt="{{ product.title }}" style="display:block;width:100%;height:100%;object-fit:cover;" loading="lazy">
+      </div>
+    {% else %}
+      <div style="aspect-ratio:4/3;background:linear-gradient(135deg, hsla(246,40%,57%,0.2), hsla(211,60%,79%,0.05));display:flex;align-items:center;justify-content:center;">
+        <span class="stellar-font-display" style="color:hsla(0,0%,13%,0.2);font-size:1.25rem;">{{ product.title }}</span>
+      </div>
+    {% endif %}
+    <div style="padding:0.75rem 1rem;">
+      {% if product.metafields.custom.jtbd_label %}
+        <p class="stellar-eyebrow" style="color:{{ product.metafields.custom.jtbd_color | default: '#655DC6' }};margin-bottom:0.375rem;">{{ product.metafields.custom.jtbd_label }}</p>
+      {% endif %}
+      <h3 class="stellar-font-display" style="font-size:1.125rem;color:var(--stellar-black);margin-bottom:0.25rem;">{{ product.title }}</h3>
+      {% if product.metafields.custom.fcc_strength %}
+        <p class="stellar-font-body" style="color:var(--stellar-skyblue);font-weight:700;font-size:0.75rem;margin-bottom:0.125rem;">{{ product.metafields.custom.fcc_strength }}</p>
+      {% endif %}
+      {% if product.metafields.custom.best_for %}
+        <p class="stellar-font-body" style="color:hsla(0,0%,40%,1);font-size:0.75rem;margin-bottom:0.125rem;">{{ product.metafields.custom.best_for }}</p>
+      {% endif %}
+      <p class="stellar-font-body" style="font-weight:700;color:var(--stellar-black);font-size:1rem;">From {{ product.price | money }}</p>
+    </div>
+  </a>
+
+{% elsif block %}
+  {%- assign prod = block.settings.product -%}
+  {%- comment -%} Determine the image source for aspect ratio calculation {%- endcomment -%}
+  {%- liquid
+    assign card_image = block.settings.image
+    if card_image == blank
+      assign card_image = prod.featured_image
+    endif
+  -%}
+  <div {{ block.shopify_attributes }} style="border-radius:1rem;border:1px solid hsla(0,0%,100%,0.1);background:linear-gradient(135deg, hsla(246,40%,57%,0.3), hsla(246,40%,57%,0.1));overflow:hidden;text-align:center;">
+
+    {%- comment -%} Image area — optionally linkable {%- endcomment -%}
+    {% if block.settings.image_link != blank %}<a href="{{ block.settings.image_link }}" style="display:block;text-decoration:none;color:inherit;">{% endif %}
+      {% if card_image != blank %}
+        <div style="aspect-ratio:{{ card_image.width }}/{{ card_image.height }};overflow:hidden;position:relative;">
+          <img src="{{ card_image | image_url: width: 800 }}" alt="{{ prod.title | default: 'Product' | escape }}" style="display:block;width:100%;height:100%;object-fit:cover;" loading="lazy">
+          {% if block.settings.badge != 'none' %}
+            <span style="position:absolute;top:0.75rem;right:0.75rem;font-size:0.625rem;font-weight:700;letter-spacing:0.05em;padding:0.25rem 0.625rem;border-radius:999px;background:var(--stellar-green);color:var(--stellar-black);">
+              {{ block.settings.badge }}
+            </span>
+          {% endif %}
+        </div>
+      {% else %}
+        <div style="aspect-ratio:4/3;position:relative;background:linear-gradient(135deg, hsla(246,40%,57%,0.2), hsla(0,0%,100%,0.05));display:flex;align-items:center;justify-content:center;">
+          <span class="stellar-font-display" style="color:hsla(0,0%,100%,0.15);font-size:1.5rem;">{{ prod.title | default: 'Product' }}</span>
+          {% if block.settings.badge != 'none' %}
+            <span style="position:absolute;top:0.75rem;right:0.75rem;font-size:0.625rem;font-weight:700;letter-spacing:0.05em;padding:0.25rem 0.625rem;border-radius:999px;background:var(--stellar-green);color:var(--stellar-black);">
+              {{ block.settings.badge }}
+            </span>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% if block.settings.image_link != blank %}</a>{% endif %}
+
+    {%- comment -%} Card content {%- endcomment -%}
+    <div style="padding:0.875rem 1rem 1rem;">
+      <h3 class="stellar-font-display" style="font-size:clamp(1rem, 4vw, 1.25rem);color:var(--stellar-offwhite);margin-bottom:0.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ prod.title | default: 'Product Name' }}</h3>
+
+      {% if block.settings.detail_1 != blank %}
+        <p class="stellar-font-body stellar-detail-1" style="color:var(--stellar-skyblue);font-weight:700;font-size:0.92rem;line-height:1.5;margin-bottom:0.125rem;">{{ block.settings.detail_1 }}</p>
+      {% endif %}
+
+      {% if block.settings.detail_2 != blank %}
+        <p class="stellar-font-body stellar-detail-2" style="color:hsla(0,0%,96%,0.5);font-size:0.6875rem;line-height:1.3;margin-bottom:0.125rem;">{{ block.settings.detail_2 }}</p>
+      {% endif %}
+
+      {% if block.settings.price != blank %}
+        <p class="stellar-font-body stellar-card-price" style="font-weight:700;color:var(--stellar-offwhite);font-size:1rem;margin-top:0.5rem;margin-bottom:0.525rem;">
+          {{ block.settings.price }}
+        </p>
+      {% endif %}
+
+      {% if block.settings.button_text != blank %}
+        <a href="{{ prod.url | default: '#' }}" class="stellar-font-body stellar-card-btn" style="display:inline-block;width:100%;padding:0.5rem;border-radius:0.5rem;background:var(--stellar-skyblue);color:var(--stellar-black);font-weight:var(--font-button-weight);font-family:var(--font-button-family);font-size:var(--font-button-size);text-transform:var(--font-button-text-transform);text-decoration:none;text-align:center;">
+          {{ block.settings.button_text }}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+{% endif %}

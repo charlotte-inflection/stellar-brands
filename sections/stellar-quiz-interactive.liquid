@@ -1,0 +1,321 @@
+{% comment %}
+  Stellar Interactive Quiz
+  Multi-step product recommendation quiz with vanilla JS.
+  @concept-theme: section-type="custom-liquid"
+{% endcomment %}
+
+<section
+  class="{% if section.settings.color_scheme == 'dark' %}stellar-bg-dark{% elsif section.settings.color_scheme == 'deepspace' %}stellar-bg-deepspace{% elsif section.settings.color_scheme == 'light' %}stellar-bg-light{% elsif section.settings.color_scheme == 'sand' %}stellar-bg-sand{% elsif section.settings.color_scheme == 'skyblue' %}stellar-bg-skyblue{% endif %}{% if section.settings.bg_texture == 'stars' %} stellar-stars-bg{% elsif section.settings.bg_texture == 'constellation' %} stellar-constellation-bg{% elsif section.settings.bg_texture == 'nebula' %} stellar-nebula-gradient{% endif %}{% if section.settings.reveal_animation == 'fade_up' %} stellar-reveal{% elsif section.settings.reveal_animation == 'stagger' %} stellar-reveal-stagger{% endif %}"
+  style="position:relative;{% if section.settings.section_height == 'full' %}min-height:50vh;display:flex;align-items:center;{% endif %}padding:{{ section.settings.padding_top }}rem 0 {{ section.settings.padding_bottom }}rem;{% if section.settings.color_scheme == 'custom' %}background:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+>
+  <div style="position:absolute;inset:0;background:linear-gradient(to bottom, hsla(246,30%,12%,0.6), hsla(0,0%,4%,0.8));"></div>
+  <div class="stellar-container stellar-quiz-inner" style="position:relative;z-index:10;max-width:36rem;margin:0 auto;padding:1rem 1rem;">
+
+    {%- assign question_count = 0 -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'question' -%}
+        {%- assign question_count = question_count | plus: 1 -%}
+      {%- endif -%}
+    {%- endfor -%}
+
+    {%- assign q_index = 0 -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'question' -%}
+        <div class="stellar-quiz-step" data-step="{{ q_index }}" {% if q_index > 0 %}style="display:none;"{% endif %} {{ block.shopify_attributes }}>
+          <div style="display:flex;gap:0.25rem;margin-bottom:2rem;">
+            {%- for i in (0..question_count) -%}
+              {%- if i < question_count -%}
+                <div style="height:0.25rem;flex:1;border-radius:9999px;{% if i <= q_index %}background:var(--stellar-skyblue);{% else %}background:hsla(0,0%,100%,0.1);{% endif %}"></div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+
+          <p class="stellar-font-body" style="font-size:0.875rem;color:hsla(0,0%,100%,0.3);margin-bottom:0.5rem;">
+            Question {{ q_index | plus: 1 }} of {{ question_count }}
+          </p>
+          <h2 class="stellar-font-display" style="font-size:clamp(1.5rem,3vw,2rem);margin-bottom:2rem;color:var(--stellar-offwhite);">
+            {{ block.settings.question_text }}
+          </h2>
+
+          <div style="display:flex;flex-direction:column;gap:0.75rem;">
+            {%- for i in (1..4) -%}
+              {%- assign label_key = 'option_' | append: i | append: '_label' -%}
+              {%- assign desc_key = 'option_' | append: i | append: '_desc' -%}
+              {%- assign score_key = 'option_' | append: i | append: '_score' -%}
+              {%- assign opt_label = block.settings[label_key] -%}
+              {%- assign opt_desc = block.settings[desc_key] -%}
+              {%- assign opt_score = block.settings[score_key] -%}
+              {%- if opt_label != blank -%}
+                <button
+                  type="button"
+                  class="stellar-quiz-option stellar-font-body stellar-hover-glow"
+                  data-score="{{ opt_score }}"
+                  style="width:100%;text-align:left;padding:1rem;border-radius:0.75rem;border:1px solid hsla(0,0%,100%,0.1);background:transparent;color:var(--stellar-offwhite);cursor:pointer;display:flex;align-items:center;gap:1rem;transition:border-color 0.2s, background 0.2s;"
+                >
+                  <div>
+                    <div style="font-weight:500;">{{ opt_label }}</div>
+                    {% if opt_desc != blank %}
+                      <div style="font-size:0.875rem;color:hsla(0,0%,100%,0.4);">{{ opt_desc }}</div>
+                    {% endif %}
+                  </div>
+                </button>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        </div>
+        {%- assign q_index = q_index | plus: 1 -%}
+      {%- endif -%}
+    {%- endfor -%}
+
+    {%- comment -%} Standard blocks {%- endcomment -%}
+    {% for block in section.blocks %}
+      {% if block.type == 'heading' or block.type == 'text' or block.type == 'button' or block.type == 'image' or block.type == 'badge' or block.type == 'divider' %}
+        {% render 'stellar-standard-block', block: block %}
+      {% endif %}
+    {% endfor %}
+
+    {%- comment -%} Results panel {%- endcomment -%}
+    <div class="stellar-quiz-results" style="display:none;text-align:center;">
+      <p class="stellar-font-display" style="color:rgb(var(--color-base-button));font-size:0.875rem;letter-spacing:0.15em;margin-bottom:1rem;">{{ section.settings.result_eyebrow }}</p>
+
+      <div class="stellar-quiz-result-high" style="display:none;">
+        <h2 class="stellar-font-display" style="font-size:clamp(1.75rem,3vw,2.5rem);margin-bottom:1.5rem;color:var(--stellar-offwhite);">
+          {{ section.settings.result_high_heading }}
+        </h2>
+        <p class="stellar-font-body" style="color:hsla(0,0%,100%,0.5);margin-bottom:2rem;">{{ section.settings.result_high_body }}</p>
+        {% if section.settings.result_high_cta_text != blank %}
+          <a href="{{ section.settings.result_high_url }}" class="stellar-font-body stellar-hover-lift" style="display:inline-block;padding:0.75rem 2rem;border-radius:0.5rem;background:rgb(var(--color-base-button));color:rgb(var(--color-base-button-text));font-weight:500;text-decoration:none;">
+            {{ section.settings.result_high_cta_text }}
+          </a>
+        {% endif %}
+      </div>
+
+      <div class="stellar-quiz-result-low" style="display:none;">
+        <h2 class="stellar-font-display" style="font-size:clamp(1.75rem,3vw,2.5rem);margin-bottom:1.5rem;color:var(--stellar-offwhite);">
+          {{ section.settings.result_low_heading }}
+        </h2>
+        <p class="stellar-font-body" style="color:hsla(0,0%,100%,0.5);margin-bottom:2rem;">{{ section.settings.result_low_body }}</p>
+        {% if section.settings.result_low_cta_text != blank %}
+          <a href="{{ section.settings.result_low_url }}" class="stellar-font-body stellar-hover-lift" style="display:inline-block;padding:0.75rem 2rem;border-radius:0.5rem;background:rgb(var(--color-base-button));color:rgb(var(--color-base-button-text));font-weight:500;text-decoration:none;">
+            {{ section.settings.result_low_cta_text }}
+          </a>
+        {% endif %}
+      </div>
+
+      {% if section.settings.show_email_capture %}
+        <div style="max-width:24rem;margin:2rem auto 0;">
+          <form id="stellar-quiz-email-{{ section.id }}" novalidate>
+            <div style="display:flex;gap:0.5rem;">
+              <input type="email" name="email" placeholder="your@email.com" required
+                style="flex:1;border-radius:0.5rem;background:hsla(0,0%,100%,0.1);border:1px solid hsla(0,0%,100%,0.1);padding:0.5rem 1rem;color:var(--stellar-offwhite);font-size:0.875rem;"
+                class="stellar-font-body" />
+              <button type="submit" class="stellar-font-body" style="padding:0.5rem 1.5rem;border-radius:0.5rem;background:rgb(var(--color-base-button));color:rgb(var(--color-base-button-text));font-weight:500;border:none;cursor:pointer;">
+                {{ section.settings.email_button_text | default: 'Get Results' }}
+              </button>
+            </div>
+            <p class="stellar-quiz-email-status stellar-font-body" style="margin-top:0.75rem;font-size:0.8125rem;display:none;"></p>
+          </form>
+        </div>
+
+        <script>
+          (function() {
+            var form = document.getElementById('stellar-quiz-email-{{ section.id }}');
+            if (!form) return;
+
+            var companyId = {{ section.settings.klaviyo_company_id | json }};
+            var listId = {{ section.settings.klaviyo_list_id | json }};
+
+            form.addEventListener('submit', function(e) {
+              e.preventDefault();
+              var emailInput = form.querySelector('input[name="email"]');
+              var statusEl = form.querySelector('.stellar-quiz-email-status');
+              var btn = form.querySelector('button[type="submit"]');
+              var email = emailInput.value.trim();
+
+              if (!email) return;
+
+              if (!companyId || !listId) {
+                console.warn('[Stellar Quiz] Klaviyo company ID or list ID is missing.');
+                statusEl.style.color = 'var(--stellar-orange)';
+                statusEl.textContent = 'Email capture is not configured.';
+                statusEl.style.display = 'block';
+                return;
+              }
+
+              btn.disabled = true;
+              btn.textContent = 'Sending...';
+              statusEl.style.display = 'none';
+
+              fetch('https://a.klaviyo.com/client/subscriptions/?company_id=' + encodeURIComponent(companyId), {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'revision': '2024-10-15'
+                },
+                body: JSON.stringify({
+                  data: {
+                    type: 'subscription',
+                    attributes: {
+                      custom_source: 'Stellar Quiz',
+                      profile: {
+                        data: {
+                          type: 'profile',
+                          attributes: { email: email }
+                        }
+                      }
+                    },
+                    relationships: {
+                      list: {
+                        data: { type: 'list', id: listId }
+                      }
+                    }
+                  }
+                })
+              })
+              .then(function(res) {
+                if (res.ok || res.status === 202) {
+                  statusEl.style.color = 'var(--stellar-green)';
+                  statusEl.textContent = {{ section.settings.email_success_message | default: 'Thanks! Check your inbox.' | json }};
+                  emailInput.value = '';
+                } else {
+                  statusEl.style.color = 'var(--stellar-orange)';
+                  statusEl.textContent = 'Something went wrong. Please try again.';
+                }
+                statusEl.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = {{ section.settings.email_button_text | default: 'Get Results' | json }};
+              })
+              .catch(function() {
+                statusEl.style.color = 'var(--stellar-orange)';
+                statusEl.textContent = 'Something went wrong. Please try again.';
+                statusEl.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = {{ section.settings.email_button_text | default: 'Get Results' | json }};
+              });
+            });
+          })();
+        </script>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    var section = document.querySelector('.stellar-quiz-interactive');
+    if (!section) return;
+    var steps = section.querySelectorAll('.stellar-quiz-step');
+    var results = section.querySelector('.stellar-quiz-results');
+    var totalScore = 0;
+    var currentStep = 0;
+    var threshold = {{ section.settings.score_threshold | default: 4 }};
+
+    section.addEventListener('click', function(e) {
+      var btn = e.target.closest('.stellar-quiz-option');
+      if (!btn) return;
+      totalScore += parseInt(btn.dataset.score || '0', 10);
+      currentStep++;
+      if (currentStep < steps.length) {
+        steps[currentStep - 1].style.display = 'none';
+        steps[currentStep].style.display = '';
+      } else {
+        steps[currentStep - 1].style.display = 'none';
+        results.style.display = '';
+        if (totalScore >= threshold) {
+          section.querySelector('.stellar-quiz-result-high').style.display = '';
+        } else {
+          section.querySelector('.stellar-quiz-result-low').style.display = '';
+        }
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Stellar Interactive Quiz",
+  "tag": "section",
+  "class": "stellar-quiz-interactive",
+  "settings": [
+    { "type": "header", "content": "Results — High Score" },
+    { "type": "text", "id": "result_eyebrow", "label": "Result eyebrow", "default": "YOUR RESULT" },
+    { "type": "text", "id": "result_high_heading", "label": "High-score heading", "default": "We recommend Milky Ultra" },
+    { "type": "textarea", "id": "result_high_body", "label": "High-score body", "default": "Based on your dairy intake and symptoms, our strongest formula is the best fit." },
+    { "type": "text", "id": "result_high_cta_text", "label": "High-score CTA text", "default": "Shop Milky Ultra" },
+    { "type": "url", "id": "result_high_url", "label": "High-score CTA link" },
+    { "type": "header", "content": "Results — Low Score" },
+    { "type": "text", "id": "result_low_heading", "label": "Low-score heading", "default": "We recommend Milky Original" },
+    { "type": "textarea", "id": "result_low_body", "label": "Low-score body", "default": "For moderate dairy intake, our Original formula has you covered." },
+    { "type": "text", "id": "result_low_cta_text", "label": "Low-score CTA text", "default": "Shop Milky Original" },
+    { "type": "url", "id": "result_low_url", "label": "Low-score CTA link" },
+    { "type": "header", "content": "Quiz Logic" },
+    { "type": "range", "id": "score_threshold", "label": "High-score threshold", "min": 1, "max": 20, "step": 1, "default": 4 },
+    { "type": "header", "content": "Email Capture" },
+    { "type": "checkbox", "id": "show_email_capture", "label": "Show email capture", "default": true },
+    { "type": "text", "id": "email_button_text", "label": "Email button text", "default": "Get Results" },
+    { "type": "text", "id": "email_success_message", "label": "Success message", "default": "Thanks! Check your inbox." },
+    {
+      "type": "text",
+      "id": "klaviyo_company_id",
+      "label": "Klaviyo company ID (public API key)",
+      "info": "Found in Klaviyo → Settings → API Keys → Public API Key / Site ID."
+    },
+    {
+      "type": "text",
+      "id": "klaviyo_list_id",
+      "label": "Klaviyo list ID",
+      "info": "Found in Klaviyo → Audience → Lists → click your list → Settings. The alphanumeric ID in the URL."
+    },
+    { "type": "header", "content": "Layout & Style" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 12, "step": 1, "default": 5, "unit": "rem" },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 12, "step": 1, "default": 5, "unit": "rem" },
+    { "type": "select", "id": "section_height", "label": "Section height", "options": [{ "value": "auto", "label": "Auto" },{ "value": "full", "label": "Full screen" }], "default": "full" },
+    { "type": "select", "id": "color_scheme", "label": "Color scheme", "options": [{ "value": "dark", "label": "Dark" },{ "value": "deepspace", "label": "Deep Space" },{ "value": "light", "label": "Light" },{ "value": "sand", "label": "Sand" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "custom", "label": "Custom" }], "default": "dark" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_bg_color", "label": "Custom background", "default": "#222222" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_text_color", "label": "Custom text", "default": "#F6F7F8" },
+    { "type": "select", "id": "bg_texture", "label": "Background texture", "options": [{ "value": "none", "label": "None" },{ "value": "stars", "label": "Stars" },{ "value": "constellation", "label": "Constellation" },{ "value": "nebula", "label": "Nebula" }], "default": "stars" },
+    { "type": "select", "id": "reveal_animation", "label": "Scroll animation", "options": [{ "value": "none", "label": "None" },{ "value": "fade_up", "label": "Fade up" },{ "value": "stagger", "label": "Stagger children" }], "default": "none" }
+  ],
+  "blocks": [
+    {
+      "type": "question",
+      "name": "Question",
+      "settings": [
+        { "type": "text", "id": "question_text", "label": "Question", "default": "How much dairy do you eat?" },
+        { "type": "text", "id": "option_1_label", "label": "Option 1 label", "default": "Light" },
+        { "type": "text", "id": "option_1_desc", "label": "Option 1 description", "default": "Occasional cheese or milk" },
+        { "type": "range", "id": "option_1_score", "label": "Option 1 score", "min": 0, "max": 3, "step": 1, "default": 0 },
+        { "type": "text", "id": "option_2_label", "label": "Option 2 label", "default": "Moderate" },
+        { "type": "text", "id": "option_2_desc", "label": "Option 2 description", "default": "Daily dairy" },
+        { "type": "range", "id": "option_2_score", "label": "Option 2 score", "min": 0, "max": 3, "step": 1, "default": 1 },
+        { "type": "text", "id": "option_3_label", "label": "Option 3 label", "default": "Heavy" },
+        { "type": "text", "id": "option_3_desc", "label": "Option 3 description", "default": "Cheese on everything" },
+        { "type": "range", "id": "option_3_score", "label": "Option 3 score", "min": 0, "max": 3, "step": 1, "default": 2 },
+        { "type": "text", "id": "option_4_label", "label": "Option 4 label" },
+        { "type": "text", "id": "option_4_desc", "label": "Option 4 description" },
+        { "type": "range", "id": "option_4_score", "label": "Option 4 score", "min": 0, "max": 3, "step": 1, "default": 3 }
+      ]
+    },
+    { "type": "heading", "name": "Heading", "settings": [{ "type": "text", "id": "text", "label": "Text", "default": "Heading" },{ "type": "select", "id": "size", "label": "Size", "options": [{ "value": "h2", "label": "Large" },{ "value": "h3", "label": "Medium" },{ "value": "h4", "label": "Small" }], "default": "h3" }] },
+    { "type": "text", "name": "Text", "settings": [{ "type": "richtext", "id": "content", "label": "Content", "default": "<p>Body text</p>" }] },
+    { "type": "button", "name": "Button", "settings": [{ "type": "text", "id": "text", "label": "Label", "default": "Learn More" },{ "type": "url", "id": "url", "label": "Link" },{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "primary", "label": "Primary" },{ "value": "outline", "label": "Outline" }], "default": "primary" }] },
+    { "type": "image", "name": "Image", "settings": [{ "type": "image_picker", "id": "image", "label": "Image" },{ "type": "text", "id": "alt", "label": "Alt text", "default": "Image" }] },
+    { "type": "badge", "name": "Badge", "settings": [{ "type": "text", "id": "label", "label": "Label", "default": "New" },{ "type": "select", "id": "color", "label": "Color", "options": [{ "value": "green", "label": "Green" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "purple", "label": "Purple" },{ "value": "gold", "label": "Gold" }], "default": "skyblue" }] },
+    { "type": "divider", "name": "Divider", "settings": [{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "line", "label": "Line" },{ "value": "space", "label": "Space" },{ "value": "dotted", "label": "Dotted" }], "default": "line" },{ "type": "range", "id": "spacing", "label": "Spacing", "min": 1, "max": 6, "step": 1, "default": 2, "unit": "rem" }] }
+  ],
+  "enabled_on": {
+    "templates": ["page"]
+  },
+  "presets": [
+    {
+      "name": "Stellar Interactive Quiz",
+      "blocks": [
+        { "type": "question", "settings": { "question_text": "How much dairy do you eat?", "option_1_label": "Light", "option_1_desc": "Occasional cheese or milk", "option_1_score": 0, "option_2_label": "Moderate", "option_2_desc": "Daily dairy", "option_2_score": 1, "option_3_label": "Heavy", "option_3_desc": "Cheese on everything", "option_3_score": 2, "option_4_label": "Extreme", "option_4_desc": "Professional pizza taster", "option_4_score": 3 } },
+        { "type": "question", "settings": { "question_text": "What happens when you eat dairy without supplements?", "option_1_label": "Mild discomfort", "option_1_desc": "A little bloating", "option_1_score": 0, "option_2_label": "Moderate symptoms", "option_2_desc": "Bloating & cramps", "option_2_score": 1, "option_3_label": "Severe symptoms", "option_3_desc": "I know where every bathroom is", "option_3_score": 2, "option_4_label": "I avoid dairy entirely", "option_4_desc": "I don't risk it", "option_4_score": 3 } },
+        { "type": "question", "settings": { "question_text": "What do you currently use?", "option_1_label": "Nothing", "option_1_desc": "I just suffer", "option_1_score": 0, "option_2_label": "Lactaid", "option_2_desc": "Standard supplements", "option_2_score": 1, "option_3_label": "Another supplement", "option_3_desc": "Something else", "option_3_score": 1, "option_4_label": "I avoid dairy", "option_4_desc": "Abstinence is my strategy", "option_4_score": 2 } },
+        { "type": "question", "settings": { "question_text": "How often would you need lactase?", "option_1_label": "Few times/month", "option_1_desc": "Occasional indulgence", "option_1_score": 0, "option_2_label": "Few times/week", "option_2_desc": "Regular dairy lover", "option_2_score": 1, "option_3_label": "Daily", "option_3_desc": "Can't live without it", "option_3_score": 2, "option_4_label": "Multiple times daily", "option_4_desc": "Every meal has dairy", "option_4_score": 3 } }
+      ]
+    }
+  ]
+}
+{% endschema %}

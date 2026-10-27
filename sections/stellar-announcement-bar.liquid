@@ -1,0 +1,70 @@
+{% comment %}
+  Stellar Announcement Bar
+  Scrolling marquee bar with multiple rotating messages.
+  @concept-theme: section-type="announcement-bar"
+{% endcomment %}
+
+<div
+  class="{% case section.settings.color_scheme %}{% when 'dark' %}stellar-bg-dark{% when 'deepspace' %}stellar-bg-deepspace{% when 'light' %}stellar-bg-light{% when 'sand' %}stellar-bg-sand{% when 'skyblue' %}stellar-bg-skyblue{% endcase %}"
+  style="position:fixed;top:0;left:0;right:0;z-index:60;overflow:hidden;height:32px;display:flex;align-items:center;{% if section.settings.color_scheme == 'custom' %}background-color:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+>
+  <div class="stellar-animate-marquee" style="display:flex;white-space:nowrap;">
+    {% for i in (1..2) %}
+      {% for block in section.blocks %}
+        {% if block.type == 'message' %}
+          <span class="stellar-font-body" style="margin:0 2rem;display:inline-block;font-size:0.75rem;">
+            <span style="color:var(--stellar-skyblue);">{{ block.settings.emoji }}</span>
+            {{ block.settings.text }}
+          </span>
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Stellar Announcement Bar",
+  "tag": "section",
+  "class": "stellar-announcement-bar",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout & Style"
+    },
+    { "type": "select", "id": "color_scheme", "label": "Color scheme", "options": [
+      { "value": "dark", "label": "Dark" },
+      { "value": "deepspace", "label": "Deep Space" },
+      { "value": "light", "label": "Light" },
+      { "value": "sand", "label": "Sand" },
+      { "value": "skyblue", "label": "Sky Blue" },
+      { "value": "custom", "label": "Custom" }
+    ], "default": "dark" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_bg_color", "label": "Custom background", "default": "#222222" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_text_color", "label": "Custom text color", "default": "#F6F7F8" }
+  ],
+  "blocks": [
+    {
+      "type": "message",
+      "name": "Message",
+      "settings": [
+        { "type": "text", "id": "emoji", "label": "Leading emoji/icon", "default": "🚀" },
+        { "type": "text", "id": "text", "label": "Message text", "default": "Free Shipping on Subscriptions & Orders $40+" }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "templates": ["index"]
+  },
+  "presets": [
+    {
+      "name": "Stellar Announcement Bar",
+      "blocks": [
+        { "type": "message", "settings": { "emoji": "🚀", "text": "Free Shipping on Subscriptions & Orders $40+" } },
+        { "type": "message", "settings": { "emoji": "⭐", "text": "Rated 4.9/5 by 2,000+ Dairy Lovers" } },
+        { "type": "message", "settings": { "emoji": "🧪", "text": "NSF Certified · Third-Party Tested · 60-Day Guarantee" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

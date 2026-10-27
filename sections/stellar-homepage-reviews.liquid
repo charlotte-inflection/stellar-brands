@@ -1,0 +1,217 @@
+{% comment %}
+  Stellar Homepage Reviews
+  Testimonial cards with horizontal scroll/swipe.
+  Desktop: 3 visible, scrollable for more. Mobile: 1 at a time, swipeable.
+  App block placeholder for Judge.me/Stamped/Okendo.
+  @concept-theme: section-type="apps" | block-type="testimonial"
+{% endcomment %}
+
+<section
+  class="{% case section.settings.color_scheme %}{% when 'dark' %}stellar-bg-dark{% when 'deepspace' %}stellar-bg-deepspace{% when 'light' %}stellar-bg-light{% when 'sand' %}stellar-bg-sand{% when 'skyblue' %}stellar-bg-skyblue{% endcase %}{% if section.settings.bg_texture == 'stars' %} stellar-stars-bg{% elsif section.settings.bg_texture == 'constellation' %} stellar-constellation-bg{% elsif section.settings.bg_texture == 'nebula' %} stellar-nebula-gradient{% endif %}{% if section.settings.reveal_animation == 'fade_up' %} stellar-reveal{% elsif section.settings.reveal_animation == 'stagger' %} stellar-reveal-stagger{% endif %}"
+  style="padding-top:{{ section.settings.padding_top }}px;padding-bottom:{{ section.settings.padding_bottom }}px;{% if section.settings.color_scheme == 'custom' %}background-color:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+>
+  <div class="stellar-container" style="text-align:center;">
+    {% if section.settings.eyebrow != blank %}
+      <p class="stellar-eyebrow" style="color:var(--stellar-purple);margin-bottom:0.75rem;">{{ section.settings.eyebrow }}</p>
+    {% endif %}
+    {% if section.settings.heading != blank %}
+      <h2 class="stellar-font-display" style="font-size:clamp(1.75rem,3vw,2.5rem);margin-bottom:3rem;">{{ section.settings.heading }}</h2>
+    {% endif %}
+
+    {%- comment -%} App block zone for Judge.me / Stamped / Okendo {%- endcomment -%}
+    {% for block in section.blocks %}
+      {% if block.type == '@app' %}
+        <div {{ block.shopify_attributes }}>
+          {% render block %}
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  {%- comment -%} Testimonial cards — horizontal scroll {%- endcomment -%}
+  {%- assign has_testimonials = false -%}
+  {%- for block in section.blocks -%}
+    {%- if block.type == 'testimonial' -%}
+      {%- assign has_testimonials = true -%}
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  {% if has_testimonials %}
+    <div class="stellar-reviews-scroll" id="StellarReviews-{{ section.id }}" style="display:flex;gap:1.5rem;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:0 1rem 1rem;max-width:72rem;margin:0 auto;scrollbar-width:none;">
+      {% for block in section.blocks %}
+        {% if block.type == 'testimonial' %}
+          <div {{ block.shopify_attributes }} class="stellar-review-card stellar-hover-lift" style="scroll-snap-align:center;flex:0 0 auto;text-align:left;padding:1.5rem;border-radius:1rem;border:1px solid hsla(0,0%,13%,0.05);background:hsla(0,0%,100%,0.5);">
+            <div style="display:flex;gap:0.125rem;margin-bottom:1rem;color:var(--stellar-gold);">
+              {% for i in (1..5) %}
+                {% if i <= block.settings.stars %}★{% else %}☆{% endif %}
+              {% endfor %}
+            </div>
+            <p class="stellar-font-body" style="font-size:0.875rem;line-height:1.6;margin-bottom:1rem;opacity:0.8;">
+              "{{ block.settings.quote }}"
+            </p>
+            <div>
+              <p class="stellar-font-display" style="font-size:0.875rem;">{{ block.settings.name }}</p>
+              {% if block.settings.detail != blank %}
+                <p class="stellar-font-body" style="font-size:0.75rem;opacity:0.5;">{{ block.settings.detail }}</p>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    {%- comment -%} Dot indicators for mobile {%- endcomment -%}
+    {%- assign testimonial_count = 0 -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'testimonial' -%}
+        {%- assign testimonial_count = testimonial_count | plus: 1 -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {% if testimonial_count > 1 %}
+      <div class="stellar-reviews-dots" style="display:flex;justify-content:center;gap:0.5rem;margin-top:1rem;padding:0 1rem;">
+        {% for i in (1..testimonial_count) %}
+          <button
+            type="button"
+            class="stellar-reviews-dot{% if forloop.first %} active{% endif %}"
+            data-index="{{ forloop.index0 }}"
+            aria-label="Review {{ forloop.index }}"
+            style="width:0.5rem;height:0.5rem;border-radius:50%;border:none;cursor:pointer;padding:0;transition:opacity 0.2s,transform 0.2s;"
+          ></button>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endif %}
+
+  <style>
+    /* Hide scrollbar */
+    .stellar-reviews-scroll::-webkit-scrollbar { display: none; }
+
+    /* Mobile: single card at a time */
+    .stellar-review-card {
+      width: calc(100vw - 2rem);
+      min-width: calc(100vw - 2rem);
+    }
+
+    /* Desktop: 3 visible */
+    @media (min-width: 768px) {
+      .stellar-review-card {
+        width: calc((min(72rem, 100vw) - 2rem - 3rem) / 3);
+        min-width: calc((min(72rem, 100vw) - 2rem - 3rem) / 3);
+      }
+      .stellar-reviews-dots { display: none !important; }
+    }
+
+    /* Dot styling */
+    .stellar-reviews-dot {
+      background: currentColor;
+      opacity: 0.25;
+    }
+    .stellar-reviews-dot.active {
+      opacity: 0.8;
+      transform: scale(1.3);
+    }
+  </style>
+
+  {% if testimonial_count > 1 %}
+    <script>
+      (function() {
+        var container = document.getElementById('StellarReviews-{{ section.id }}');
+        if (!container) return;
+
+        var dots = container.parentElement.querySelectorAll('.stellar-reviews-dot');
+        if (!dots.length) return;
+
+        var cards = container.querySelectorAll('.stellar-review-card');
+
+        /* Update active dot on scroll */
+        var scrollTimeout;
+        container.addEventListener('scroll', function() {
+          clearTimeout(scrollTimeout);
+          scrollTimeout = setTimeout(function() {
+            var scrollLeft = container.scrollLeft;
+            var containerWidth = container.offsetWidth;
+            var activeIndex = 0;
+            var minDistance = Infinity;
+
+            cards.forEach(function(card, i) {
+              var cardCenter = card.offsetLeft - container.offsetLeft + card.offsetWidth / 2;
+              var distance = Math.abs(cardCenter - scrollLeft - containerWidth / 2);
+              if (distance < minDistance) {
+                minDistance = distance;
+                activeIndex = i;
+              }
+            });
+
+            dots.forEach(function(dot, i) {
+              dot.classList.toggle('active', i === activeIndex);
+            });
+          }, 50);
+        }, { passive: true });
+
+        /* Tap dot to scroll to card */
+        dots.forEach(function(dot) {
+          dot.addEventListener('click', function() {
+            var index = parseInt(this.dataset.index, 10);
+            if (cards[index]) {
+              cards[index].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+          });
+        });
+      })();
+    </script>
+  {% endif %}
+</section>
+
+{% schema %}
+{
+  "name": "Stellar Homepage Reviews",
+  "tag": "section",
+  "class": "stellar-homepage-reviews",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "REAL REVIEWS" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "What Our Customers Say" },
+    { "type": "header", "content": "Layout & Style" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 120, "step": 4, "default": 80, "unit": "px" },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 120, "step": 4, "default": 80, "unit": "px" },
+    { "type": "select", "id": "color_scheme", "label": "Color scheme", "options": [
+      { "value": "dark", "label": "Dark" },
+      { "value": "deepspace", "label": "Deep Space" },
+      { "value": "light", "label": "Light" },
+      { "value": "sand", "label": "Sand" },
+      { "value": "skyblue", "label": "Sky Blue" },
+      { "value": "custom", "label": "Custom" }
+    ], "default": "light" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_bg_color", "label": "Custom background", "default": "#F6F7F8" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_text_color", "label": "Custom text color", "default": "#222222" },
+    { "type": "select", "id": "bg_texture", "label": "Background texture", "options": [{ "value": "none", "label": "None" },{ "value": "stars", "label": "Stars" },{ "value": "constellation", "label": "Constellation" },{ "value": "nebula", "label": "Nebula" }], "default": "none" },
+    { "type": "select", "id": "reveal_animation", "label": "Scroll animation", "options": [{ "value": "none", "label": "None" },{ "value": "fade_up", "label": "Fade up" },{ "value": "stagger", "label": "Stagger children" }], "default": "fade_up" }
+  ],
+  "blocks": [
+    { "type": "@app" },
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        { "type": "textarea", "id": "quote", "label": "Quote", "default": "I can finally enjoy pizza without worrying!" },
+        { "type": "text", "id": "name", "label": "Name", "default": "Sarah M." },
+        { "type": "text", "id": "detail", "label": "Detail", "default": "Verified Buyer" },
+        { "type": "range", "id": "stars", "label": "Stars", "min": 1, "max": 5, "step": 1, "default": 5 }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "templates": ["index", "page", "product"]
+  },
+  "presets": [
+    {
+      "name": "Stellar Homepage Reviews",
+      "blocks": [
+        { "type": "testimonial", "settings": { "quote": "I can finally enjoy pizza without worrying!", "name": "Sarah M.", "detail": "Verified Buyer", "stars": 5 } },
+        { "type": "testimonial", "settings": { "quote": "Milky is a game changer. I take it everywhere.", "name": "James R.", "detail": "Subscribed 6 months", "stars": 5 } },
+        { "type": "testimonial", "settings": { "quote": "Way better than Lactaid. Actually works for heavy meals.", "name": "Emily K.", "detail": "Ultra Customer", "stars": 5 } }
+      ]
+    }
+  ]
+}
+{% endschema %}

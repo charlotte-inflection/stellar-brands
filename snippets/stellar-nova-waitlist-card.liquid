@@ -1,0 +1,54 @@
+{% comment %}
+  Stellar Nova Waitlist Card Snippet
+  Coming-soon card for Nova product with waitlist CTA.
+
+  Usage: {% render 'stellar-nova-waitlist-card' %}
+  Or with a block: {% render 'stellar-nova-waitlist-card', block: block %}
+{% endcomment %}
+
+<div {{ block.shopify_attributes }} style="border-radius:1rem;border:1px solid hsla(28,92%,61%,0.2);background:linear-gradient(135deg, hsla(28,92%,61%,0.15), hsla(28,92%,61%,0.05));overflow:hidden;text-align:center;display:flex;flex-direction:column;">
+
+  {%- comment -%} Card image — full-width, 3:4 aspect ratio (matches product cards) {%- endcomment -%}
+  <div style="aspect-ratio:3/4;overflow:hidden;position:relative;">
+    {% if block and block.settings.image != blank %}
+      <img src="{{ block.settings.image | image_url: width: 600 }}" alt="{{ block.settings.heading | default: 'Nova' | escape }}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
+    {% else %}
+      <div style="width:100%;height:100%;background:linear-gradient(135deg, hsla(28,92%,61%,0.1), transparent);display:flex;align-items:center;justify-content:center;">
+        <span class="stellar-font-display" style="font-size:3rem;color:hsla(28,92%,61%,0.2);">N</span>
+      </div>
+    {% endif %}
+
+    {%- comment -%} Badge overlay {%- endcomment -%}
+    {% if block.settings.badge != blank and block.settings.badge != 'none' %}
+      <span style="position:absolute;top:1rem;right:1rem;font-size:0.625rem;font-weight:700;letter-spacing:0.05em;padding:0.25rem 0.625rem;border-radius:999px;background:var(--stellar-green);color:var(--stellar-black);">
+        {{ block.settings.badge }}
+      </span>
+    {% endif %}
+  </div>
+
+  {%- comment -%} Card content {%- endcomment -%}
+  <div style="padding:1.5rem 2rem 2rem;display:flex;flex-direction:column;flex:1;">
+    <p class="stellar-eyebrow" style="color:var(--stellar-orange);margin-bottom:0.75rem;">Meet Nova</p>
+    <h3 class="stellar-font-display" style="font-size:1.5rem;color:var(--stellar-offwhite);margin-bottom:0.25rem;">
+      {{ block.settings.heading | default: 'Nova' }}
+    </h3>
+    {% if block.settings.description != blank %}
+      <p class="stellar-font-body" style="color:hsla(0,0%,96%,0.4);font-size:0.875rem;margin-bottom:0.25rem;">
+        {{ block.settings.description }}
+      </p>
+    {% endif %}
+    {% if block.settings.detail != blank %}
+      <p class="stellar-font-body" style="color:hsla(28,92%,61%,0.8);font-size:0.875rem;margin-bottom:1.5rem;">
+        {{ block.settings.detail }}
+      </p>
+    {% endif %}
+
+    <div style="margin-top:auto;padding-top:1rem;">
+      {% if block.settings.button_text != blank %}
+        <a href="{{ block.settings.url | default: '/pages/preorder' }}" class="stellar-font-body" style="display:inline-block;width:100%;padding:0.625rem;border-radius:0.5rem;border:1px solid hsla(28,92%,61%,0.3);color:var(--stellar-orange);text-decoration:none;text-align:center;">
+          {{ block.settings.button_text }}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>

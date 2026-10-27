@@ -1,0 +1,188 @@
+{% comment %}
+  Stellar Email Signup
+  Newsletter section with Shopify or Klaviyo mode.
+  @concept-theme: section-type="newsletter"
+{% endcomment %}
+
+<section
+  class="{% if section.settings.color_scheme == 'dark' %}stellar-bg-dark{% elsif section.settings.color_scheme == 'deepspace' %}stellar-bg-deepspace{% elsif section.settings.color_scheme == 'light' %}stellar-bg-light{% elsif section.settings.color_scheme == 'sand' %}stellar-bg-sand{% elsif section.settings.color_scheme == 'skyblue' %}stellar-bg-skyblue{% endif %}{% if section.settings.bg_texture == 'stars' %} stellar-stars-bg{% elsif section.settings.bg_texture == 'constellation' %} stellar-constellation-bg{% elsif section.settings.bg_texture == 'nebula' %} stellar-nebula-gradient{% endif %}{% if section.settings.reveal_animation == 'fade_up' %} stellar-reveal{% elsif section.settings.reveal_animation == 'stagger' %} stellar-reveal-stagger{% endif %}"
+  style="padding-top:{{ section.settings.padding_top }}px;padding-bottom:{{ section.settings.padding_bottom }}px;position:relative;overflow:hidden;{% if section.settings.color_scheme == 'custom' %}background-color:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+>
+  <div style="position:relative;z-index:10;" class="stellar-container">
+    <div style="text-align:center;max-width:32rem;margin:0 auto;">
+      <h2 class="stellar-font-display" style="font-size:clamp(1.75rem,3vw,2.5rem);color:var(--stellar-offwhite);margin-bottom:1rem;">
+        {{ section.settings.heading }}
+      </h2>
+      <p class="stellar-font-body" style="color:hsla(0,0%,96%,0.5);margin-bottom:0.5rem;">{{ section.settings.description }}</p>
+      <p class="stellar-font-body" style="color:hsla(211,60%,79%,0.6);font-size:0.75rem;margin-bottom:2rem;">{{ section.settings.subscriber_count }}</p>
+
+      {% if section.settings.form_mode == 'klaviyo' %}
+        {%- comment -%}
+          Klaviyo AJAX subscribe.
+          Requires: Klaviyo company ID (public API key) and list ID.
+          The form submits via JS to Klaviyo's client API endpoint.
+          No action URL needed; the company ID + list ID handle routing.
+        {%- endcomment -%}
+        <form id="stellar-newsletter-klaviyo-{{ section.id }}" novalidate>
+          <div style="display:flex;gap:0.5rem;">
+            <input type="email" name="email" placeholder="your@email.com" required class="stellar-font-body" style="flex:1;border-radius:0.5rem;background:hsla(0,0%,100%,0.1);border:1px solid hsla(0,0%,100%,0.1);padding:0.75rem 1rem;color:var(--stellar-offwhite);font-size:0.875rem;outline:none;">
+            <button type="submit" class="stellar-font-body" style="padding:0.75rem 1.5rem;border-radius:0.5rem;background:rgb(var(--color-base-button));color:rgb(var(--color-base-button-text));font-weight:500;border:none;cursor:pointer;">{{ section.settings.button_text | default: 'Subscribe' }}</button>
+          </div>
+          <p class="stellar-newsletter-status stellar-font-body" style="margin-top:0.75rem;font-size:0.8125rem;display:none;"></p>
+        </form>
+
+        <script>
+          (function() {
+            var form = document.getElementById('stellar-newsletter-klaviyo-{{ section.id }}');
+            if (!form) return;
+
+            var companyId = {{ section.settings.klaviyo_company_id | json }};
+            var listId = {{ section.settings.klaviyo_list_id | json }};
+
+            if (!companyId || !listId) {
+              console.warn('[Stellar Email Signup] Klaviyo company ID or list ID is missing.');
+              return;
+            }
+
+            form.addEventListener('submit', function(e) {
+              e.preventDefault();
+              var emailInput = form.querySelector('input[name="email"]');
+              var statusEl = form.querySelector('.stellar-newsletter-status');
+              var btn = form.querySelector('button[type="submit"]');
+              var email = emailInput.value.trim();
+
+              if (!email) return;
+
+              btn.disabled = true;
+              btn.textContent = 'Sending...';
+              statusEl.style.display = 'none';
+
+              /* Klaviyo client API v3 subscribe */
+              fetch('https://a.klaviyo.com/client/subscriptions/?company_id=' + encodeURIComponent(companyId), {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'revision': '2024-10-15'
+                },
+                body: JSON.stringify({
+                  data: {
+                    type: 'subscription',
+                    attributes: {
+                      custom_source: 'Stellar Email Signup',
+                      profile: {
+                        data: {
+                          type: 'profile',
+                          attributes: { email: email }
+                        }
+                      }
+                    },
+                    relationships: {
+                      list: {
+                        data: { type: 'list', id: listId }
+                      }
+                    }
+                  }
+                })
+              })
+              .then(function(res) {
+                if (res.ok || res.status === 202) {
+                  statusEl.style.color = 'var(--stellar-green)';
+                  statusEl.textContent = {{ section.settings.success_message | default: 'Thanks for subscribing!' | json }};
+                  emailInput.value = '';
+                } else {
+                  statusEl.style.color = 'var(--stellar-orange)';
+                  statusEl.textContent = 'Something went wrong. Please try again.';
+                }
+                statusEl.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = {{ section.settings.button_text | default: 'Subscribe' | json }};
+              })
+              .catch(function() {
+                statusEl.style.color = 'var(--stellar-orange)';
+                statusEl.textContent = 'Something went wrong. Please try again.';
+                statusEl.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = {{ section.settings.button_text | default: 'Subscribe' | json }};
+              });
+            });
+          })();
+        </script>
+
+      {% else %}
+        {% form 'customer', id: 'stellar-newsletter' %}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <div style="display:flex;gap:0.5rem;">
+            <input type="email" name="contact[email]" placeholder="your@email.com" required class="stellar-font-body" style="flex:1;border-radius:0.5rem;background:hsla(0,0%,100%,0.1);border:1px solid hsla(0,0%,100%,0.1);padding:0.75rem 1rem;color:var(--stellar-offwhite);font-size:0.875rem;outline:none;">
+            <button type="submit" class="stellar-font-body" style="padding:0.75rem 1.5rem;border-radius:0.5rem;background:rgb(var(--color-base-button));color:rgb(var(--color-base-button-text));font-weight:500;border:none;cursor:pointer;">{{ section.settings.button_text | default: 'Subscribe' }}</button>
+          </div>
+          {% if form.posted_successfully? %}
+            <p class="stellar-font-body" style="margin-top:0.75rem;font-size:0.8125rem;color:var(--stellar-green);">{{ section.settings.success_message | default: 'Thanks for subscribing!' }}</p>
+          {% endif %}
+          {% if form.errors %}
+            <p class="stellar-font-body" style="margin-top:0.75rem;font-size:0.8125rem;color:var(--stellar-orange);">{{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}</p>
+          {% endif %}
+        {% endform %}
+      {% endif %}
+    </div>
+
+    <div style="max-width:48rem;margin:2rem auto 0;">
+      {% for block in section.blocks %}
+        {% if block.type == 'heading' or block.type == 'text' or block.type == 'button' or block.type == 'image' or block.type == 'badge' or block.type == 'divider' %}
+          {% render 'stellar-standard-block', block: block %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Stellar Email Signup",
+  "tag": "section",
+  "class": "stellar-email-signup",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Join the Stellar Universe" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Be first to know about new products, limited editions, and exclusive offers." },
+    { "type": "text", "id": "subscriber_count", "label": "Subscriber count text", "default": "Join 12,000+ subscribers" },
+    { "type": "text", "id": "button_text", "label": "Button text", "default": "Subscribe" },
+    { "type": "text", "id": "success_message", "label": "Success message", "default": "Thanks for subscribing!" },
+    { "type": "header", "content": "Form integration" },
+    { "type": "select", "id": "form_mode", "label": "Form mode", "options": [
+      { "value": "shopify", "label": "Shopify (customer)" },
+      { "value": "klaviyo", "label": "Klaviyo" }
+    ], "default": "shopify", "info": "Klaviyo mode subscribes via the Klaviyo client API. Requires company ID and list ID below." },
+    {
+      "type": "text",
+      "id": "klaviyo_company_id",
+      "label": "Klaviyo company ID (public API key)",
+      "info": "Found in Klaviyo → Settings → API Keys → Public API Key / Site ID. Starts with a letter, typically 6 characters."
+    },
+    {
+      "type": "text",
+      "id": "klaviyo_list_id",
+      "label": "Klaviyo list ID",
+      "info": "Found in Klaviyo → Audience → Lists → click your list → Settings. The alphanumeric ID in the URL."
+    },
+    { "type": "header", "content": "Layout & Style" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 120, "step": 4, "default": 80, "unit": "px" },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 120, "step": 4, "default": 80, "unit": "px" },
+    { "type": "select", "id": "color_scheme", "label": "Color scheme", "options": [{ "value": "dark", "label": "Dark" }, { "value": "deepspace", "label": "Deep Space" }, { "value": "light", "label": "Light" }, { "value": "sand", "label": "Sand" }, { "value": "skyblue", "label": "Sky Blue" }, { "value": "custom", "label": "Custom" }], "default": "deepspace" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_bg_color", "label": "Custom background", "default": "#1a1625" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_text_color", "label": "Custom text color", "default": "#F6F7F8" },
+    { "type": "select", "id": "bg_texture", "label": "Background texture", "options": [{ "value": "none", "label": "None" },{ "value": "stars", "label": "Stars" },{ "value": "constellation", "label": "Constellation" },{ "value": "nebula", "label": "Nebula" }], "default": "nebula" },
+    { "type": "select", "id": "reveal_animation", "label": "Scroll animation", "options": [{ "value": "none", "label": "None" },{ "value": "fade_up", "label": "Fade up" },{ "value": "stagger", "label": "Stagger children" }], "default": "fade_up" }
+  ],
+  "blocks": [
+    { "type": "heading", "name": "Heading", "settings": [{ "type": "text", "id": "text", "label": "Heading text", "default": "Heading" }, { "type": "select", "id": "size", "label": "Size", "options": [{ "value": "h1", "label": "Extra Large" }, { "value": "h2", "label": "Large" }, { "value": "h3", "label": "Medium" }], "default": "h2" }] },
+    { "type": "text", "name": "Text", "settings": [{ "type": "richtext", "id": "content", "label": "Text" }, { "type": "color", "id": "color", "label": "Text color" }] },
+    { "type": "button", "name": "Button", "settings": [{ "type": "text", "id": "text", "label": "Button text", "default": "Learn More" }, { "type": "url", "id": "url", "label": "Link" }, { "type": "select", "id": "style", "label": "Style", "options": [{ "value": "primary", "label": "Primary" }, { "value": "outline", "label": "Outline" }], "default": "primary" }] },
+    { "type": "image", "name": "Image", "settings": [{ "type": "image_picker", "id": "image", "label": "Image" }, { "type": "text", "id": "alt", "label": "Alt text" }] },
+    { "type": "badge", "name": "Badge", "settings": [{ "type": "text", "id": "label", "label": "Label", "default": "New" },{ "type": "select", "id": "color", "label": "Color", "options": [{ "value": "green", "label": "Green" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "purple", "label": "Purple" },{ "value": "gold", "label": "Gold" }], "default": "skyblue" }] },
+    { "type": "divider", "name": "Divider", "settings": [{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "line", "label": "Line" },{ "value": "space", "label": "Space" },{ "value": "dotted", "label": "Dotted" }], "default": "line" },{ "type": "range", "id": "spacing", "label": "Spacing", "min": 1, "max": 6, "step": 1, "default": 2, "unit": "rem" }] }
+  ],
+  "enabled_on": {
+    "templates": ["index"]
+  },
+  "presets": [{ "name": "Stellar Email Signup" }]
+}
+{% endschema %}

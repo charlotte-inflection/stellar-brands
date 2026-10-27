@@ -1,0 +1,112 @@
+{% comment %}
+  Stellar Testimonials
+  Quote cards with hover lift. Fully editable via schema.
+  @concept-theme: section-type="testimonials" or "multicolumn"
+{% endcomment %}
+
+<section
+  class="{% if section.settings.color_scheme == 'dark' %}stellar-bg-dark{% elsif section.settings.color_scheme == 'deepspace' %}stellar-bg-deepspace{% elsif section.settings.color_scheme == 'light' %}stellar-bg-light{% elsif section.settings.color_scheme == 'sand' %}stellar-bg-sand{% elsif section.settings.color_scheme == 'skyblue' %}stellar-bg-skyblue{% endif %}{% if section.settings.bg_texture == 'stars' %} stellar-stars-bg{% elsif section.settings.bg_texture == 'constellation' %} stellar-constellation-bg{% elsif section.settings.bg_texture == 'nebula' %} stellar-nebula-gradient{% endif %}{% if section.settings.reveal_animation == 'fade_up' %} stellar-reveal{% elsif section.settings.reveal_animation == 'stagger' %} stellar-reveal-stagger{% endif %}"
+  style="padding:{{ section.settings.padding_top }}rem 0 {{ section.settings.padding_bottom }}rem;{% if section.settings.color_scheme == 'custom' %}background:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+>
+  <div class="stellar-container" style="text-align:center;">
+    <p class="stellar-eyebrow" style="color:var(--stellar-purple);margin-bottom:0.75rem;">{{ section.settings.eyebrow }}</p>
+    <h2 class="stellar-font-display" style="font-size:clamp(1.75rem,3vw,2.5rem);margin-bottom:3rem;">
+      {{ section.settings.heading }}
+    </h2>
+
+    <div style="display:grid;gap:2rem;max-width:64rem;margin:0 auto;" class="stellar-testimonials-grid">
+      {% for block in section.blocks %}
+        {% if block.type == 'testimonial' %}
+          <div {{ block.shopify_attributes }} class="stellar-hover-lift" style="border:1px solid hsla(0,0%,13%,0.05);border-radius:1rem;padding:1.5rem;background:white;box-shadow:0 1px 3px hsla(0,0%,0%,0.05);text-align:left;">
+            <div style="display:flex;gap:2px;margin-bottom:1rem;">
+              {% for i in (1..5) %}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--stellar-skyblue)" stroke="var(--stellar-skyblue)" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              {% endfor %}
+            </div>
+            <p class="stellar-font-body" style="color:hsla(0,0%,13%,0.7);font-size:0.875rem;font-style:italic;margin-bottom:1.5rem;line-height:1.75;">
+              &ldquo;{{ block.settings.quote }}&rdquo;
+            </p>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <div style="width:2.25rem;height:2.25rem;border-radius:50%;background:hsla(211,60%,79%,0.15);border:1px solid hsla(211,60%,79%,0.2);display:flex;align-items:center;justify-content:center;">
+                <span class="stellar-font-body" style="color:var(--stellar-skyblue);font-size:0.625rem;font-weight:700;">{{ block.settings.initials }}</span>
+              </div>
+              <div>
+                <p class="stellar-font-body" style="font-size:0.875rem;font-weight:500;">
+                  {{ block.settings.author }}
+                  {% if block.settings.verified %}
+                    <span style="color:var(--stellar-green);font-size:0.625rem;margin-left:0.375rem;">✓ Verified</span>
+                  {% endif %}
+                </p>
+                <p class="stellar-font-body" style="font-size:0.75rem;color:hsla(0,0%,40%,1);">{{ block.settings.badge }}</p>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div style="max-width:48rem;margin:2rem auto 0;">
+      {% for block in section.blocks %}
+        {% if block.type == 'heading' or block.type == 'text' or block.type == 'button' or block.type == 'image' or block.type == 'badge' or block.type == 'divider' %}
+          {% render 'stellar-standard-block', block: block %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  <style>
+    @media (min-width: 768px) {
+      .stellar-testimonials-grid { grid-template-columns: repeat(3, 1fr) !important; }
+    }
+  </style>
+</section>
+
+{% schema %}
+{
+  "name": "Stellar Testimonials",
+  "tag": "section",
+  "class": "stellar-testimonials",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "What People Are Saying" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Loved by 2,000+ Dairy Lovers" },
+    { "type": "header", "content": "Layout & Style" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 12, "step": 1, "default": 5, "unit": "rem" },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 12, "step": 1, "default": 5, "unit": "rem" },
+    { "type": "select", "id": "color_scheme", "label": "Color scheme", "options": [{ "value": "dark", "label": "Dark" },{ "value": "deepspace", "label": "Deep Space" },{ "value": "light", "label": "Light" },{ "value": "sand", "label": "Sand" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "custom", "label": "Custom" }], "default": "light" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_bg_color", "label": "Custom background", "default": "#F6F7F8" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_text_color", "label": "Custom text", "default": "#222222" },
+    { "type": "select", "id": "bg_texture", "label": "Background texture", "options": [{ "value": "none", "label": "None" },{ "value": "stars", "label": "Stars" },{ "value": "constellation", "label": "Constellation" },{ "value": "nebula", "label": "Nebula" }], "default": "none" },
+    { "type": "select", "id": "reveal_animation", "label": "Scroll animation", "options": [{ "value": "none", "label": "None" },{ "value": "fade_up", "label": "Fade up" },{ "value": "stagger", "label": "Stagger children" }], "default": "none" }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        { "type": "textarea", "id": "quote", "label": "Quote" },
+        { "type": "text", "id": "author", "label": "Author name", "default": "Sarah M." },
+        { "type": "text", "id": "initials", "label": "Initials", "default": "SM" },
+        { "type": "text", "id": "badge", "label": "Badge text", "default": "Verified Buyer" },
+        { "type": "checkbox", "id": "verified", "label": "Show verified badge", "default": true }
+      ]
+    },
+    { "type": "heading", "name": "Heading", "settings": [{ "type": "text", "id": "text", "label": "Text", "default": "Heading" },{ "type": "select", "id": "size", "label": "Size", "options": [{ "value": "h2", "label": "Large" },{ "value": "h3", "label": "Medium" },{ "value": "h4", "label": "Small" }], "default": "h3" }] },
+    { "type": "text", "name": "Text", "settings": [{ "type": "richtext", "id": "content", "label": "Content", "default": "<p>Body text</p>" }] },
+    { "type": "button", "name": "Button", "settings": [{ "type": "text", "id": "text", "label": "Label", "default": "Learn More" },{ "type": "url", "id": "url", "label": "Link" },{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "primary", "label": "Primary" },{ "value": "outline", "label": "Outline" }], "default": "primary" }] },
+    { "type": "image", "name": "Image", "settings": [{ "type": "image_picker", "id": "image", "label": "Image" },{ "type": "text", "id": "alt", "label": "Alt text", "default": "Image" }] },
+    { "type": "badge", "name": "Badge", "settings": [{ "type": "text", "id": "label", "label": "Label", "default": "New" },{ "type": "select", "id": "color", "label": "Color", "options": [{ "value": "green", "label": "Green" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "purple", "label": "Purple" },{ "value": "gold", "label": "Gold" }], "default": "skyblue" }] },
+    { "type": "divider", "name": "Divider", "settings": [{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "line", "label": "Line" },{ "value": "space", "label": "Space" },{ "value": "dotted", "label": "Dotted" }], "default": "line" },{ "type": "range", "id": "spacing", "label": "Spacing", "min": 1, "max": 6, "step": 1, "default": 2, "unit": "rem" }] }
+  ],
+  "enabled_on": {
+    "templates": ["index"]
+  },
+  "presets": [
+    {
+      "name": "Stellar Testimonials",
+      "blocks": [
+        { "type": "testimonial", "settings": { "quote": "I haven't been able to eat ice cream in 15 years. Milky changed everything.", "author": "Sarah M.", "initials": "SM", "badge": "Verified Buyer", "verified": true } },
+        { "type": "testimonial", "settings": { "quote": "Milky's lactase enzyme supplements are crafted for those who love dairy but struggle with lactose intolerance.", "author": "Dr. Michael Seidman, MD", "initials": "MS", "badge": "Medical Advisor", "verified": false } },
+        { "type": "testimonial", "settings": { "quote": "I take Milky Ultra before every pizza night. 21,000 FCC is no joke.", "author": "James R.", "initials": "JR", "badge": "Verified Buyer", "verified": true } }
+      ]
+    }
+  ]
+}
+{% endschema %}

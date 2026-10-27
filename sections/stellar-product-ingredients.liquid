@@ -1,0 +1,163 @@
+{% comment %}
+  Stellar Product Ingredients (PDP below-fold)
+  Fully modular block-based: eyebrow, heading, supplement facts, ingredient spotlight, clean-label tags.
+  @concept-theme: section-type="multicolumn" + "collapsible-content"
+{% endcomment %}
+
+<section id="ingredients"
+  class="{% if section.settings.color_scheme == 'dark' %}stellar-bg-dark{% elsif section.settings.color_scheme == 'deepspace' %}stellar-bg-deepspace{% elsif section.settings.color_scheme == 'light' %}stellar-bg-light{% elsif section.settings.color_scheme == 'sand' %}stellar-bg-sand{% elsif section.settings.color_scheme == 'skyblue' %}stellar-bg-skyblue{% endif %}{% if section.settings.bg_texture == 'stars' %} stellar-stars-bg{% elsif section.settings.bg_texture == 'constellation' %} stellar-constellation-bg{% elsif section.settings.bg_texture == 'nebula' %} stellar-nebula-gradient{% endif %}{% if section.settings.reveal_animation == 'fade_up' %} stellar-reveal{% elsif section.settings.reveal_animation == 'stagger' %} stellar-reveal-stagger{% endif %}"
+  style="padding:{{ section.settings.padding_top }}rem 0 {{ section.settings.padding_bottom }}rem;{% if section.settings.color_scheme == 'custom' %}background:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+>
+  <div class="stellar-container" style="max-width:64rem;">
+    {% for block in section.blocks %}
+      {% case block.type %}
+
+        {% when 'eyebrow' %}
+          <div style="text-align:center;" {{ block.shopify_attributes }}>
+            <p class="stellar-eyebrow" style="color:var(--stellar-purple);margin-bottom:0.75rem;">{{ block.settings.text }}</p>
+          </div>
+
+        {% when 'heading' %}
+          <div style="text-align:center;" {{ block.shopify_attributes }}>
+            <h2 class="stellar-font-display" style="font-size:clamp(1.75rem,3vw,2.5rem);margin-bottom:2rem;{% if section.settings.color_scheme == 'dark' or section.settings.color_scheme == 'deepspace' %}color:var(--stellar-offwhite);{% else %}color:var(--stellar-black);{% endif %}">
+              {{ block.settings.text }}
+            </h2>
+          </div>
+
+        {% when 'supplement_facts' %}
+          <div style="margin-bottom:3rem;padding:0 1rem;" {{ block.shopify_attributes }}>
+            <div style="border:2px solid {% if section.settings.color_scheme == 'dark' or section.settings.color_scheme == 'deepspace' %}var(--stellar-offwhite){% else %}var(--stellar-black){% endif %};border-radius:0.75rem;padding:1.5rem;">
+              <h3 class="stellar-font-display" style="font-size:1.125rem;border-bottom:8px solid {% if section.settings.color_scheme == 'dark' or section.settings.color_scheme == 'deepspace' %}var(--stellar-offwhite){% else %}var(--stellar-black){% endif %};padding-bottom:0.5rem;margin-bottom:0.75rem;">Supplement Facts</h3>
+              <p class="stellar-font-body" style="font-size:0.75rem;opacity:0.6;margin-bottom:0.75rem;">Serving Size: 1 Tablet</p>
+              <div style="border-top:4px solid {% if section.settings.color_scheme == 'dark' or section.settings.color_scheme == 'deepspace' %}var(--stellar-offwhite){% else %}var(--stellar-black){% endif %};padding-top:0.5rem;">
+                <div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid hsla(0,0%,50%,0.2);">
+                  <span class="stellar-font-body" style="font-weight:700;font-size:0.875rem;">Lactase Enzyme</span>
+                  <span class="stellar-font-body" style="font-size:0.875rem;">{{ block.settings.fcc_value }}</span>
+                </div>
+              </div>
+              <div style="margin-top:0.75rem;padding-top:0.5rem;border-top:1px solid hsla(0,0%,50%,0.2);">
+                <p class="stellar-font-body" style="font-size:0.75rem;opacity:0.6;">
+                  <strong>Other Ingredients:</strong> {{ block.settings.other_ingredients }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+        {% when 'ingredient_spotlight' %}
+          <div style="margin-bottom:2rem;padding:0 1rem;" {{ block.shopify_attributes }}>
+            <div class="stellar-bg-deepspace stellar-rounded-2xl" style="padding:1.5rem;">
+              <p class="stellar-eyebrow" style="color:var(--stellar-skyblue);margin-bottom:0.5rem;">{{ block.settings.eyebrow }}</p>
+              <h3 class="stellar-font-display" style="font-size:1.5rem;color:var(--stellar-offwhite);margin-bottom:1rem;">{{ block.settings.name }}</h3>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;">
+                <div>
+                  <p class="stellar-font-body" style="color:hsla(0,0%,96%,0.4);font-size:0.75rem;margin-bottom:0.25rem;">Source</p>
+                  <p class="stellar-font-body" style="color:var(--stellar-offwhite);font-weight:500;font-size:0.875rem;">{{ block.settings.source }}</p>
+                </div>
+                <div>
+                  <p class="stellar-font-body" style="color:hsla(0,0%,96%,0.4);font-size:0.75rem;margin-bottom:0.25rem;">Dose</p>
+                  <p class="stellar-font-body" style="color:var(--stellar-offwhite);font-weight:500;font-size:0.875rem;">{{ block.settings.dose }}</p>
+                </div>
+                <div>
+                  <p class="stellar-font-body" style="color:hsla(0,0%,96%,0.4);font-size:0.75rem;margin-bottom:0.25rem;">Form</p>
+                  <p class="stellar-font-body" style="color:var(--stellar-offwhite);font-weight:500;font-size:0.875rem;">{{ block.settings.form }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        {% when 'clean_label_tag' %}
+          <div {{ block.shopify_attributes }} class="stellar-hover-lift" style="display:inline-flex;flex-direction:column;align-items:center;text-align:center;gap:0.5rem;padding:0.75rem;border-radius:0.75rem;background:hsla(0,0%,50%,0.05);margin:0.25rem;">
+            {% if block.settings.icon_image != blank %}
+              <img src="{{ block.settings.icon_image | image_url: width: 40 }}" alt="{{ block.settings.label }}" width="20" height="20" loading="lazy">
+            {% endif %}
+            <span class="stellar-font-body" style="font-size:0.625rem;font-weight:500;opacity:0.6;">{{ block.settings.label }}</span>
+          </div>
+
+        {% when 'text' %}
+          <div style="text-align:center;margin-bottom:1rem;" {{ block.shopify_attributes }}>
+            <div class="stellar-font-body" style="line-height:1.75;">{{ block.settings.content }}</div>
+          </div>
+
+        {% when 'button' %}
+          {% render 'stellar-standard-block', block: block %}
+
+        {% when 'image' %}
+          {% render 'stellar-standard-block', block: block %}
+
+        {% when 'divider' %}
+          {% render 'stellar-standard-block', block: block %}
+
+      {% endcase %}
+    {% endfor %}
+
+    {%- comment -%} Center the clean label tags row {%- endcomment -%}
+    <style>
+      .stellar-product-ingredients .stellar-container { text-align: center; }
+    </style>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Stellar PDP Ingredients",
+  "tag": "section",
+  "class": "stellar-product-ingredients",
+  "settings": [
+    { "type": "header", "content": "Layout & Style" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 12, "step": 1, "default": 5, "unit": "rem" },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 12, "step": 1, "default": 5, "unit": "rem" },
+    { "type": "select", "id": "color_scheme", "label": "Color scheme", "options": [{ "value": "dark", "label": "Dark" },{ "value": "deepspace", "label": "Deep Space" },{ "value": "light", "label": "Light" },{ "value": "sand", "label": "Sand" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "custom", "label": "Custom" }], "default": "light" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_bg_color", "label": "Custom background", "default": "#F6F7F8" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_text_color", "label": "Custom text", "default": "#222222" },
+    { "type": "select", "id": "bg_texture", "label": "Background texture", "options": [{ "value": "none", "label": "None" },{ "value": "stars", "label": "Stars" },{ "value": "constellation", "label": "Constellation" },{ "value": "nebula", "label": "Nebula" }], "default": "none" },
+    { "type": "select", "id": "reveal_animation", "label": "Scroll animation", "options": [{ "value": "none", "label": "None" },{ "value": "fade_up", "label": "Fade up" },{ "value": "stagger", "label": "Stagger children" }], "default": "fade_up" }
+  ],
+  "blocks": [
+    { "type": "eyebrow", "name": "Eyebrow", "settings": [
+      { "type": "text", "id": "text", "label": "Eyebrow text", "default": "Radical Transparency" }
+    ] },
+    { "type": "heading", "name": "Heading", "settings": [
+      { "type": "text", "id": "text", "label": "Heading text", "default": "What's Inside" }
+    ] },
+    { "type": "supplement_facts", "name": "Supplement Facts", "limit": 1, "settings": [
+      { "type": "text", "id": "fcc_value", "label": "FCC value", "default": "10,800 FCC" },
+      { "type": "text", "id": "other_ingredients", "label": "Other ingredients", "default": "Mannitol, Crospovidone, Magnesium Stearate, Silicon Dioxide." }
+    ] },
+    { "type": "ingredient_spotlight", "name": "Ingredient Spotlight", "settings": [
+      { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Active Ingredient" },
+      { "type": "text", "id": "name", "label": "Ingredient name", "default": "Pure Lactase Enzyme" },
+      { "type": "text", "id": "source", "label": "Source", "default": "Naturally Derived" },
+      { "type": "text", "id": "dose", "label": "Dose", "default": "10,800 FCC" },
+      { "type": "text", "id": "form", "label": "Form", "default": "Chewable Tablet" }
+    ] },
+    { "type": "clean_label_tag", "name": "Clean Label Tag", "settings": [
+      { "type": "text", "id": "label", "label": "Label", "default": "FODMAP-Free" },
+      { "type": "image_picker", "id": "icon_image", "label": "Icon image" }
+    ] },
+    { "type": "text", "name": "Text", "settings": [{ "type": "richtext", "id": "content", "label": "Content", "default": "<p>Body text</p>" }] },
+    { "type": "button", "name": "Button", "settings": [{ "type": "text", "id": "text", "label": "Label", "default": "Learn More" },{ "type": "url", "id": "url", "label": "Link" },{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "primary", "label": "Primary" },{ "value": "outline", "label": "Outline" }], "default": "primary" }] },
+    { "type": "image", "name": "Image", "settings": [{ "type": "image_picker", "id": "image", "label": "Image" },{ "type": "text", "id": "alt", "label": "Alt text", "default": "Image" }] },
+    { "type": "divider", "name": "Divider", "settings": [{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "line", "label": "Line" },{ "value": "space", "label": "Space" },{ "value": "dotted", "label": "Dotted" }], "default": "line" },{ "type": "range", "id": "spacing", "label": "Spacing", "min": 1, "max": 6, "step": 1, "default": 2, "unit": "rem" }] }
+  ],
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "presets": [
+    {
+      "name": "Stellar PDP Ingredients",
+      "blocks": [
+        { "type": "eyebrow", "settings": { "text": "Radical Transparency" } },
+        { "type": "heading", "settings": { "text": "What's Inside" } },
+        { "type": "supplement_facts", "settings": { "fcc_value": "10,800 FCC", "other_ingredients": "Mannitol, Crospovidone, Magnesium Stearate, Silicon Dioxide." } },
+        { "type": "ingredient_spotlight", "settings": { "eyebrow": "Active Ingredient", "name": "Pure Lactase Enzyme", "source": "Naturally Derived", "dose": "10,800 FCC", "form": "Chewable Tablet" } },
+        { "type": "clean_label_tag", "settings": { "label": "FODMAP-Free" } },
+        { "type": "clean_label_tag", "settings": { "label": "Gluten-Free" } },
+        { "type": "clean_label_tag", "settings": { "label": "No Artificial Sweeteners" } },
+        { "type": "clean_label_tag", "settings": { "label": "No Heavy Metals" } },
+        { "type": "clean_label_tag", "settings": { "label": "NSF Certified" } },
+        { "type": "clean_label_tag", "settings": { "label": "Non-GMO" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

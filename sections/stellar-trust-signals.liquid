@@ -1,0 +1,95 @@
+{% comment %}
+  Stellar Trust Signals
+  Icon grid with hover lift.
+  @concept-theme: section-type="multicolumn" | block-type="icon,heading,text"
+{% endcomment %}
+
+<section
+  class="{% if section.settings.color_scheme == 'dark' %}stellar-bg-dark{% elsif section.settings.color_scheme == 'deepspace' %}stellar-bg-deepspace{% elsif section.settings.color_scheme == 'light' %}stellar-bg-light{% elsif section.settings.color_scheme == 'sand' %}stellar-bg-sand{% elsif section.settings.color_scheme == 'skyblue' %}stellar-bg-skyblue{% endif %}{% if section.settings.bg_texture == 'stars' %} stellar-stars-bg{% elsif section.settings.bg_texture == 'constellation' %} stellar-constellation-bg{% elsif section.settings.bg_texture == 'nebula' %} stellar-nebula-gradient{% endif %}{% if section.settings.reveal_animation == 'fade_up' %} stellar-reveal{% elsif section.settings.reveal_animation == 'stagger' %} stellar-reveal-stagger{% endif %}"
+  style="padding:{{ section.settings.padding_top }}rem 0 {{ section.settings.padding_bottom }}rem;{% if section.settings.color_scheme == 'custom' %}background:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+>
+  <div class="stellar-container">
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:2rem;max-width:56rem;margin:0 auto;" class="stellar-trust-grid">
+      {% for block in section.blocks %}
+        {% if block.type == 'signal' %}
+          <div {{ block.shopify_attributes }} class="stellar-hover-lift" style="text-align:center;padding:1rem;border-radius:1rem;">
+            {% if block.settings.icon_image != blank %}
+              <div style="width:3.5rem;height:3.5rem;margin:0 auto 1rem;border-radius:1rem;overflow:hidden;background:{{ section.settings.icon_card_color }};display:flex;align-items:center;justify-content:center;">
+                <img src="{{ block.settings.icon_image | image_url: width: 48 }}" alt="{{ block.settings.title }}" width="24" height="24" loading="lazy">
+              </div>
+            {% else %}
+              <div style="width:3.5rem;height:3.5rem;margin:0 auto 1rem;border-radius:1rem;background:{{ section.settings.icon_card_color }};display:flex;align-items:center;justify-content:center;">
+                <span style="font-size:1.5rem;">{{ block.settings.icon_emoji }}</span>
+              </div>
+            {% endif %}
+            <h3 class="stellar-font-display" style="font-size:0.875rem;margin-bottom:0.25rem;color:{{ section.settings.title_color }};">{{ block.settings.title }}</h3>
+            <p class="stellar-font-body" style="font-size:0.75rem;color:{{ section.settings.caption_color }};">{{ block.settings.description }}</p>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div style="max-width:48rem;margin:2rem auto 0;">
+      {% for block in section.blocks %}
+        {% if block.type == 'heading' or block.type == 'text' or block.type == 'button' or block.type == 'image' or block.type == 'badge' or block.type == 'divider' %}
+          {% render 'stellar-standard-block', block: block %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  <style>
+    @media (min-width: 768px) {
+      .stellar-trust-grid { grid-template-columns: repeat(4, 1fr) !important; }
+    }
+  </style>
+</section>
+
+{% schema %}
+{
+  "name": "Stellar Trust Signals",
+  "tag": "section",
+  "class": "stellar-trust-signals",
+  "settings": [
+    { "type": "header", "content": "Layout & Style" },
+    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 12, "step": 1, "default": 5, "unit": "rem" },
+    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 12, "step": 1, "default": 5, "unit": "rem" },
+    { "type": "select", "id": "color_scheme", "label": "Color scheme", "options": [{ "value": "dark", "label": "Dark" },{ "value": "deepspace", "label": "Deep Space" },{ "value": "light", "label": "Light" },{ "value": "sand", "label": "Sand" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "custom", "label": "Custom" }], "default": "light" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_bg_color", "label": "Custom background", "default": "#F6F7F8" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_text_color", "label": "Custom text", "default": "#222222" },
+    { "type": "select", "id": "bg_texture", "label": "Background texture", "options": [{ "value": "none", "label": "None" },{ "value": "stars", "label": "Stars" },{ "value": "constellation", "label": "Constellation" },{ "value": "nebula", "label": "Nebula" }], "default": "none" },
+    { "type": "select", "id": "reveal_animation", "label": "Scroll animation", "options": [{ "value": "none", "label": "None" },{ "value": "fade_up", "label": "Fade up" },{ "value": "stagger", "label": "Stagger children" }], "default": "none" },
+    { "type": "header", "content": "Signal colors" },
+    { "type": "color", "id": "title_color", "label": "Label text", "default": "#222222" },
+    { "type": "color", "id": "icon_card_color", "label": "Icon card background", "default": "#d2e2f2" },
+    { "type": "color", "id": "caption_color", "label": "Caption text", "default": "#666666" }
+  ],
+  "blocks": [
+    {
+      "type": "signal",
+      "name": "Trust Signal",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "NSF Certified" },
+        { "type": "text", "id": "description", "label": "Description", "default": "GMP manufacturing standards" },
+        { "type": "image_picker", "id": "icon_image", "label": "Custom icon image" },
+        { "type": "text", "id": "icon_emoji", "label": "Fallback emoji", "default": "🛡️" }
+      ]
+    },
+    { "type": "heading", "name": "Heading", "settings": [{ "type": "text", "id": "text", "label": "Text", "default": "Heading" },{ "type": "select", "id": "size", "label": "Size", "options": [{ "value": "h2", "label": "Large" },{ "value": "h3", "label": "Medium" },{ "value": "h4", "label": "Small" }], "default": "h3" }] },
+    { "type": "text", "name": "Text", "settings": [{ "type": "richtext", "id": "content", "label": "Content", "default": "<p>Body text</p>" }] },
+    { "type": "button", "name": "Button", "settings": [{ "type": "text", "id": "text", "label": "Label", "default": "Learn More" },{ "type": "url", "id": "url", "label": "Link" },{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "primary", "label": "Primary" },{ "value": "outline", "label": "Outline" }], "default": "primary" }] },
+    { "type": "image", "name": "Image", "settings": [{ "type": "image_picker", "id": "image", "label": "Image" },{ "type": "text", "id": "alt", "label": "Alt text", "default": "Image" }] },
+    { "type": "badge", "name": "Badge", "settings": [{ "type": "text", "id": "label", "label": "Label", "default": "New" },{ "type": "select", "id": "color", "label": "Color", "options": [{ "value": "green", "label": "Green" },{ "value": "skyblue", "label": "Sky Blue" },{ "value": "purple", "label": "Purple" },{ "value": "gold", "label": "Gold" }], "default": "skyblue" }] },
+    { "type": "divider", "name": "Divider", "settings": [{ "type": "select", "id": "style", "label": "Style", "options": [{ "value": "line", "label": "Line" },{ "value": "space", "label": "Space" },{ "value": "dotted", "label": "Dotted" }], "default": "line" },{ "type": "range", "id": "spacing", "label": "Spacing", "min": 1, "max": 6, "step": 1, "default": 2, "unit": "rem" }] }
+  ],
+  "presets": [
+    {
+      "name": "Stellar Trust Signals",
+      "blocks": [
+        { "type": "signal", "settings": { "title": "NSF Certified", "description": "GMP manufacturing standards", "icon_emoji": "🛡️" } },
+        { "type": "signal", "settings": { "title": "Third-Party Tested", "description": "Independent ISO 17025 lab verification", "icon_emoji": "🧪" } },
+        { "type": "signal", "settings": { "title": "FODMAP-Free", "description": "Safe for sensitive digestive systems", "icon_emoji": "🌿" } },
+        { "type": "signal", "settings": { "title": "HSA/FSA Eligible", "description": "Reimbursable with health spending accounts", "icon_emoji": "💳" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

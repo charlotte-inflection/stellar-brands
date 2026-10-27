@@ -1,0 +1,166 @@
+{% comment %}
+  Stellar Collection JTBD (Jobs to Be Done)
+  Product grid section for collection pages. Pulls from a selected collection
+  or falls back to the page collection. Product cards render JTBD labels from
+  the product.metafields.custom.jtbd_label metafield when present.
+  @concept-theme: section-type="product-grid" with JTBD categorization
+{% endcomment %}
+
+<section
+  class="{% case section.settings.color_scheme %}{% when 'dark' %}stellar-bg-dark{% when 'deepspace' %}stellar-bg-deepspace{% when 'light' %}stellar-bg-light{% when 'sand' %}stellar-bg-sand{% when 'skyblue' %}stellar-bg-skyblue{% endcase %}{% if section.settings.bg_texture == 'stars' %} stellar-stars-bg{% elsif section.settings.bg_texture == 'constellation' %} stellar-constellation-bg{% elsif section.settings.bg_texture == 'nebula' %} stellar-nebula-gradient{% endif %}{% if section.settings.reveal_animation == 'fade_up' %} stellar-reveal{% elsif section.settings.reveal_animation == 'stagger' %} stellar-reveal-stagger{% endif %}"
+  style="{% if section.settings.section_height == 'full' %}min-height:100vh;{% endif %}padding-top:{{ section.settings.padding_top }}px;padding-bottom:{{ section.settings.padding_bottom }}px;{% if section.settings.color_scheme == 'custom' %}background-color:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+>
+  <div class="stellar-container" style="max-width:64rem;text-align:center;">
+    <p class="stellar-eyebrow" style="color:{% if section.settings.eyebrow_color != blank %}{{ section.settings.eyebrow_color }}{% else %}var(--stellar-purple){% endif %};margin-bottom:0.75rem;">{{ section.settings.milky_eyebrow }}</p>
+    <h2 class="stellar-font-display" style="font-size:clamp(1.75rem,3vw,2.5rem);margin-bottom:0.75rem;">
+      {{ section.settings.milky_heading }}
+    </h2>
+    <p class="stellar-font-body" style="opacity:0.5;max-width:32rem;margin:0 auto 3.5rem;">
+      {{ section.settings.milky_description }}
+    </p>
+
+    {%- liquid
+      if section.settings.milky_collection != blank
+        assign jtbd_collection = collections[section.settings.milky_collection]
+      elsif collection
+        assign jtbd_collection = collection
+      endif
+    -%}
+    {% if jtbd_collection != blank and jtbd_collection.products.size > 0 %}
+      <div style="display:grid;gap:2.5rem;" class="stellar-jtbd-product-grid">
+        {% for product in jtbd_collection.products limit: section.settings.product_limit %}
+          {% render 'stellar-product-card', product: product %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="stellar-container" style="max-width:48rem;margin:2rem auto 0;">
+    {% for block in section.blocks %}
+      {% if block.type == 'heading' or block.type == 'text' or block.type == 'button' or block.type == 'image' or block.type == 'badge' or block.type == 'divider' %}
+        {% render 'stellar-standard-block', block: block %}
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <style>
+    @media (min-width: 768px) {
+      .stellar-jtbd-product-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    }
+  </style>
+</section>
+
+{% schema %}
+{
+  "name": "Stellar Collection JTBD",
+  "tag": "section",
+  "class": "stellar-collection-jtbd",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    { "type": "text", "id": "milky_eyebrow", "label": "Eyebrow", "default": "Dairy Freedom" },
+    { "type": "color", "id": "eyebrow_color", "label": "Eyebrow color", "info": "Defaults to Milky purple." },
+    { "type": "text", "id": "milky_heading", "label": "Heading", "default": "Enjoy Dairy Without Limits" },
+    { "type": "textarea", "id": "milky_description", "label": "Description", "default": "The world's most powerful wallet-sized lactase supplement. Choose your strength." },
+    { "type": "collection", "id": "milky_collection", "label": "Products collection", "info": "Select a collection. Falls back to the page collection if blank." },
+    { "type": "range", "id": "product_limit", "label": "Max products to show", "min": 1, "max": 12, "step": 1, "default": 4 },
+    {
+      "type": "header",
+      "content": "Layout & Style"
+    },
+    { "type": "select", "id": "section_height", "label": "Section height", "options": [
+      { "value": "auto", "label": "Auto (content)" },
+      { "value": "full", "label": "Full viewport" }
+    ], "default": "auto" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 120, "step": 4, "default": 80, "unit": "px" },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 120, "step": 4, "default": 80, "unit": "px" },
+    { "type": "select", "id": "color_scheme", "label": "Color scheme", "options": [
+      { "value": "dark", "label": "Dark" },
+      { "value": "deepspace", "label": "Deep Space" },
+      { "value": "light", "label": "Light" },
+      { "value": "sand", "label": "Sand" },
+      { "value": "skyblue", "label": "Sky Blue" },
+      { "value": "custom", "label": "Custom" }
+    ], "default": "light" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_bg_color", "label": "Custom background", "default": "#F6F7F8" },
+    { "visible_if": "{{ section.settings.color_scheme == 'custom' }}", "type": "color", "id": "custom_text_color", "label": "Custom text color", "default": "#222222" },
+    { "type": "select", "id": "bg_texture", "label": "Background texture", "options": [
+      { "value": "none", "label": "None" },
+      { "value": "stars", "label": "Stars" },
+      { "value": "constellation", "label": "Constellation" },
+      { "value": "nebula", "label": "Nebula" }
+    ], "default": "none" },
+    { "type": "select", "id": "reveal_animation", "label": "Scroll animation", "options": [{ "value": "none", "label": "None" },{ "value": "fade_up", "label": "Fade up" },{ "value": "stagger", "label": "Stagger children" }], "default": "fade_up" }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "Heading",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Heading text", "default": "Heading" },
+        { "type": "select", "id": "size", "label": "Size", "options": [
+          { "value": "h2", "label": "Large" },
+          { "value": "h3", "label": "Medium" },
+          { "value": "h4", "label": "Small" }
+        ], "default": "h3" }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        { "type": "richtext", "id": "content", "label": "Text" }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Button",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Button text", "default": "Learn More" },
+        { "type": "url", "id": "url", "label": "Link" },
+        { "type": "select", "id": "style", "label": "Style", "options": [
+          { "value": "primary", "label": "Primary" },
+          { "value": "outline", "label": "Outline" }
+        ], "default": "primary" }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "alt", "label": "Alt text" }
+      ]
+    },
+    {
+      "type": "badge",
+      "name": "Badge",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Badge text", "default": "New" },
+        { "type": "select", "id": "color", "label": "Color", "options": [
+          { "value": "purple", "label": "Purple" },
+          { "value": "orange", "label": "Orange" },
+          { "value": "skyblue", "label": "Sky Blue" },
+          { "value": "green", "label": "Green" }
+        ], "default": "purple" }
+      ]
+    },
+    {
+      "type": "divider",
+      "name": "Divider",
+      "settings": [
+        { "type": "range", "id": "height", "label": "Height", "min": 1, "max": 4, "step": 1, "default": 1, "unit": "px" },
+        { "type": "range", "id": "opacity", "label": "Opacity", "min": 5, "max": 50, "step": 5, "default": 10, "unit": "%" }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "templates": ["collection"]
+  },
+  "presets": [
+    { "name": "Stellar Collection JTBD" }
+  ]
+}
+{% endschema %}

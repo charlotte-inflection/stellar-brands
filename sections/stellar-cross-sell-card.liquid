@@ -1,0 +1,366 @@
+{% comment %}
+  Stellar Cross-Sell Card
+  Configurable cross-product card for PDPs.
+  Shows the other product line (e.g. Nova on the Milky PDP, Milky on the Nova PDP).
+  Designed to match the visual language of the Skio plan picker and other
+  stellar section components.
+  @stellar-custom
+{% endcomment %}
+
+{%- liquid
+  assign cross_product = all_products[section.settings.product_handle]
+  assign card_image = section.settings.card_image | default: cross_product.featured_image
+  assign card_heading = section.settings.heading
+  assign card_subheading = section.settings.subheading
+  assign cta_text = section.settings.cta_text | default: 'Learn More'
+  assign cta_url = section.settings.cta_url | default: cross_product.url
+  assign accent_color = section.settings.accent_color | default: '#FFAA4D'
+-%}
+
+{% if cross_product != blank or request.design_mode %}
+<section
+  class="stellar-cross-sell-card {% if section.settings.color_scheme == 'dark' %}stellar-bg-dark{% elsif section.settings.color_scheme == 'deepspace' %}stellar-bg-deepspace{% elsif section.settings.color_scheme == 'light' %}stellar-bg-light{% elsif section.settings.color_scheme == 'sand' %}stellar-bg-sand{% elsif section.settings.color_scheme == 'custom' %}{% endif %}"
+  style="padding:{{ section.settings.padding_top }}rem 0 {{ section.settings.padding_bottom }}rem;{% if section.settings.color_scheme == 'custom' %}background:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+  {{ section.shopify_attributes }}
+>
+  <div class="stellar-container" style="max-width:42rem;">
+    {% if section.settings.eyebrow != blank %}
+      <h2 class="scsc-section-heading stellar-font-display"{% if section.settings.heading_color != blank %} style="color:{{ section.settings.heading_color }};"{% endif %}>{{ section.settings.eyebrow }}</h2>
+    {% endif %}
+    <div class="scsc-card" style="--scsc-accent: {{ accent_color }};{% if section.settings.card_bg_color != blank %}--scsc-card-bg:{{ section.settings.card_bg_color }};{% endif %}{% if section.settings.card_border_color != blank %}--scsc-card-border:{{ section.settings.card_border_color }};--scsc-card-border-hover:{{ section.settings.card_border_color }};{% endif %}{% if section.settings.cta_text_color != blank %}--scsc-cta-text:{{ section.settings.cta_text_color }};{% endif %}">
+      {% if card_image != blank %}
+        <div class="scsc-media" style="max-height:20rem;">
+          <img
+            src="{{ card_image | image_url: width: 600 }}"
+            alt="{{ cross_product.title | default: card_heading | escape }}"
+            width="300"
+            height="300"
+            loading="lazy"
+            style="width:100%;height:100%;object-fit:cover;border-radius:0.75rem;"
+          >
+        </div>
+      {% endif %}
+
+      <div class="scsc-content">
+
+        {% if section.settings.card_logo != blank %}
+          <img class="scsc-logo" src="{{ section.settings.card_logo | image_url: height: 48 }}" alt="" loading="lazy">
+        {% endif %}
+
+        {% if card_heading != blank %}
+          <h3 class="scsc-heading stellar-font-display"{% if section.settings.heading_color != blank %} style="color:{{ section.settings.heading_color }};"{% endif %}>{{ card_heading }}</h3>
+        {% elsif cross_product != blank %}
+          <h3 class="scsc-heading stellar-font-display"{% if section.settings.heading_color != blank %} style="color:{{ section.settings.heading_color }};"{% endif %}>{{ cross_product.title }}</h3>
+        {% endif %}
+
+        {% if card_subheading != blank %}
+          <p class="scsc-subheading stellar-font-body"{% if section.settings.subheading_color != blank %} style="color:{{ section.settings.subheading_color }};opacity:1;"{% endif %}>{{ card_subheading }}</p>
+        {% elsif cross_product.description != blank %}
+          <p class="scsc-subheading stellar-font-body"{% if section.settings.subheading_color != blank %} style="color:{{ section.settings.subheading_color }};opacity:1;"{% endif %}>{{ cross_product.description | strip_html | truncatewords: 20 }}</p>
+        {% endif %}
+
+        {% if cross_product != blank %}
+          <p class="scsc-price stellar-font-body"{% if section.settings.price_color != blank %} style="color:{{ section.settings.price_color }};"{% endif %}>
+            {{ cross_product.price | money }}
+            {% if cross_product.compare_at_price > cross_product.price %}
+              <s style="opacity:0.5;font-size:0.875em;">{{ cross_product.compare_at_price | money }}</s>
+            {% endif %}
+          </p>
+        {% endif %}
+
+        <a href="{{ cta_url }}" class="scsc-cta stellar-font-body">
+          {{ cta_text }}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<style>
+  .scsc-card {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    background: var(--scsc-card-bg, rgba(255, 255, 255, 0.04));
+    border: 1.5px solid var(--scsc-card-border, rgba(255, 255, 255, 0.08));
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: border-color 0.3s ease;
+  }
+
+  .scsc-card:hover {
+    border-color: var(--scsc-card-border-hover, rgba(255, 255, 255, 0.15));
+  }
+
+  @media (min-width: 640px) {
+    .scsc-card {
+      grid-template-columns: 1fr 1.25fr;
+      gap: 2rem;
+      padding: 2rem;
+    }
+  }
+
+  .scsc-media {
+    border-radius: 0.75rem;
+    overflow: hidden;
+    aspect-ratio: 1;
+  }
+
+  .scsc-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .scsc-section-heading {
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+    line-height: 1.2;
+    margin: 0 0 1.25rem;
+  }
+
+  .scsc-eyebrow {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--scsc-accent);
+    margin: 0;
+  }
+
+  .scsc-logo {
+    height: 24px;
+    width: auto;
+    max-width: 120px;
+    object-fit: contain;
+    object-position: left;
+  }
+
+  .scsc-heading {
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  .scsc-subheading {
+    font-size: 0.875rem;
+    opacity: 0.7;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .scsc-price {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0.25rem 0 0;
+  }
+
+  .scsc-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--scsc-accent);
+    color: var(--scsc-cta-text, #222222);
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: opacity 0.2s ease, transform 0.15s ease;
+    align-self: flex-start;
+  }
+
+  .scsc-cta:hover {
+    opacity: 0.9;
+    transform: translateX(2px);
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Stellar Cross-Sell Card",
+  "tag": "section",
+  "class": "stellar-cross-sell-section",
+  "limit": 2,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Cross-sell card for showing a related product line. Place on a PDP template to promote the other product (e.g. Nova on the Milky PDP, or Milky on the Nova PDP)."
+    },
+    {
+      "type": "header",
+      "content": "Product"
+    },
+    {
+      "type": "product",
+      "id": "product_handle",
+      "label": "Product"
+    },
+    {
+      "type": "image_picker",
+      "id": "card_image",
+      "label": "Image override",
+      "info": "Falls back to the product's featured image."
+    },
+    {
+      "type": "image_picker",
+      "id": "card_logo",
+      "label": "Brand logo",
+      "info": "Optional product line logo shown above the heading."
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "info": "Small uppercase text above the heading, e.g. 'Also from Stellar'."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Falls back to the product title if blank."
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#F6F7F8",
+      "info": "Defaults to near-white. Set to a brand color if preferred."
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Description",
+      "info": "Falls back to the product description (first 20 words) if blank."
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "Button text",
+      "default": "Learn More"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Button link",
+      "info": "Falls back to the product URL if blank."
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#FFAA4D",
+      "info": "Used for the eyebrow text and CTA button. Set to Nova orange (#FFAA4D) or Milky purple (#655DC6) as appropriate."
+    },
+    {
+      "type": "color",
+      "id": "cta_text_color",
+      "label": "Button text color",
+      "info": "Defaults to dark (#222222). Set to white for dark button backgrounds."
+    },
+    {
+      "type": "color",
+      "id": "subheading_color",
+      "label": "Description text color",
+      "info": "Overrides the inherited text color for the description."
+    },
+    {
+      "type": "color",
+      "id": "price_color",
+      "label": "Price color"
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "Card background",
+      "info": "Inner card background. Defaults to a subtle white tint on dark schemes."
+    },
+    {
+      "type": "color",
+      "id": "card_border_color",
+      "label": "Card border color"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 12,
+      "step": 1,
+      "default": 4,
+      "unit": "rem"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 12,
+      "step": 1,
+      "default": 4,
+      "unit": "rem"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        {
+          "value": "dark",
+          "label": "Dark"
+        },
+        {
+          "value": "deepspace",
+          "label": "Deep Space"
+        },
+        {
+          "value": "light",
+          "label": "Light"
+        },
+        {
+          "value": "sand",
+          "label": "Sand"
+        },
+        {
+          "value": "custom",
+          "label": "Custom"
+        }
+      ],
+      "default": "dark"
+    },
+    {
+      "visible_if": "{{ section.settings.color_scheme == 'custom' }}",
+      "type": "color",
+      "id": "custom_bg_color",
+      "label": "Custom background",
+      "default": "#222222"
+    },
+    {
+      "visible_if": "{{ section.settings.color_scheme == 'custom' }}",
+      "type": "color",
+      "id": "custom_text_color",
+      "label": "Custom text color",
+      "default": "#F6F7F8"
+    }
+  ],
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "presets": [
+    {
+      "name": "Stellar Cross-Sell Card"
+    }
+  ]
+}
+{% endschema %}

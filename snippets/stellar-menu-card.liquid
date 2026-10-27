@@ -1,0 +1,137 @@
+{% comment %}
+  Stellar Menu Card — Renders a single collection card within the menu drawer.
+
+  @param {object} block - Block object with card settings
+  @param {number} index - Block index for unique IDs
+{% endcomment %}
+
+{%- liquid
+  assign collection = collections[block.settings.collection]
+  assign card_bg = block.settings.card_bg_color | default: '#f0e8f5'
+  assign card_text = block.settings.card_text_color | default: '#222222'
+  assign card_image = block.settings.card_image
+  assign card_logo = block.settings.card_logo
+  assign card_label = block.settings.card_label | default: collection.title
+  assign direct_link = block.settings.direct_link
+-%}
+
+{%- if direct_link != blank -%}
+<a
+  href="{{ direct_link }}"
+  class="smd-card stellar-font-body"
+  style="--smd-card-bg: {{ card_bg }}; --smd-card-text: {{ card_text }};text-decoration:none;"
+>
+{%- else -%}
+<button
+  type="button"
+  class="smd-card stellar-font-body"
+  style="--smd-card-bg: {{ card_bg }}; --smd-card-text: {{ card_text }};"
+  data-smd-card="{{ index }}"
+  aria-expanded="false"
+  aria-controls="smd-subpanel-{{ index }}"
+>
+{%- endif -%}
+  {% if card_image != blank %}
+    <img
+      class="smd-card-image"
+      src="{{ card_image | image_url: width: 112, height: 112, crop: 'center' }}"
+      alt="{{ card_label | escape }}"
+      width="56"
+      height="56"
+      loading="lazy"
+    >
+  {% elsif collection.image != blank %}
+    <img
+      class="smd-card-image"
+      src="{{ collection.image | image_url: width: 112, height: 112, crop: 'center' }}"
+      alt="{{ card_label | escape }}"
+      width="56"
+      height="56"
+      loading="lazy"
+    >
+  {% endif %}
+
+  <div class="smd-card-content">
+    {% if card_logo != blank %}
+      <img
+        class="smd-card-logo"
+        src="{{ card_logo | image_url: height: 36 }}"
+        alt=""
+        loading="lazy"
+      >
+    {% endif %}
+    <span class="smd-card-label">{{ card_label | escape }}</span>
+  </div>
+
+  <span class="smd-card-chevron">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+  </span>
+{%- if direct_link != blank -%}
+</a>
+{%- else -%}
+</button>
+{%- endif -%}
+
+{%- if direct_link == blank -%}
+{%- comment %} Sub-panel: products from this collection {% endcomment -%}
+<div
+  class="smd-subpanel"
+  id="smd-subpanel-{{ index }}"
+  aria-hidden="true"
+>
+  <div class="smd-subpanel-header">
+    <button type="button" class="smd-back" data-smd-back="{{ index }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back
+    </button>
+  </div>
+
+  <div class="smd-subpanel-breadcrumb">
+    <span class="smd-breadcrumb-parent stellar-font-body">{{ section.settings.cards_heading | default: 'Shop by product line' }}</span>
+    <span class="smd-breadcrumb-sep">›</span>
+    <span class="smd-breadcrumb-current stellar-font-body">{{ card_label | escape }}</span>
+  </div>
+
+  <div class="smd-subpanel-body">
+    {% if collection != blank and collection.products.size > 0 %}
+      <ul class="smd-product-list">
+        {% for product in collection.products limit: block.settings.product_limit %}
+          <li class="smd-product-item">
+            <a href="{{ product.url }}" class="smd-product-link">
+              {% if product.featured_image != blank %}
+                <img
+                  class="smd-product-image"
+                  src="{{ product.featured_image | image_url: width: 88, height: 88, crop: 'center' }}"
+                  alt="{{ product.title | escape }}"
+                  width="44"
+                  height="44"
+                  loading="lazy"
+                >
+              {% else %}
+                <span class="smd-product-image"></span>
+              {% endif %}
+              <span class="smd-product-name stellar-font-body">{{ product.title }}</span>
+              <span class="smd-product-chevron">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </span>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+
+      {% if collection.products.size > block.settings.product_limit %}
+        <a href="{{ collection.url }}" class="smd-view-all stellar-font-body">
+          <span class="smd-view-all-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+          See all {{ card_label }}
+        </a>
+      {% endif %}
+    {% elsif collection == blank %}
+      <p class="stellar-font-body" style="opacity:0.5;font-size:0.875rem;padding:1rem 0;">No collection selected. Choose one in the theme editor.</p>
+    {% else %}
+      <p class="stellar-font-body" style="opacity:0.5;font-size:0.875rem;padding:1rem 0;">No products in this collection yet.</p>
+    {% endif %}
+  </div>
+</div>
+{%- endif -%}

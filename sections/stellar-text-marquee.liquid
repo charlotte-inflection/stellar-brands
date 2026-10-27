@@ -1,0 +1,223 @@
+{% comment %}
+  Stellar Text Marquee
+  Scrolling text ticker using the logo-list custom element (Flickity-based, works in editor).
+  Uses Rowdies font via stellar-font-styles snippet.
+{% endcomment %}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    --section-padding-top: {{ section.settings.padding_top }}px;
+    --section-padding-bottom: {{ section.settings.padding_bottom }}px;
+    {%- render 'section-variables', section: section -%}
+    --section-grid-gap: {{ section.settings.spacing }}px;
+  }
+
+  #shopify-section-{{ section.id }} .stellar-text-marquee__item {
+    font-family: 'Rowdies', cursive, system-ui, sans-serif;
+    font-size: {{ section.settings.font_size }}px;
+    font-weight: {{ section.settings.font_weight }};
+    line-height: 1.2;
+    white-space: nowrap;
+    letter-spacing: {{ section.settings.letter_spacing | divided_by: 100.0 }}em;
+  }
+
+  @media screen and (max-width: 767px) {
+    #shopify-section-{{ section.id }} .stellar-text-marquee__item {
+      font-size: {{ section.settings.font_size | times: 0.6 | round }}px;
+    }
+  }
+
+  {%- if section.settings.separator != blank -%}
+    #shopify-section-{{ section.id }} .stellar-text-marquee__item + .stellar-text-marquee__item::before {
+      content: '{{ section.settings.separator }}';
+      display: inline-block;
+      margin-right: var(--section-grid-gap);
+      opacity: 0.4;
+    }
+  {%- endif -%}
+</style>
+
+<section
+  class="{% if section.settings.color_scheme == 'dark' %}stellar-bg-dark{% elsif section.settings.color_scheme == 'deepspace' %}stellar-bg-deepspace{% elsif section.settings.color_scheme == 'light' %}stellar-bg-light{% elsif section.settings.color_scheme == 'sand' %}stellar-bg-sand{% elsif section.settings.color_scheme == 'skyblue' %}stellar-bg-skyblue{% endif %}"
+  style="padding-top:var(--section-padding-top);padding-bottom:var(--section-padding-bottom);overflow:hidden;{% if section.settings.color_scheme == 'custom' %}background:{{ section.settings.custom_bg_color }};color:{{ section.settings.custom_text_color }};{% endif %}"
+>
+  {%- if section.blocks.size > 0 -%}
+    <logo-list class="logo-list logo-list--{{ section.settings.direction }} flex items-center" data-speed="{{ section.settings.speed }}" data-direction="{{ section.settings.direction }}">
+      <div class="logo-bar inline-flex items-center flex-nowrap">
+        {%- for block in section.blocks -%}
+          <span class="stellar-text-marquee__item shrink-0" {{ block.shopify_attributes }}>
+            {{ block.settings.text }}
+          </span>
+        {%- endfor -%}
+      </div>
+    </logo-list>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Stellar Text Marquee",
+  "tag": "section",
+  "class": "stellar-text-marquee",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Marquee"
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left",
+      "label": "Direction"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 1,
+      "max": 30,
+      "step": 1,
+      "default": 5,
+      "unit": "x",
+      "label": "Speed"
+    },
+    {
+      "type": "range",
+      "id": "spacing",
+      "min": 20,
+      "max": 200,
+      "step": 5,
+      "default": 60,
+      "unit": "px",
+      "label": "Item spacing"
+    },
+    {
+      "type": "text",
+      "id": "separator",
+      "label": "Separator character",
+      "info": "Displayed between items. Leave blank for none.",
+      "default": "·"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "min": 12,
+      "max": 120,
+      "step": 2,
+      "default": 18,
+      "unit": "px",
+      "label": "Font size",
+      "info": "Scales to 60% on mobile."
+    },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Regular" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "400",
+      "label": "Font weight"
+    },
+    {
+      "type": "range",
+      "id": "letter_spacing",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "default": 5,
+      "unit": "%",
+      "label": "Letter spacing",
+      "info": "In hundredths of an em. 5 = 0.05em."
+    },
+    {
+      "type": "header",
+      "content": "Layout & style"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 16,
+      "unit": "px",
+      "label": "Padding top"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 16,
+      "unit": "px",
+      "label": "Padding bottom"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "options": [
+        { "value": "dark", "label": "Dark" },
+        { "value": "deepspace", "label": "Deep Space" },
+        { "value": "light", "label": "Light" },
+        { "value": "sand", "label": "Sand" },
+        { "value": "skyblue", "label": "Sky Blue" },
+        { "value": "custom", "label": "Custom" }
+      ],
+      "default": "skyblue"
+    },
+    {
+      "visible_if": "{{ section.settings.color_scheme == 'custom' }}",
+      "type": "color",
+      "id": "custom_bg_color",
+      "label": "Custom background",
+      "default": "#8DB8D4"
+    },
+    {
+      "visible_if": "{{ section.settings.color_scheme == 'custom' }}",
+      "type": "color",
+      "id": "custom_text_color",
+      "label": "Custom text",
+      "default": "#222222"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text_item",
+      "name": "Text item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "TRUSTED BY 45,000+ DAIRY LOVERS"
+        }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "presets": [
+    {
+      "name": "Stellar Text Marquee",
+      "blocks": [
+        { "type": "text_item", "settings": { "text": "TRUSTED BY 45,000+ DAIRY LOVERS" } },
+        { "type": "text_item", "settings": { "text": "NSF CERTIFIED" } },
+        { "type": "text_item", "settings": { "text": "4.9 ★ RATING" } },
+        { "type": "text_item", "settings": { "text": "60-DAY GUARANTEE" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

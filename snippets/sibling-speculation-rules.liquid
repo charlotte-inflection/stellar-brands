@@ -1,0 +1,113 @@
+{% comment %}
+  Smooths the Original <-> Ultra sibling switch while keeping it a real navigation
+  (so Skio and all selectors initialise fresh on the destination product).
+
+  - Prerenders sibling product pages on hover/pointerdown (Speculation Rules API).
+  - Opts this PDP into cross-document View Transitions. Both endpoints of the
+    navigation must opt in, so the morph only runs between PDPs that render this
+    snippet (the strength siblings) and never affects other navigations.
+  - Carries an active subscription (selling_plan) across the switch.
+
+  All features degrade to a normal navigation where unsupported.
+
+  @param {object} block - The sibling_picker block (reads block.settings.products)
+  @param {object} product - The current product
+{% endcomment %}
+
+{%- liquid
+  assign sibling_urls = ''
+  for sibling in block.settings.products
+    if sibling.id != product.id
+      assign sibling_urls = sibling_urls | append: sibling.url | append: ','
+    endif
+  endfor
+  assign sibling_urls = sibling_urls | split: ','
+-%}
+
+{%- if sibling_urls.size > 0 -%}
+  <script type="speculationrules">
+    {
+      "prerender": [
+        {
+          "urls": [{% for url in sibling_urls %}"{{ url }}"{% unless forloop.last %}, {% endunless %}{% endfor %}],
+          "eagerness": "moderate"
+        }
+      ]
+    }
+  </script>
+
+  {%- style -%}
+    @view-transition { navigation: auto; }
+
+    @supports (view-transition-name: none) {
+      .product__gallery-container { view-transition-name: milky-pdp-gallery; }
+      .product__info { view-transition-name: milky-pdp-buybox; }
+
+      ::view-transition-group(milky-pdp-gallery),
+      ::view-transition-group(milky-pdp-buybox) {
+        animation-duration: 0.28s;
+      }
+    }
+  {%- endstyle -%}
+
+  <script>
+    (function () {
+      // Carry an active subscription to the sibling, and prerender the exact
+      // destination so the switch stays instant. Falls back to a normal link.
+      if (window.__milkySiblingContinuity) return;
+      window.__milkySiblingContinuity = true;
+
+      var canPrerender = 'HTMLScriptElement' in window
+        && HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules');
+
+      function activeSellingPlan() {
+        var input = document.querySelector('input[name="selling_plan"]');
+        return input && input.value ? input.value : null;
+      }
+
+      function destination(link) {
+        try {
+          var url = new URL(link.href, window.location.origin);
+          var plan = activeSellingPlan();
+          if (plan) {
+            url.searchParams.set('selling_plan', plan);
+          } else {
+            url.searchParams.delete('selling_plan');
+          }
+          return url;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function prerender(href) {
+        if (!canPrerender) return;
+        try {
+          var tag = document.createElement('script');
+          tag.type = 'speculationrules';
+          tag.textContent = JSON.stringify({
+            prerender: [{ urls: [href], eagerness: 'immediate' }]
+          });
+          document.head.appendChild(tag);
+        } catch (e) {}
+      }
+
+      function sync(link) {
+        var url = destination(link);
+        if (!url) return;
+        var href = url.pathname + url.search;
+        if (link.getAttribute('href') !== href) {
+          link.setAttribute('href', href);
+          if (url.searchParams.has('selling_plan')) prerender(href);
+        }
+      }
+
+      document.querySelectorAll('.variant-picker a.label-swatch[href*="/products/"]').forEach(function (link) {
+        ['pointerenter', 'focus'].forEach(function (evt) {
+          link.addEventListener(evt, function () { sync(link); }, { passive: true });
+        });
+        link.addEventListener('pointerdown', function () { sync(link); }, { passive: true });
+      });
+    })();
+  </script>
+{%- endif -%}

@@ -1,0 +1,822 @@
+{% comment %}
+  Stellar Header
+  Combined desktop nav + mobile drawer (O Positiv-style).
+  Sticky cosmic header with logo, nav, search, account, cart.
+  Transparent on homepage/content pages, solid on scroll.
+  Solid #22162B background from the start on product pages, cart, Skio, and Our Story.
+  Includes optional announcement bar (solid, does not inherit scroll transition).
+  Sets --header-height CSS variable used by the base theme for content offset.
+  Mobile drawer uses collection_card, shop_link, and nav_link blocks.
+  @concept-theme: section-type="header"
+{% endcomment %}
+
+{{ 'stellar-mobile-menu.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  comment
+    Determine whether the header should start solid.
+  endcomment
+
+  assign header_solid = false
+  assign is_solid_override = false
+
+  if template.name == 'product'
+    assign header_solid = true
+    assign is_solid_override = true
+  endif
+
+  if template.name == 'cart'
+    assign header_solid = true
+    assign is_solid_override = true
+  endif
+
+  if request.path contains '/pages/ourstory' or request.path contains '/a/account'
+    assign header_solid = true
+    assign is_solid_override = true
+  endif
+
+  if request.path contains '/pages/about' or request.path contains '/pages/reviews'
+    assign header_solid = true
+    assign is_solid_override = true
+  endif
+
+  if template.name == 'collection' or template.name == 'list-collections'
+    assign header_solid = true
+    assign is_solid_override = true
+  endif
+
+  if section.settings.force_solid
+    assign header_solid = true
+  endif
+
+  if section.settings.force_transparent
+    assign header_solid = false
+  endif
+
+  comment
+    Announcement bar
+  endcomment
+  assign show_announcement = false
+  if section.settings.enable_announcement and section.settings.announcement_text != blank
+    assign show_announcement = true
+  endif
+
+  comment
+    Drawer colors
+  endcomment
+  assign drawer_bg = section.settings.drawer_bg_color | default: '#F6F7F8'
+  assign drawer_text = section.settings.drawer_text_color | default: '#222222'
+-%}
+
+<header
+  class="stellar-header-wrap {% if is_solid_override %}stellar-header-product{% else %}{% case section.settings.color_scheme %}{% when 'dark' %}stellar-bg-dark{% when 'deepspace' %}stellar-bg-deepspace{% when 'light' %}stellar-bg-light{% when 'sand' %}stellar-bg-sand{% when 'skyblue' %}stellar-bg-skyblue{% endcase %}{% endif %}{% if header_solid %} stellar-header-scrolled{% endif %}"
+  style="position:fixed;top:0;left:0;right:0;z-index:30;border-bottom:1px solid transparent;transition:background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;{% if is_solid_override %}color:{{ section.settings.product_text_color }};{% else %}{% if section.settings.color_scheme == 'custom' %}--stellar-header-bg:{{ section.settings.custom_bg_color }};{% endif %}color:{{ section.settings.custom_text_color }};{% endif %}"
+  id="stellar-header"
+  {% unless header_solid %}data-header-transparent{% endunless %}
+  {% if is_solid_override %}data-header-product{% endif %}
+>
+  {%- if show_announcement -%}
+    {%- liquid
+      assign announcement_count = 0
+      if section.settings.announcement_text != blank
+        assign announcement_count = announcement_count | plus: 1
+      endif
+      if section.settings.announcement_text_2 != blank
+        assign announcement_count = announcement_count | plus: 1
+      endif
+      if section.settings.announcement_text_3 != blank
+        assign announcement_count = announcement_count | plus: 1
+      endif
+    -%}
+    <div class="stellar-announcement-bar" style="background:{{ section.settings.announcement_bg }};color:{{ section.settings.announcement_text_color }};">
+      {%- if announcement_count > 1 -%}
+        <div class="stellar-announcement-slides" data-announcement-speed="{{ section.settings.announcement_speed | default: 5 }}">
+          {%- assign slide_i = 0 -%}
+          {%- if section.settings.announcement_text != blank -%}
+            <div class="stellar-announcement-slide{% if slide_i == 0 %} stellar-announcement-active{% endif %}">
+              {%- if section.settings.announcement_link != blank -%}
+                <a href="{{ section.settings.announcement_link }}" style="color:inherit;">{{ section.settings.announcement_text }}</a>
+              {%- else -%}
+                {{ section.settings.announcement_text }}
+              {%- endif -%}
+            </div>
+            {%- assign slide_i = slide_i | plus: 1 -%}
+          {%- endif -%}
+          {%- if section.settings.announcement_text_2 != blank -%}
+            <div class="stellar-announcement-slide{% if slide_i == 0 %} stellar-announcement-active{% endif %}">
+              {%- if section.settings.announcement_link_2 != blank -%}
+                <a href="{{ section.settings.announcement_link_2 }}" style="color:inherit;">{{ section.settings.announcement_text_2 }}</a>
+              {%- else -%}
+                {{ section.settings.announcement_text_2 }}
+              {%- endif -%}
+            </div>
+            {%- assign slide_i = slide_i | plus: 1 -%}
+          {%- endif -%}
+          {%- if section.settings.announcement_text_3 != blank -%}
+            <div class="stellar-announcement-slide{% if slide_i == 0 %} stellar-announcement-active{% endif %}">
+              {%- if section.settings.announcement_link_3 != blank -%}
+                <a href="{{ section.settings.announcement_link_3 }}" style="color:inherit;">{{ section.settings.announcement_text_3 }}</a>
+              {%- else -%}
+                {{ section.settings.announcement_text_3 }}
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        </div>
+      {%- elsif section.settings.announcement_scroll -%}
+        <div class="stellar-announcement-marquee">
+          <span class="stellar-announcement-marquee-text">{{ section.settings.announcement_text }}</span>
+          <span class="stellar-announcement-marquee-text" aria-hidden="true">{{ section.settings.announcement_text }}</span>
+        </div>
+      {%- else -%}
+        <div style="text-align:{{ section.settings.announcement_alignment }};">
+          {{ section.settings.announcement_text }}
+        </div>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  <div class="stellar-header-inner stellar-container" style="display:flex;align-items:center;justify-content:space-between;padding-top:1rem;padding-bottom:1rem;">
+    {%- comment %} Left: hamburger (mobile) {% endcomment -%}
+    <div class="stellar-header-mobile-only" style="display:flex;align-items:center;gap:1rem;">
+      <button
+        type="button"
+        class="stellar-mobile-menu-toggle"
+        style="display:none;background:none;border:none;color:currentColor;cursor:pointer;padding:0;"
+        aria-label="Menu"
+        aria-expanded="false"
+        id="smm-hamburger"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+
+    {%- comment %} Center: logo {% endcomment -%}
+    <a href="{{ routes.root_url }}" style="text-decoration:none;display:flex;align-items:center;">
+      {% if section.settings.logo != blank %}
+        <img src="{{ section.settings.logo | image_url: height: 80 }}" alt="{{ shop.name }}" width="{{ section.settings.logo.width }}" height="{{ section.settings.logo.height }}" style="height:{{ section.settings.logo_height }}px;width:auto;" loading="eager">
+      {% else %}
+        <span class="stellar-font-display" style="font-size:1.5rem;">{{ shop.name }}</span>
+      {% endif %}
+    </a>
+
+    {%- comment %} Desktop nav (hidden on mobile) {% endcomment -%}
+    <nav style="display:none;" class="stellar-header-desktop-nav">
+      <ul style="display:flex;gap:2rem;list-style:none;margin:0;padding:0;">
+        {% for link in linklists[section.settings.menu].links %}
+          <li>
+            <a href="{{ link.url }}" class="stellar-font-body" style="font-size:0.875rem;text-decoration:none;opacity:0.7;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
+              {{ link.title }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
+
+    {%- comment %} Right: account + cart (always visible) {% endcomment -%}
+    <div class="stellar-header-icons" style="display:flex;align-items:center;gap:1rem;">
+      {% if section.settings.show_search %}
+        <a href="{{ routes.search_url }}" class="stellar-header-desktop-nav" style="display:none;opacity:0.7;transition:opacity 0.2s;" aria-label="Search">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </a>
+      {% endif %}
+      {% if section.settings.show_account %}
+        <a href="{{ routes.account_url }}" style="opacity:0.7;transition:opacity 0.2s;" aria-label="Account">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </a>
+      {% endif %}
+      {% if settings.cart_type == 'drawer' %}
+        <button type="button" id="smm-cart-btn" aria-controls="CartDrawer" aria-expanded="false" style="position:relative;opacity:0.7;transition:opacity 0.2s;background:none;border:none;color:currentColor;cursor:pointer;padding:0;" aria-label="Cart">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          {% if cart.item_count > 0 %}
+            <span style="position:absolute;top:-6px;right:-6px;background:var(--stellar-skyblue);color:var(--stellar-black);font-size:0.625rem;font-weight:700;width:1rem;height:1rem;border-radius:50%;display:flex;align-items:center;justify-content:center;">{{ cart.item_count }}</span>
+          {% endif %}
+        </button>
+      {% else %}
+        <a href="{{ routes.cart_url }}" style="position:relative;opacity:0.7;transition:opacity 0.2s;" aria-label="Cart">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          {% if cart.item_count > 0 %}
+            <span style="position:absolute;top:-6px;right:-6px;background:var(--stellar-skyblue);color:var(--stellar-black);font-size:0.625rem;font-weight:700;width:1rem;height:1rem;border-radius:50%;display:flex;align-items:center;justify-content:center;">{{ cart.item_count }}</span>
+          {% endif %}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+{%- comment %} ============ MOBILE MENU OVERLAY ============ {% endcomment -%}
+<div class="smm-overlay" id="smm-overlay"></div>
+
+{%- comment %} ============ MOBILE MENU DRAWER ============ {% endcomment -%}
+<div
+  class="smm-drawer"
+  id="StellarMobileMenu"
+  aria-hidden="true"
+  role="dialog"
+  aria-label="Navigation menu"
+  style="--smm-bg: {{ drawer_bg }}; --smm-text: {{ drawer_text }};"
+>
+  <div class="smm-drawer-inner" style="display:flex;flex-direction:column;height:100%;position:relative;">
+    {%- comment %} Drawer header {% endcomment -%}
+    <div class="smm-drawer-header" style="display:flex;align-items:center;justify-content:flex-start;gap:1rem;">
+      <button type="button" class="smm-close" id="smm-close" aria-label="Close menu" style="background:none;border:none;padding:0;cursor:pointer;color:currentColor;display:flex;align-items:center;justify-content:center;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <span class="smm-section-heading stellar-font-body">
+        {{ section.settings.drawer_heading | default: 'Shop by product line' }}
+      </span>
+    </div>
+
+    {%- comment %} Drawer body (scrollable) {% endcomment -%}
+    <div class="smm-body">
+
+      {%- comment %} Collection cards {% endcomment -%}
+      {%- assign has_cards = false -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'collection_card' -%}
+          {%- unless has_cards -%}
+            <div class="smm-cards">
+          {%- endunless -%}
+          {%- assign has_cards = true -%}
+
+          {%- liquid
+            assign collection = collections[block.settings.collection]
+            assign card_bg = block.settings.card_bg_color | default: '#f0e8f5'
+            assign card_text = block.settings.card_text_color | default: '#222222'
+            assign card_image = block.settings.card_image
+            assign card_logo = block.settings.card_logo
+            assign card_label = block.settings.card_label | default: collection.title
+          -%}
+
+          {%- assign card_url = block.settings.card_url | default: collection.url -%}
+          <a
+            href="{{ card_url | default: '#' }}"
+            class="smm-card stellar-font-body"
+            style="--smm-card-bg: {{ card_bg }}; --smm-card-text: {{ card_text }};text-decoration:none;"
+            {{ block.shopify_attributes }}
+          >
+            {% if card_image != blank %}
+              <img class="smm-card-image" src="{{ card_image | image_url: width: 112, height: 112, crop: 'center' }}" alt="{{ card_label | escape }}" width="56" height="56" loading="lazy">
+            {% elsif collection.image != blank %}
+              <img class="smm-card-image" src="{{ collection.image | image_url: width: 112, height: 112, crop: 'center' }}" alt="{{ card_label | escape }}" width="56" height="56" loading="lazy">
+            {% endif %}
+            <div class="smm-card-content">
+              {% if card_logo != blank %}
+                <img class="smm-card-logo" src="{{ card_logo | image_url: height: 36 }}" alt="" loading="lazy">
+              {% endif %}
+              <span class="smm-card-label">{{ card_label | escape }}</span>
+            </div>
+            <span class="smm-card-chevron">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </a>
+
+          {%- comment -%} Sub-panel disabled: cards are styled links for now.
+          {% unless block.settings.card_url != blank %}
+          <div class="smm-subpanel" id="smm-subpanel-{{ forloop.index }}" aria-hidden="true">
+            <div class="smm-subpanel-header">
+              <button type="button" class="smm-back" data-smm-back="{{ forloop.index }}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                Back
+              </button>
+            </div>
+            <div class="smm-subpanel-breadcrumb">
+              <span>{{ section.settings.drawer_heading | default: 'Shop by product line' }}</span>
+              <span>›</span>
+              <span>{{ card_label | escape }}</span>
+            </div>
+            <div class="smm-subpanel-body">
+              {% if collection != blank and collection.products.size > 0 %}
+                <ul class="smm-product-list">
+                  {% for product in collection.products limit: block.settings.product_limit %}
+                    <li class="smm-product-item">
+                      <a href="{{ product.url }}" class="smm-product-link">
+                        {% if product.featured_image != blank %}
+                          <img class="smm-product-image" src="{{ product.featured_image | image_url: width: 88, height: 88, crop: 'center' }}" alt="{{ product.title | escape }}" width="44" height="44" loading="lazy">
+                        {% else %}
+                          <span class="smm-product-image"></span>
+                        {% endif %}
+                        <span class="smm-product-name stellar-font-body">{{ product.title }}</span>
+                        <span class="smm-product-chevron">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                        </span>
+                      </a>
+                    </li>
+                  {% endfor %}
+                </ul>
+                {% if collection.products.size > block.settings.product_limit %}
+                  <a href="{{ collection.url }}" class="smm-view-all stellar-font-body">
+                    <span class="smm-view-all-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+                    See all {{ card_label }}
+                  </a>
+                {% endif %}
+              {% elsif collection == blank %}
+                <p class="stellar-font-body" style="opacity:0.5;font-size:0.875rem;padding:1rem 0;">No collection selected. Choose one in the theme editor.</p>
+              {% else %}
+                <p class="stellar-font-body" style="opacity:0.5;font-size:0.875rem;padding:1rem 0;">No products in this collection yet.</p>
+              {% endif %}
+            </div>
+          </div>
+          {% endunless %}
+          {%- endcomment -%}
+
+        {%- endif -%}
+      {%- endfor -%}
+      {%- if has_cards -%}
+        </div>
+      {%- endif -%}
+
+      {%- comment %} Shop links with optional badges {% endcomment -%}
+      {%- assign has_shop_links = false -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'shop_link' and block.settings.link != blank -%}
+          {%- unless has_shop_links -%}
+            <ul class="smm-links">
+          {%- endunless -%}
+          {%- assign has_shop_links = true -%}
+          <li class="smm-link-item" {{ block.shopify_attributes }}>
+            <a href="{{ block.settings.link }}" class="stellar-font-body">
+              {{ block.settings.link_label | default: block.settings.link.title | escape }}
+            </a>
+            {%- if block.settings.badge_text != blank -%}
+              <span class="stellar-badge stellar-badge-{{ block.settings.badge_color | default: 'purple' }}">
+                {{ block.settings.badge_text | escape }}
+              </span>
+            {%- endif -%}
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+      {%- if has_shop_links -%}
+        </ul>
+      {%- endif -%}
+
+      {%- comment %} Divider between shop links and nav links {% endcomment -%}
+      {%- assign has_nav_links = false -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'nav_link' and block.settings.link != blank -%}
+          {%- assign has_nav_links = true -%}
+          {%- break -%}
+        {%- endif -%}
+      {%- endfor -%}
+      {%- if has_shop_links and has_nav_links -%}
+        <hr class="smm-divider">
+      {%- endif -%}
+
+      {%- comment %} Navigation links {% endcomment -%}
+      {%- if has_nav_links -%}
+        <ul class="smm-nav-links stellar-font-body">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'nav_link' and block.settings.link != blank -%}
+              <li {{ block.shopify_attributes }}>
+                <a href="{{ block.settings.link }}">
+                  {{ block.settings.link_label | default: block.settings.link.title | escape }}
+                </a>
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Product / Override pages: always solid */
+  #stellar-header.stellar-header-product {
+    background: {{ section.settings.product_bg_color }} !important;
+    color: {{ section.settings.product_text_color }} !important;
+    border-bottom-color: hsla(0,0%,100%,0.05) !important;
+    box-shadow: 0 1px 12px hsla(0,0%,0%,0.15);
+  }
+
+  /* Transparent state */
+  #stellar-header[data-header-transparent] {
+    background: transparent !important;
+    border-bottom-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  /* Scrolled / solid state */
+  #stellar-header.stellar-header-scrolled:not(.stellar-header-product) {
+    border-bottom-color: hsla(0,0%,100%,0.05) !important;
+    box-shadow: 0 1px 12px hsla(0,0%,0%,0.15);
+  }
+
+  @media (min-width: 768px) {
+    .stellar-header-inner {
+      display: grid !important;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      justify-content: initial;
+    }
+    .stellar-header-mobile-only { display: none !important; }
+    .stellar-header-desktop-nav {
+      display: block !important;
+      justify-self: center;
+    }
+    .stellar-header-icons { justify-self: end; }
+  }
+  @media (max-width: 767px) {
+    .stellar-mobile-menu-toggle { display: block !important; }
+  }
+
+  /* --- Announcement bar --- */
+  .stellar-announcement-bar {
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    padding: 0.5rem 1rem;
+  }
+  .stellar-announcement-slides {
+    position: relative;
+    text-align: center;
+  }
+  .stellar-announcement-slide {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+  }
+  .stellar-announcement-slide.stellar-announcement-active {
+    opacity: 1;
+    position: relative;
+    pointer-events: auto;
+  }
+  .stellar-announcement-bar a {
+    color: inherit;
+    text-decoration: underline;
+  }
+  .stellar-announcement-marquee {
+    overflow: hidden;
+    white-space: nowrap;
+    display: flex;
+  }
+  .stellar-announcement-marquee-text {
+    display: inline-block;
+    flex-shrink: 0;
+    padding-right: 4rem;
+    animation: stellar-marquee 20s linear infinite;
+  }
+  @keyframes stellar-marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+
+  /* --- Force Menu To Front --- */
+  .smm-overlay {
+    z-index: 100 !important;
+  }
+  .smm-drawer {
+    z-index: 101 !important;
+  }
+
+  {% if is_solid_override %}
+  /* Solid-start pages: push main content below the fixed header.
+     Transparent pages handle their own offset via hero section padding. */
+  .main-content {
+    padding-top: var(--header-height, 100px);
+  }
+  {% endif %}
+</style>
+
+<script>
+  (function() {
+    var header = document.getElementById('stellar-header');
+    var hamburger = document.getElementById('smm-hamburger');
+    var drawer = document.getElementById('StellarMobileMenu');
+    var overlay = document.getElementById('smm-overlay');
+    var closeBtn = document.getElementById('smm-close');
+    var cartBtn = document.getElementById('smm-cart-btn');
+    if (!header) return;
+
+    /* --- Announcement cycling --- */
+    var announcementSlides = header.querySelectorAll('.stellar-announcement-slide');
+    if (announcementSlides.length > 1) {
+      var slidesContainer = header.querySelector('.stellar-announcement-slides');
+      var cycleSpeed = parseInt(slidesContainer.getAttribute('data-announcement-speed') || '5', 10) * 1000;
+      var currentSlide = 0;
+      setInterval(function() {
+        announcementSlides[currentSlide].classList.remove('stellar-announcement-active');
+        currentSlide = (currentSlide + 1) % announcementSlides.length;
+        announcementSlides[currentSlide].classList.add('stellar-announcement-active');
+      }, cycleSpeed);
+    }
+
+    /* --- Set --header-height for base theme CSS --- */
+    function updateHeaderHeight() {
+      var h = header.getBoundingClientRect().height;
+      document.documentElement.style.setProperty('--header-height', h.toFixed(1) + 'px');
+    }
+    updateHeaderHeight();
+    window.addEventListener('resize', updateHeaderHeight);
+    if (window.ResizeObserver) {
+      new ResizeObserver(updateHeaderHeight).observe(header);
+    }
+
+    /* --- Mobile menu open / close --- */
+    function openMenu() {
+      if (!drawer) return;
+      drawer.setAttribute('aria-hidden', 'false');
+      overlay.classList.add('smm-visible');
+      document.body.classList.add('smm-open');
+      if (hamburger) hamburger.setAttribute('aria-expanded', 'true');
+      /* Force header solid while menu is open */
+      header.removeAttribute('data-header-transparent');
+      header.classList.add('stellar-header-scrolled');
+    }
+
+    function closeMenu() {
+      if (!drawer) return;
+      /* Collapse any open sub-panels */
+      drawer.querySelectorAll('.smm-subpanel-open').forEach(function(p) {
+        p.classList.remove('smm-subpanel-open');
+        p.setAttribute('aria-hidden', 'true');
+      });
+      drawer.querySelectorAll('[data-smm-card][aria-expanded="true"]').forEach(function(c) {
+        c.setAttribute('aria-expanded', 'false');
+      });
+      drawer.setAttribute('aria-hidden', 'true');
+      overlay.classList.remove('smm-visible');
+      document.body.classList.remove('smm-open');
+      if (hamburger) hamburger.setAttribute('aria-expanded', 'false');
+      /* Restore scroll-based header state */
+      window.dispatchEvent(new Event('scroll'));
+    }
+
+    function isMenuOpen() {
+      return drawer && drawer.getAttribute('aria-hidden') === 'false';
+    }
+
+    /* Public API */
+    window.StellarMobileMenu = { open: openMenu, close: closeMenu };
+
+    /* Hamburger toggle */
+    if (hamburger && drawer) {
+      hamburger.addEventListener('click', function() {
+        isMenuOpen() ? closeMenu() : openMenu();
+      });
+    }
+
+    /* Close button */
+    if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+
+    /* Overlay click */
+    if (overlay) overlay.addEventListener('click', closeMenu);
+
+    /* Escape key */
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && isMenuOpen()) {
+        var openPanel = drawer.querySelector('.smm-subpanel-open');
+        if (openPanel) {
+          closeSubpanel(openPanel);
+        } else {
+          closeMenu();
+        }
+      }
+    });
+
+    /* Cart button: close menu first, then let cart drawer open */
+    if (cartBtn) {
+      cartBtn.addEventListener('click', function() {
+        if (isMenuOpen()) {
+          closeMenu();
+          /* Small delay so the menu close animation completes before cart opens */
+          /* The cart drawer event will fire normally via the aria-controls binding */
+        }
+      }, true); /* useCapture: run before the theme's cart drawer handler */
+    }
+
+    /* --- Sub-panel navigation --- */
+    if (drawer) {
+      drawer.querySelectorAll('[data-smm-card]').forEach(function(card) {
+        card.addEventListener('click', function() {
+          var idx = card.getAttribute('data-smm-card');
+          var panel = document.getElementById('smm-subpanel-' + idx);
+          if (!panel) return;
+          card.setAttribute('aria-expanded', 'true');
+          panel.classList.add('smm-subpanel-open');
+          panel.setAttribute('aria-hidden', 'false');
+        });
+      });
+
+      drawer.querySelectorAll('[data-smm-back]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var panel = btn.closest('.smm-subpanel');
+          if (panel) closeSubpanel(panel);
+        });
+      });
+    }
+
+    function closeSubpanel(panel) {
+      panel.classList.remove('smm-subpanel-open');
+      panel.setAttribute('aria-hidden', 'true');
+      var idx = panel.id.replace('smm-subpanel-', '');
+      var card = drawer.querySelector('[data-smm-card="' + idx + '"]');
+      if (card) card.setAttribute('aria-expanded', 'false');
+    }
+
+    /* --- Scroll behavior (desktop + mobile) --- */
+    if (header.hasAttribute('data-header-product')) return;
+    var startedSolid = !header.hasAttribute('data-header-transparent');
+    if (startedSolid) return;
+
+    var threshold = {{ section.settings.scroll_threshold }};
+    function onScroll() {
+      /* Keep header solid while menu is open */
+      if (isMenuOpen()) {
+        header.classList.add('stellar-header-scrolled');
+        return;
+      }
+      if (window.scrollY > threshold) {
+        header.removeAttribute('data-header-transparent');
+        header.classList.add('stellar-header-scrolled');
+      } else {
+        header.setAttribute('data-header-transparent', '');
+        header.classList.remove('stellar-header-scrolled');
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Stellar Header",
+  "tag": "section",
+  "class": "stellar-header",
+  "settings": [
+    { "type": "image_picker", "id": "logo", "label": "Logo image" },
+    { "type": "range", "id": "logo_height", "label": "Logo height", "min": 20, "max": 60, "step": 2, "default": 32, "unit": "px" },
+    { "type": "link_list", "id": "menu", "label": "Desktop navigation menu", "default": "main-menu", "info": "Used for the inline desktop nav links." },
+    { "type": "checkbox", "id": "show_search", "label": "Show search icon (desktop)", "default": true },
+    { "type": "checkbox", "id": "show_account", "label": "Show account icon", "default": true },
+    { "type": "header", "content": "Announcement bar" },
+    { "type": "checkbox", "id": "enable_announcement", "label": "Enable announcement bar", "default": false },
+    { "type": "inline_richtext", "id": "announcement_text", "label": "Text" },
+    {
+      "visible_if": "{{ section.settings.enable_announcement and section.settings.announcement_scroll == false }}",
+      "type": "select",
+      "id": "announcement_alignment",
+      "label": "Text alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "visible_if": "{{ section.settings.enable_announcement }}",
+      "type": "checkbox",
+      "id": "announcement_scroll",
+      "label": "Scroll text",
+      "default": false
+    },
+    {
+      "visible_if": "{{ section.settings.enable_announcement }}",
+      "type": "color",
+      "id": "announcement_bg",
+      "label": "Background color",
+      "default": "#000000"
+    },
+    {
+      "visible_if": "{{ section.settings.enable_announcement }}",
+      "type": "color",
+      "id": "announcement_text_color",
+      "label": "Text color",
+      "default": "#FFFFFF"
+    },
+    {
+      "visible_if": "{{ section.settings.enable_announcement }}",
+      "type": "url",
+      "id": "announcement_link",
+      "label": "Message 1 link",
+      "info": "Optional. Makes the first announcement a link."
+    },
+    {
+      "visible_if": "{{ section.settings.enable_announcement }}",
+      "type": "inline_richtext",
+      "id": "announcement_text_2",
+      "label": "Message 2"
+    },
+    {
+      "visible_if": "{{ section.settings.enable_announcement }}",
+      "type": "url",
+      "id": "announcement_link_2",
+      "label": "Message 2 link"
+    },
+    {
+      "visible_if": "{{ section.settings.enable_announcement }}",
+      "type": "inline_richtext",
+      "id": "announcement_text_3",
+      "label": "Message 3"
+    },
+    {
+      "visible_if": "{{ section.settings.enable_announcement }}",
+      "type": "url",
+      "id": "announcement_link_3",
+      "label": "Message 3 link"
+    },
+    {
+      "visible_if": "{{ section.settings.enable_announcement }}",
+      "type": "range",
+      "id": "announcement_speed",
+      "label": "Cycle speed (seconds)",
+      "min": 2,
+      "max": 15,
+      "step": 1,
+      "default": 5,
+      "unit": "s",
+      "info": "How long each message displays before cycling. Only applies when multiple messages are set."
+    },
+    { "type": "header", "content": "Scroll behavior" },
+    { "type": "paragraph", "content": "Product and cart pages always use a solid background. On all other pages, the header is transparent on load and fades to solid on scroll." },
+    { "type": "range", "id": "scroll_threshold", "label": "Scroll distance before solid", "min": 10, "max": 300, "step": 10, "default": 50, "unit": "px" },
+    { "type": "checkbox", "id": "force_solid", "label": "Always start solid", "default": false },
+    { "type": "checkbox", "id": "force_transparent", "label": "Always start transparent", "default": false },
+    { "type": "header", "content": "Product / cart page style" },
+    { "type": "color", "id": "product_bg_color", "label": "Solid page background", "default": "#22162B" },
+    { "type": "color", "id": "product_text_color", "label": "Solid page text color", "default": "#F6F7F8" },
+    { "type": "header", "content": "Non-product page style" },
+    { "type": "select", "id": "color_scheme", "label": "Color scheme (scrolled state)", "options": [
+      { "value": "dark", "label": "Dark" },
+      { "value": "deepspace", "label": "Deep Space" },
+      { "value": "light", "label": "Light" },
+      { "value": "sand", "label": "Sand" },
+      { "value": "skyblue", "label": "Sky Blue" },
+      { "value": "custom", "label": "Custom" }
+    ], "default": "dark" },
+    {
+      "visible_if": "{{ section.settings.color_scheme == 'custom' }}",
+      "type": "color", "id": "custom_bg_color", "label": "Custom background", "default": "#222222"
+    },
+    {
+      "visible_if": "{{ section.settings.color_scheme == 'custom' }}",
+      "type": "color", "id": "custom_text_color", "label": "Custom text color", "default": "#F6F7F8"
+    },
+    { "type": "header", "content": "Mobile menu drawer" },
+    { "type": "text", "id": "drawer_heading", "label": "Drawer heading", "default": "Shop by product line" },
+    { "type": "color", "id": "drawer_bg_color", "label": "Drawer background", "default": "#F6F7F8" },
+    { "type": "color", "id": "drawer_text_color", "label": "Drawer text color", "default": "#222222" }
+  ],
+  "blocks": [
+    {
+      "type": "collection_card",
+      "name": "Product line card",
+      "limit": 6,
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "text", "id": "card_label", "label": "Card label", "info": "Defaults to the collection title if left blank." },
+        { "type": "url", "id": "card_url", "label": "Direct link", "info": "If set, the card links directly to this URL instead of expanding a sub-panel." },
+        { "type": "image_picker", "id": "card_image", "label": "Card image", "info": "Shown at 56x56. Falls back to the collection image." },
+        { "type": "image_picker", "id": "card_logo", "label": "Card logo / icon", "info": "Optional brand logo shown above the label." },
+        { "type": "color", "id": "card_bg_color", "label": "Card background", "default": "#f0e8f5" },
+        { "type": "color", "id": "card_text_color", "label": "Card text color", "default": "#222222" },
+        { "type": "range", "id": "product_limit", "label": "Products to show", "min": 3, "max": 20, "step": 1, "default": 10, "info": "How many products from this collection appear when the card is expanded." }
+      ]
+    },
+    {
+      "type": "shop_link",
+      "name": "Shop link",
+      "limit": 8,
+      "settings": [
+        { "type": "url", "id": "link", "label": "Link" },
+        { "type": "text", "id": "link_label", "label": "Link label", "info": "Defaults to the link title if left blank." },
+        { "type": "text", "id": "badge_text", "label": "Badge text", "info": "Optional inline tag, e.g. 'Save 20%' or 'New'." },
+        { "type": "select", "id": "badge_color", "label": "Badge color", "options": [
+          { "value": "green", "label": "Green" },
+          { "value": "purple", "label": "Purple" },
+          { "value": "skyblue", "label": "Sky Blue" },
+          { "value": "orange", "label": "Orange" },
+          { "value": "gold", "label": "Gold" }
+        ], "default": "purple" }
+      ]
+    },
+    {
+      "type": "nav_link",
+      "name": "Navigation link",
+      "limit": 10,
+      "settings": [
+        { "type": "url", "id": "link", "label": "Link" },
+        { "type": "text", "id": "link_label", "label": "Link label", "info": "Defaults to the link title if left blank." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Stellar Header",
+      "blocks": [
+        { "type": "collection_card" },
+        { "type": "collection_card" },
+        { "type": "shop_link" },
+        { "type": "shop_link" },
+        { "type": "nav_link" },
+        { "type": "nav_link" }
+      ]
+    }
+  ]
+}
+{% endschema %}
