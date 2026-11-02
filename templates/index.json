@@ -1,1 +1,238 @@
-{"sections":{"blog-posts-collage":{"type":"blog-posts-collage","disabled":true,"settings":{"blog":"","post_limit":3,"show_view_all":true,"image_ratio":"landscape","show_tags":true,"show_date":true,"show_comments":true,"show_author":false,"show_excerpt":true,"heading":"Latest Stories","heading_size":"title-md","heading_alignment":"text-left md:items-end md:flex-row","heading_tag":"h2","subheading":"","description":"","highlighted_text":"none","highlighted_scribble":"circle","highlighted_reveal":false,"color_text":"","color_background":"","gradient_background":"","color_highlight":"","gradient_highlight":"","color_button_text":"","color_button_background":"","color_button_gradient":"","padding_top":100,"padding_bottom":100,"divider":false,"full_width":false,"rounded":false}},"stellar_scrolling_marquee_NXHw9i":{"type":"stellar-scrolling-marquee","disabled":true,"name":"Stellar Scrolling Marquee","settings":{"text":"","padding_top":16,"padding_bottom":16,"color_scheme":"skyblue","custom_bg_color":"#8db8d4","custom_text_color":"#222222","bg_texture":"none"}},"stellar_hero_banner_97hpeQ":{"type":"stellar-hero-banner","blocks":{"heading_HLMPUH":{"type":"heading","settings":{"text":"Enjoy Dairy Without Discomfort","size":"h2","heading_font":"default","line_break_after":"Dairy","highlight_text":"","highlight_weight":"700","highlight_color":"#655dc6"}},"text_RxYVHJ":{"type":"text","settings":{"content":"<p>Ultra powerful lactase supplements designed to travel with you.<br\/><br\/>★★★★★ 4.9 stars | 100k+ members<\/p>","color":"#f6f7f8"}},"button_pEdxQi":{"type":"button","settings":{"text":"Shop Now","url":"shopify:\/\/products\/milky-ultra","style":"primary","bg_color":"","text_color":""}},"button_TjaAPk":{"type":"button","settings":{"text":"Take the Quiz","url":"shopify:\/\/pages\/quiz","style":"outline","bg_color":"","text_color":""}}},"block_order":["heading_HLMPUH","text_RxYVHJ","button_pEdxQi","button_TjaAPk"],"disabled":true,"name":"Stellar Hero Banner","settings":{"hero_image":"shopify:\/\/shop_images\/5_a433dc39-609e-460c-bbcf-6aa1dd79426b.png","hero_image_alt":"Product image","hero_video_autoplay":false,"image_position":"right","background_image":"shopify:\/\/shop_images\/572471.jpg","overlay_color":"#ffffff","overlay_opacity":85,"section_height":"auto","desktop_height":90,"mobile_height":80,"desktop_object_fit":"cover","desktop_focal_x":50,"desktop_focal_y":50,"mobile_object_fit":"cover","mobile_focal_x":50,"mobile_focal_y":50,"mobile_group_gap":36,"padding_top":120,"padding_bottom":60,"color_scheme":"dark","custom_bg_color":"#222222","custom_text_color":"#f6f7f8","bg_texture":"constellation","reveal_animation":"fade_up"}},"stellar_hero_banner_PhaqKL":{"type":"stellar-hero-banner","blocks":{"heading_9FAfJ8":{"type":"heading","settings":{"text":"Introducing Nova","size":"h1","heading_font":"default","line_break_after":"","highlight_text":"","highlight_weight":"700","highlight_color":"#655dc6"}},"text_hLVUPV":{"type":"text","settings":{"content":"<p>Powerful heartburn relief designed to travel with you. For people who love bold, spicy foods.<br\/><\/p>","color":"#ffffff"}},"button_taMwh9":{"type":"button","settings":{"text":"Shop Now","url":"shopify:\/\/products\/nova","style":"primary","bg_color":"","text_color":""}},"button_Ma9DWr":{"type":"button","settings":{"text":"Learn More","url":"shopify:\/\/products\/nova","style":"outline","bg_color":"","text_color":""}}},"block_order":["heading_9FAfJ8","text_hLVUPV","button_taMwh9","button_Ma9DWr"],"name":"Stellar Hero Banner","settings":{"hero_image_alt":"Product image","hero_video_autoplay":false,"image_position":"right","background_image":"shopify:\/\/shop_images\/DSC01450-Edit.jpg","background_image_mobile":"shopify:\/\/shop_images\/DSC01460-Edit.png","overlay_color":"#1c142a","overlay_opacity":90,"section_height":"fixed","desktop_height":90,"mobile_height":90,"desktop_object_fit":"cover","desktop_focal_x":50,"desktop_focal_y":50,"mobile_object_fit":"cover","mobile_focal_x":50,"mobile_focal_y":50,"mobile_group_gap":352,"padding_top":140,"padding_bottom":84,"color_scheme":"dark","custom_bg_color":"#222222","custom_text_color":"#f6f7f8","bg_texture":"constellation","reveal_animation":"fade_up"}},"stellar_press_logos_8BkqpD":{"type":"stellar-press-logos","blocks":{"logo_yVbBD8":{"type":"logo","settings":{"name":"New York Times","logo":"shopify:\/\/shop_images\/buzzfeed-logo-black-and-white.png"}},"logo_YGjFWE":{"type":"logo","settings":{"name":"Eater","logo":"shopify:\/\/shop_images\/eater.svg"}},"logo_WdTDaN":{"type":"logo","settings":{"name":"NY Times","logo":"shopify:\/\/shop_images\/79-791089_press-logos-newyorktimes-logo-new-york-times-800x587-1.png"}}},"block_order":["logo_yVbBD8","logo_YGjFWE","logo_WdTDaN"],"disabled":true,"name":"Stellar Press Logos","settings":{"padding_top":40,"padding_bottom":8,"color_scheme":"dark","custom_bg_color":"#22162b","custom_text_color":"#f6f7f8","bg_texture":"none","reveal_animation":"stagger"}},"stellar_limited_editions_RjCpn7":{"type":"stellar-limited-editions","blocks":{"edition_K8mBzV":{"type":"edition","settings":{"name":"Milky Ultra | 21,000 FCC | $39 | Ultra strength lactase support for those with severe lactose intolerance.","status":"NEW","image":"shopify:\/\/shop_images\/Ultra_BH_2db24377-df0a-4b7c-bc2e-dc071abf75ae.png","product":"milky-ultra"}},"edition_UYcgKT":{"type":"edition","settings":{"name":"Milky Original | 10,800 FCC | $29 | Thin, pocketable support for your everyday dairy needs.","status":"SOLD OUT","product":"milky-original"}}},"block_order":["edition_K8mBzV","edition_UYcgKT"],"disabled":true,"name":"Stellar Limited Editions","settings":{"heading":"Two Strengths, One Mission","subheading":"Two different enzyme strengths to fit your lifestyle and health needs.","padding_top":52,"padding_bottom":36,"color_scheme":"deepspace","custom_bg_color":"#22162b","custom_text_color":"#f6f7f8","bg_texture":"none","reveal_animation":"none"}},"stellar_nova_banner_XP4Qmr":{"type":"stellar-nova-banner","disabled":true,"name":"Stellar Nova Banner","settings":{"visible":true,"eyebrow":"Coming Soon","heading":"Relief from Heartburn & Acid Indigestion","description":"Meet Nova. Engineered for people who love bold, spicy, and rich foods, but hate the aftermath. Our innovative, portable sleeve design makes this the perfect heartburn relief for on the go.","waitlist_count":"Pre-order so you don't miss the first drop.","cta_text":"Shop Now","cta_url":"shopify:\/\/products\/nova","cta2_text":"Learn More","cta2_url":"shopify:\/\/products\/nova","image":"shopify:\/\/shop_images\/DSC01460-Edit.jpg","padding_top":80,"padding_bottom":80,"color_scheme":"dark","custom_bg_color":"#222222","custom_text_color":"#f6f7f8","bg_texture":"none","reveal_animation":"none"}},"stellar_product_comparison_KwkyTx":{"type":"stellar-product-comparison","blocks":{"button_ycVbRn":{"type":"button","settings":{"text":"Shop Now","url":"shopify:\/\/products\/milky-card","style":"primary"}},"product_card_aTVRnx":{"type":"product_card","settings":{"product":"milky-card","image":"shopify:\/\/shop_images\/Original_Cards.jpg","image_link":"shopify:\/\/products\/milky-card","badge":"none","detail_1":"10,800-21,000 FCC","detail_2":"Slim & portable for everyday dairy needs.","price":"","button_text":""}},"product_card_wgRq8d":{"type":"product_card","disabled":true,"settings":{"product":"milky-ultra","image":"shopify:\/\/shop_images\/Ultra_Cards.png","image_link":"shopify:\/\/products\/milky-card","badge":"none","detail_1":"21,000 FCC","detail_2":"Ultra strength support for heavy dairy meals.","price":"","button_text":""}}},"block_order":["button_ycVbRn","product_card_aTVRnx","product_card_wgRq8d"],"name":"Stellar Product Comp","settings":{"eyebrow":"Meet Milky","heading":"Enjoy Dairy Without Discomfort","subheading":"Two different enzyme strengths to fit your lifestyle and health needs.","line_break_after":"Dairy","highlight_text":"","highlight_weight":"inherit","highlight_color":"#655dc6","mobile_single_row":true,"padding_top":4,"padding_bottom":4,"color_scheme":"custom","custom_bg_color":"#22162b","custom_text_color":"#f6f7f8","bg_texture":"nebula","reveal_animation":"fade_up"}},"stellar_ingredient_spotlight_FiJMzh":{"type":"stellar-ingredient-spotlight","blocks":{"ingredient_MQzznU":{"type":"ingredient","settings":{"media_type":"image","icon":"molecule","image":"shopify:\/\/shop_images\/DSC02012-Edit.jpg","name":"Stronger Than Lactaid","fact":"Up to seven times stronger than Lactaid, with 10,800–21,000 FCC units per tablet.","description":""}},"ingredient_W6jajD":{"type":"ingredient","settings":{"media_type":"image","icon":"molecule","image":"shopify:\/\/shop_images\/DSC00838-Edit.jpg","name":"Sleek, Pocketable Design","fact":"Intentionally engineered to be something you actually want to carry. Pocketable, sleek, and intentional.","description":""}},"ingredient_8pHTyb":{"type":"ingredient","settings":{"media_type":"image","icon":"molecule","image":"shopify:\/\/shop_images\/Ji_Su_Photo.jpg","name":"100% Happiness Guarantee","fact":"We think you will love Milky. If you don't, reach out to us and we will make it right.","description":""}}},"block_order":["ingredient_MQzznU","ingredient_W6jajD","ingredient_8pHTyb"],"name":"Stellar Ingredients","settings":{"eyebrow":"why milky","heading":"Dairy Relief Without Compromise","subheading":"Designed to be stronger, sleeker, and more portable than any other lactase enzyme.","line_break_after":"Relief","highlight_text":"","highlight_weight":"inherit","highlight_color":"#655dc6","columns":"3","mobile_scroll":true,"padding_top":4,"padding_bottom":4,"color_scheme":"custom","custom_bg_color":"#f6f7f8","custom_text_color":"#222222","caption_color":"#2a1e3b","bg_texture":"none","reveal_animation":"fade_up"}},"stellar_trust_signals_LmjYzh":{"type":"stellar-trust-signals","blocks":{"signal_jKBFBt":{"type":"signal","settings":{"title":"3rd Party Tested","description":"ISO 17025 lab verification.","icon_emoji":"🧪"}},"signal_qUB6LN":{"type":"signal","settings":{"title":"FODMAP-Free","description":"Safe for sensitive digestive systems.","icon_emoji":"🍽"}},"signal_YtBwfE":{"type":"signal","settings":{"title":"Vegan","description":"No animal byproducts.","icon_emoji":"🌿"}},"signal_6QzjAX":{"type":"signal","settings":{"title":"Gluten-Free","description":"Certified gluten free.","icon_emoji":"🌾"}}},"block_order":["signal_jKBFBt","signal_qUB6LN","signal_YtBwfE","signal_6QzjAX"],"disabled":true,"name":"Stellar Trust Signals","settings":{"padding_top":4,"padding_bottom":4,"color_scheme":"light","custom_bg_color":"#f6f7f8","custom_text_color":"#222222","bg_texture":"none","reveal_animation":"fade_up","title_color":"#222222","icon_card_color":"#d2e2f2","caption_color":"#666666"}},"stellar_product_compare_table_LjkXBx":{"type":"stellar-product-compare-table","blocks":{"column_z3HB7a":{"type":"column","settings":{"name":"Original","highlight":true}},"column_e8zCFg":{"type":"column","settings":{"name":"Ultra","highlight":true}},"column_QN7MnH":{"type":"column","settings":{"name":"Lactaid*","highlight":false}},"row_HTQWki":{"type":"row","settings":{"label":"FCC Lactase","col_1":"10,800","col_2":"21,000","col_3":"3,000","col_4":"","col_5":""}},"row_x7gUJR":{"type":"row","settings":{"label":"Doses per pack","col_1":"24","col_2":"24","col_3":"Varies","col_4":"","col_5":""}},"row_4g9Wze":{"type":"row","settings":{"label":"Price per thousand FCC","col_1":"$0.05","col_2":"$0.03","col_3":"$0.06","col_4":"","col_5":""}},"row_td7XQq":{"type":"row","disabled":true,"settings":{"label":"Format","col_1":"Credit-card","col_2":"Credit-card","col_3":"Pill bottle","col_4":"","col_5":""}},"row_Dgr6rN":{"type":"row","settings":{"label":"Pocketable design","col_1":"true","col_2":"true","col_3":"false","col_4":"","col_5":""}},"row_tKcWH4":{"type":"row","settings":{"label":"FODMAP Safe","col_1":"true","col_2":"true","col_3":"false","col_4":"","col_5":""}},"row_MHrCiJ":{"type":"row","settings":{"label":"Third-party tested","col_1":"true","col_2":"true","col_3":"true","col_4":"","col_5":""}},"row_jjjQJm":{"type":"row","disabled":true,"settings":{"label":"Free shipping","col_1":"Subs. & $40+","col_2":"Subs. & $40+","col_3":"Varies","col_4":"","col_5":""}},"row_rLRAmz":{"type":"row","settings":{"label":"Subscribe & save","col_1":"10%","col_2":"10%","col_3":"false","col_4":"","col_5":""}},"row_bAKWC9":{"type":"row","settings":{"label":"Money-back guarantee","col_1":"60 days","col_2":"60 days","col_3":"false","col_4":"","col_5":""}}},"block_order":["column_z3HB7a","column_e8zCFg","column_QN7MnH","row_HTQWki","row_x7gUJR","row_4g9Wze","row_td7XQq","row_Dgr6rN","row_tKcWH4","row_MHrCiJ","row_jjjQJm","row_rLRAmz","row_bAKWC9"],"name":"Stellar Compare Table","settings":{"toggle_group":"","eyebrow":"Side by Side","heading":"How Milky Compares","heading_line_2":"","heading_color":"","heading_line_2_color":"","cta_text":"","cta_url":"","cta_bg_color":"","cta_text_color":"","footnote":"* Lactaid Original","padding_top":4,"padding_bottom":4,"color_scheme":"dark","custom_bg_color":"rgba(0,0,0,0)","custom_text_color":"#f6f7f8","bg_texture":"stars","reveal_animation":"fade_up"}},"stellar_quiz_cta_w8BzqX":{"type":"stellar-quiz-cta","name":"Stellar Quiz CTA","settings":{"heading":"Which Milky Is Right For Me?","subheading":"Take our quick quiz and get a personalized recommendation.","cta_text":"Take the Quiz","cta_url":"shopify:\/\/pages\/quiz","nova_text":"","nova_url":"","padding_top":60,"padding_bottom":20,"color_scheme":"dark","custom_bg_color":"#222222","custom_text_color":"#f6f7f8","bg_texture":"none","reveal_animation":"fade_up"}},"stellar_product_comparison_FUfamx":{"type":"stellar-product-comparison","blocks":{"nova_card_nJGJFm":{"type":"nova_card","settings":{"eyebrow":"Meet Nova","heading":"Nova","description":"Heartburn & Acid Indigestion Relief","detail":"","url":"shopify:\/\/products\/nova-card","button_text":"Shop Now","image":"shopify:\/\/shop_images\/DSC02204-Edit.jpg","badge":"NEW"}}},"block_order":["nova_card_nJGJFm"],"name":"Stellar Product Comp","settings":{"eyebrow":"","heading":"","subheading":"","line_break_after":"","highlight_text":"","highlight_weight":"inherit","highlight_color":"#655dc6","mobile_single_row":false,"padding_top":5,"padding_bottom":5,"color_scheme":"dark","custom_bg_color":"#222222","custom_text_color":"#f6f7f8","bg_texture":"none","reveal_animation":"none"}},"stellar_expert_endorsement_HACYMf":{"type":"stellar-expert-endorsement","blocks":{"endorsement_wjgdDL":{"type":"endorsement","settings":{"avatar":"shopify:\/\/shop_images\/custom_resized_6835ac35-7270-461d-8638-85b3a5dfd013.jpg","quote":"Milky and Nova were designed for people who love food, but struggle with the implications for their gut.","name":"Dr. Michael Seidman, MD, FACS","title":"Director of Otologic\/Neurotologic Surgery · Board-Certified"}}},"block_order":["endorsement_wjgdDL"],"name":"Stellar Expert Endorse","settings":{"heading":"Created with Doctors, Backed by Science","line_break_after":",","highlight_text":"","highlight_weight":"inherit","highlight_color":"#655dc6","cta_text":"Learn About Our Science","cta_url":"shopify:\/\/pages\/resources","padding_top":60,"padding_bottom":60,"color_scheme":"deepspace","custom_bg_color":"#1a1625","custom_text_color":"#f6f7f8","bg_texture":"constellation","reveal_animation":"fade_up"}},"177440797201dd145f":{"type":"apps","blocks":{"junip_junip_review_carousel_MGDXAn":{"type":"shopify:\/\/apps\/junip\/blocks\/junip-review-carousel\/dc14f5a8-ed15-41b1-ad08-cfba23f9789b","settings":{"reviewsType":"product_reviews","sortOrder":"mostRecent","product":"","reviewTag":"","showSummary":true,"title":"Reviews","paddingTop":48,"paddingBottom":48,"containerClass":""}}},"block_order":["junip_junip_review_carousel_MGDXAn"],"disabled":true,"settings":{}},"stellar_homepage_reviews_gVLGyN":{"type":"stellar-homepage-reviews","blocks":{"testimonial_bGrKDE":{"type":"testimonial","settings":{"quote":"Both my husband and I took a milky tablet before a meal at a fancy restaurant, and we survived without any tummy troubles.","name":"Rebeca O","detail":"Verified Buyer","stars":5}},"testimonial_9dJ7Br":{"type":"testimonial","settings":{"quote":"It is one of the pills that work great compared to other brands. Brand name Lactaid taste absolutely grosss, the generic taste better but is not as effective. At least this doesn't have a taste. It works great with 2 pills It fits in my purse fine and the Lunar New Years design was extra cute.","name":"Thuy N","detail":"Verified Buyer","stars":5}},"testimonial_Ty46pJ":{"type":"testimonial","settings":{"quote":"This product just WORKS! I carry the tablet card with me in my purse wherever I go so I have it on hand.  I don’t hesitate to have an ice cream, yogurt or milkshake with Milky tablets.  I’ve shared this product with my daughter-in-law who is lactose intolerant and she has had great results with Milky too.","name":"Christine O","detail":"Verified Buyer","stars":5}},"testimonial_KbFRdp":{"type":"testimonial","settings":{"quote":"This is such a good product! Have been using milky for almost a whole year now and I wouldn’t want to switch to anything else","name":"Emily P","detail":"Verified Buyer","stars":5}},"testimonial_3zYr9w":{"type":"testimonial","settings":{"quote":"Milky Ultra is my go to for eating cheese! If I didn't have Milky I would would have to go without my cheese addiction.  Thank you Milky!","name":"Lorraine T","detail":"Ultra Customer","stars":5}}},"block_order":["testimonial_bGrKDE","testimonial_9dJ7Br","testimonial_Ty46pJ","testimonial_KbFRdp","testimonial_3zYr9w"],"name":"Stellar Homepage Reviews","settings":{"eyebrow":"REAL REVIEWS","heading":"Trusted by 100,000+ Dairy Lovers","padding_top":60,"padding_bottom":60,"color_scheme":"light","custom_bg_color":"#f6f7f8","custom_text_color":"#222222","bg_texture":"none","reveal_animation":"fade_up"}},"stellar_ugc_gallery_ymdPRp":{"type":"stellar-ugc-gallery","blocks":{"post_UNMPMp":{"type":"post","settings":{"username":"@shop__milky","city":"","caption":"","platform":"","video":"shopify:\/\/files\/videos\/Never Pass on Dairy.mp4"}},"post_tYRyTj":{"type":"post","settings":{"username":"@firstdateguide","city":"","caption":"","platform":"","video":"shopify:\/\/files\/videos\/firstdateguide.mp4"}},"post_6Hcfi7":{"type":"post","settings":{"username":"","city":"","caption":"","platform":"","video":"shopify:\/\/files\/videos\/bestoflafood.mp4"}},"post_48dmLX":{"type":"post","settings":{"username":"@shop__milky","city":"","caption":"","platform":"","video":"shopify:\/\/files\/videos\/Free Milky 139_Website.mp4"}},"post_aU66Gn":{"type":"post","settings":{"username":"@natalieinkc","city":"","caption":"","platform":"","video":"shopify:\/\/files\/videos\/natalieinkc.mp4"}},"post_ikXzQM":{"type":"post","settings":{"username":"@shop__milky","city":"","caption":"","platform":"","video":"shopify:\/\/files\/videos\/Founder 001 v5.mp4"}}},"block_order":["post_UNMPMp","post_tYRyTj","post_6Hcfi7","post_48dmLX","post_aU66Gn","post_ikXzQM"],"custom_css":["h2 {color: #f6f7f8;}"],"name":"Stellar UGC Gallery","settings":{"heading":"The Milky Moment","subheading":"Real people. Real dairy. No regrets.","padding_top":4,"padding_bottom":4,"color_scheme":"dark","custom_bg_color":"#222222","custom_text_color":"#f6f7f8","bg_texture":"stars","reveal_animation":"fade_up"}},"stellar_email_signup_VDGjtL":{"type":"stellar-email-signup","name":"Stellar Email Signup","settings":{"heading":"Join the Milky Way","description":"Be the first to know about new products, limited editions, and exclusive offers.","subscriber_count":"","button_text":"Subscribe","success_message":"Thanks for subscribing!","form_mode":"shopify","klaviyo_company_id":"","klaviyo_list_id":"","padding_top":60,"padding_bottom":32,"color_scheme":"deepspace","custom_bg_color":"#1a1625","custom_text_color":"#f6f7f8","bg_texture":"constellation","reveal_animation":"fade_up"}}},"order":["blog-posts-collage","stellar_scrolling_marquee_NXHw9i","stellar_hero_banner_97hpeQ","stellar_hero_banner_PhaqKL","stellar_press_logos_8BkqpD","stellar_limited_editions_RjCpn7","stellar_nova_banner_XP4Qmr","stellar_product_comparison_KwkyTx","stellar_ingredient_spotlight_FiJMzh","stellar_trust_signals_LmjYzh","stellar_product_compare_table_LjkXBx","stellar_quiz_cta_w8BzqX","stellar_product_comparison_FUfamx","stellar_expert_endorsement_HACYMf","177440797201dd145f","stellar_homepage_reviews_gVLGyN","stellar_ugc_gallery_ymdPRp","stellar_email_signup_VDGjtL"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "stellar-announcement": {
+      "type": "stellar-announcement-bar",
+      "blocks": {
+        "msg1": {
+          "type": "message",
+          "settings": {
+            "emoji": "🚀",
+            "text": "Free Shipping on Subscriptions & Orders $40+"
+          }
+        },
+        "msg2": {
+          "type": "message",
+          "settings": {
+            "emoji": "⭐",
+            "text": "Rated 4.9/5 by 2,000+ Dairy Lovers"
+          }
+        },
+        "msg3": {
+          "type": "message",
+          "settings": {
+            "emoji": "🧪",
+            "text": "NSF Certified · Third-Party Tested · 60-Day Guarantee"
+          }
+        }
+      },
+      "block_order": [
+        "msg1",
+        "msg2",
+        "msg3"
+      ],
+      "settings": {}
+    },
+    "stellar-hero": {
+      "type": "stellar-hero-banner",
+      "blocks": {
+        "badge": {
+          "type": "badge",
+          "settings": {
+            "label": "Coming Soon: Nova",
+            "color": "gold"
+          }
+        },
+        "h1": {
+          "type": "heading",
+          "settings": {
+            "text": "Eat Dairy Without Fear",
+            "size": "h1"
+          }
+        },
+        "desc": {
+          "type": "text",
+          "settings": {
+            "content": "<p>The world's most powerful lactase supplement, designed to fit in your wallet.</p>"
+          }
+        },
+        "trust": {
+          "type": "text",
+          "settings": {
+            "content": "<p>Trusted by 45,000+ dairy lovers · 4.9 ★ rating</p>"
+          }
+        },
+        "cta1": {
+          "type": "button",
+          "settings": {
+            "text": "Shop Now",
+            "style": "primary"
+          }
+        },
+        "cta2": {
+          "type": "button",
+          "settings": {
+            "text": "Take the Quiz",
+            "style": "outline"
+          }
+        }
+      },
+      "block_order": [
+        "badge",
+        "h1",
+        "desc",
+        "trust",
+        "cta1",
+        "cta2"
+      ],
+      "settings": {
+        "image_position": "right"
+      }
+    },
+    "stellar-stats": {
+      "type": "stellar-community-stats",
+      "blocks": {
+        "s1": {
+          "type": "stat",
+          "settings": {
+            "value": "45,000+",
+            "label": "Dairy lovers served"
+          }
+        },
+        "s2": {
+          "type": "stat",
+          "settings": {
+            "value": "4.9 ★",
+            "label": "Average rating"
+          }
+        },
+        "s3": {
+          "type": "stat",
+          "settings": {
+            "value": "2,000+",
+            "label": "Five-star reviews"
+          }
+        },
+        "s4": {
+          "type": "stat",
+          "settings": {
+            "value": "7x",
+            "label": "Stronger than Lactaid"
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2",
+        "s3",
+        "s4"
+      ],
+      "settings": {}
+    },
+    "stellar-products": {
+      "type": "stellar-product-comparison",
+      "settings": {}
+    },
+    "stellar-marquee": {
+      "type": "stellar-scrolling-marquee",
+      "settings": {
+        "text": "TRUSTED BY 45,000+ DAIRY LOVERS · NSF CERTIFIED · 4.9 ★ RATING · 60-DAY GUARANTEE"
+      }
+    },
+    "stellar-how-to": {
+      "type": "stellar-how-to-use",
+      "settings": {}
+    },
+    "stellar-ingredients": {
+      "type": "stellar-ingredient-spotlight",
+      "settings": {}
+    },
+    "stellar-reviews": {
+      "type": "stellar-homepage-reviews",
+      "settings": {}
+    },
+    "stellar-testimonials": {
+      "type": "stellar-testimonials",
+      "settings": {}
+    },
+    "stellar-ugc": {
+      "type": "stellar-ugc-gallery",
+      "settings": {}
+    },
+    "stellar-expert": {
+      "type": "stellar-expert-endorsement",
+      "settings": {}
+    },
+    "stellar-subscribe": {
+      "type": "stellar-subscription-cta",
+      "settings": {}
+    },
+    "stellar-brand": {
+      "type": "stellar-brand-story",
+      "settings": {}
+    },
+    "stellar-nova": {
+      "type": "stellar-nova-banner",
+      "settings": {}
+    },
+    "stellar-comparison": {
+      "type": "stellar-competitor-comparison",
+      "settings": {}
+    },
+    "stellar-limited": {
+      "type": "stellar-limited-editions",
+      "settings": {}
+    },
+    "stellar-trust": {
+      "type": "stellar-trust-signals",
+      "settings": {}
+    },
+    "stellar-press": {
+      "type": "stellar-press-logos",
+      "settings": {}
+    },
+    "stellar-blog": {
+      "type": "stellar-blog-preview",
+      "settings": {}
+    },
+    "stellar-quiz": {
+      "type": "stellar-quiz-cta",
+      "settings": {}
+    },
+    "stellar-email": {
+      "type": "stellar-email-signup",
+      "settings": {}
+    }
+  },
+  "order": [
+    "stellar-announcement",
+    "stellar-hero",
+    "stellar-stats",
+    "stellar-products",
+    "stellar-marquee",
+    "stellar-how-to",
+    "stellar-ingredients",
+    "stellar-reviews",
+    "stellar-testimonials",
+    "stellar-ugc",
+    "stellar-expert",
+    "stellar-subscribe",
+    "stellar-brand",
+    "stellar-nova",
+    "stellar-comparison",
+    "stellar-limited",
+    "stellar-trust",
+    "stellar-press",
+    "stellar-blog",
+    "stellar-quiz",
+    "stellar-email"
+  ]
+}
